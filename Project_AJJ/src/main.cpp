@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include "Object.h"
 #include <SFML/Graphics.hpp>
 
 int main()
