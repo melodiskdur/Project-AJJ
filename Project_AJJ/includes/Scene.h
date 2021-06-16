@@ -15,7 +15,7 @@ public:
 
 	//Getters
 	Camera* getCamera();
-	std::vector<sf::Sprite*> getObjectSprites();
+	//std::vector<sf::Sprite*> getObjectSprites();
 	//Setters
 	void setCamera(Camera* camera);
 	//Etc

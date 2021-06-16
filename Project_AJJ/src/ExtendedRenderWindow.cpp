@@ -1,3 +1,1 @@
 #include "ExtendedRenderWindow.h"
-
-Scene

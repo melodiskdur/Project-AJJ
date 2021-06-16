@@ -16,6 +16,7 @@ Camera* Scene::getCamera()
 	return scene_camera;
 }
 
+/*
 std::vector<sf::Sprite*> Scene::getObjectSprites()
 {
 	std::vector<sf::Sprite*> objectSprites;
@@ -24,6 +25,7 @@ std::vector<sf::Sprite*> Scene::getObjectSprites()
 		//Retreive sprite from each object in the scene
 	}
 }
+*/
 
 //Setters
 void Scene::setCamera(Camera* camera)
