@@ -1,5 +1,7 @@
 #include <stdlib.h>
+#include <iostream>
 #include "Object.h"
+#include "Controller.h"
 #include <SFML/Graphics.hpp>
 
 int main()
@@ -7,6 +9,8 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(800, 600), "Project AJJ");
 
 	sf::Event event;
+
+	Object obj(sf::Vector2f(100.f,100.f), sf::Vector2f(100.f, 100.f));
 
 	while (window.isOpen())
 	{
@@ -23,6 +27,8 @@ int main()
 
 		// draw everything here...
 		// window.draw(...);
+		
+		window.draw(obj.getGeoShape());
 
 		// end the current frame
 		window.display();
