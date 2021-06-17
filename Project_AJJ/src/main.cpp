@@ -2,15 +2,25 @@
 #include <iostream>
 #include "Object.h"
 #include "Controller.h"
+#include "ExtendedRenderWindow.h"
+#include "Scene.h"
+#include "Camera.h"
 #include <SFML/Graphics.hpp>
 
 int main()
 {
-	sf::RenderWindow window(sf::VideoMode(800, 600), "Project AJJ");
-
 	sf::Event event;
 
+	//Test environment
+	ExtendedRenderWindow window(sf::Vector2u(800, 600), "Project AJJ");
+	Scene test_scene;
+	Camera scene_camera;
+	test_scene.setCamera(&scene_camera);
 	Object obj(sf::Vector2f(100.f,100.f), sf::Vector2f(100.f, 100.f));
+	test_scene.addSceneObject(&obj);
+	window.setActiveScene(&test_scene);
+
+	/////////////////////////////////////
 
 	while (window.isOpen())
 	{
@@ -26,9 +36,7 @@ int main()
 		window.clear(sf::Color::Black);
 
 		// draw everything here...
-		// window.draw(...);
-		
-		window.draw(obj.getGeoShape());
+		window.drawActiveScene();
 
 		// end the current frame
 		window.display();
