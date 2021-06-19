@@ -2,7 +2,7 @@
 
 Camera::Camera()
 {
-	camera_view = new sf::View();
+	camera_view = new sf::View(sf::Vector2f(400, 300), sf::Vector2f(800, 600));
 }
 
 Camera::~Camera()
@@ -14,6 +14,8 @@ Camera::~Camera()
 //Getters
 sf::View* Camera::getCameraView()
 {
+	if (target_object != nullptr)
+		camera_view->setCenter(target_object->getWorldPosition());
 	return camera_view;
 }
 
@@ -31,6 +33,7 @@ void Camera::setCameraView(sf::View* view)
 void Camera::setCameraPosition(sf::Vector2f pos)
 {
 	camera_position = pos;
+	this->camera_view->setCenter(pos);
 }
 
 //Etc

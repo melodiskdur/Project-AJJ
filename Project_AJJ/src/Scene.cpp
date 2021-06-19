@@ -7,6 +7,8 @@ Scene::Scene()
 
 Scene::~Scene()
 {
+	for (Object* o : scene_objects)
+		delete o;
 	std::cout << "Scene deleted" << std::endl;
 }
 
