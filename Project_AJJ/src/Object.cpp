@@ -33,7 +33,7 @@ sf::Vector2f Object::getWorldPosition()
 
 sf::Vector2f Object::getVelocity()
 {
-	return sf::Vector2f(0.f, 0.f);
+	return this->velocity;
 }
 
 sf::VertexArray Object::getGeoShape()
@@ -43,7 +43,7 @@ sf::VertexArray Object::getGeoShape()
 
 int Object::getRotation()
 {
-	return 0;
+	return this->rotation;
 }
 
 void Object::setWorldPosition(sf::Vector2f pos)
