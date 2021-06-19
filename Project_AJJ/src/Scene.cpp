@@ -7,7 +7,7 @@ Scene::Scene()
 
 Scene::~Scene()
 {
-
+	std::cout << "Scene deleted" << std::endl;
 }
 
 //Getters
@@ -16,6 +16,7 @@ Camera* Scene::getCamera()
 	return scene_camera;
 }
 
+/*
 std::vector<sf::Sprite*> Scene::getObjectSprites()
 {
 	std::vector<sf::Sprite*> objectSprites;
@@ -24,6 +25,13 @@ std::vector<sf::Sprite*> Scene::getObjectSprites()
 		//Retreive sprite from each object in the scene
 	}
 }
+*/
+
+std::vector<Object*> Scene::getSceneObjects()
+{
+	return scene_objects;
+}
+
 
 //Setters
 void Scene::setCamera(Camera* camera)

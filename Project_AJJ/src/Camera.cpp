@@ -8,6 +8,7 @@ Camera::Camera()
 Camera::~Camera()
 {
 	delete camera_view;
+	std::cout << "Camera deleted" << std::endl;
 }
 
 //Getters
