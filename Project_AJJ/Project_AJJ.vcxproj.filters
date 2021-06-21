@@ -27,10 +27,10 @@
     <ClInclude Include="includes\ExtendedRenderWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Controller.h">
+    <ClInclude Include="includes\Action.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="includes\Action.h">
+    <ClInclude Include="includes\Controller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,10 +50,10 @@
     <ClCompile Include="src\ExtendedRenderWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Controller.cpp">
+    <ClCompile Include="src\Action.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Action.cpp">
+    <ClCompile Include="src\Controller.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

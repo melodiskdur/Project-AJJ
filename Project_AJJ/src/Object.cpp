@@ -39,12 +39,12 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
 
     actionLeft->setActionName("Left");
     actionLeft->setActionParameter(&this->world_position.x);
-    actionLeft->setParameterManipulation(-this->velocity.y);
+    actionLeft->setParameterManipulation(-this->velocity.x);
     actionLeft->setParentObject(this);
 
     actionRight->setActionName("Right");
     actionRight->setActionParameter(&this->world_position.x);
-    actionRight->setParameterManipulation(-this->velocity.y);
+    actionRight->setParameterManipulation(this->velocity.x);
     actionRight->setParentObject(this);
 
     object_actions.push_back(actionUp);
@@ -78,6 +78,11 @@ int Object::getRotation()
 	return this->rotation;
 }
 
+std::vector<Action*> Object::getActions()
+{
+    return object_actions;
+}
+
 void Object::setWorldPosition(sf::Vector2f pos)
 {
 	//update object position and the quad shapes vertices
@@ -106,12 +111,13 @@ void Object::setRotation(int rot)
 //Others
 void Object::onActionRequest(std::string action_name)
 {
+
     for (int i = 0; i < object_actions.size(); i++)
     {
         if (action_name.compare(object_actions[i]->getActionName()) == 0)
         {
             object_actions[i]->triggerAction();
-            this->setWorldPosition(world_position);
+            //this->setWorldPosition(world_position);
             break;
         }
     }

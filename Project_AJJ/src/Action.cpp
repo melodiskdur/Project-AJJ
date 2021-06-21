@@ -61,5 +61,6 @@ void Action::setParameterManipulation(float manipulation_value)
 void Action::triggerAction()
 {
 	*action_parameter = *action_parameter + parameter_manipulation;
+	parent_object->setWorldPosition(parent_object->getWorldPosition());
 	//parent_object->doStuff
 }
