@@ -4,21 +4,23 @@
 
 Object::Object(sf::Vector2f pos, sf::Vector2f size)
 {
-	this->world_position = pos;
-	this->geo_shape = sf::VertexArray(sf::Quads, 4);
+    this->world_position = pos;
+    this->geo_shape = sf::VertexArray(sf::Quads, 4);
+    this->size = size;
 
-	geo_shape[0].position = sf::Vector2f(pos.x - (size.x / 2.f), pos.y - (size.y / 2.f));
-	geo_shape[1].position = sf::Vector2f(pos.x + (size.x / 2.f), pos.y - (size.y / 2.f));
-	geo_shape[2].position = sf::Vector2f(pos.x + (size.x / 2.f), pos.y + (size.y / 2.f));
-	geo_shape[3].position = sf::Vector2f(pos.x - (size.x / 2.f), pos.y + (size.y / 2.f));
-	
-	
-	geo_shape[0].color = sf::Color::Red;
-	geo_shape[1].color = sf::Color::Blue;
-	geo_shape[2].color = sf::Color::Green;
-	geo_shape[3].color = sf::Color::Yellow;
+    //add vertices to the quad shape
+    geo_shape[0].position = sf::Vector2f(pos.x, pos.y);
+    geo_shape[1].position = sf::Vector2f(pos.x + size.x, pos.y);
+    geo_shape[2].position = sf::Vector2f(pos.x + size.x, pos.y + size.y);
+    geo_shape[3].position = sf::Vector2f(pos.x, pos.y + size.y);
 
-	std::cout << "Object created" << std::endl;
+    //hardcoded example colors
+    geo_shape[0].color = sf::Color::Red;
+    geo_shape[1].color = sf::Color::Blue;
+    geo_shape[2].color = sf::Color::Green;
+    geo_shape[3].color = sf::Color::Yellow;
+
+    std::cout << "Object created" << std::endl;
 }
 
 Object::~Object()
@@ -48,7 +50,12 @@ int Object::getRotation()
 
 void Object::setWorldPosition(sf::Vector2f pos)
 {
-
+	//update object position and the quad shapes vertices
+	this->world_position = pos;
+	geo_shape[0].position = sf::Vector2f(pos.x, pos.y);
+	geo_shape[1].position = sf::Vector2f(pos.x + size.x, pos.y);
+	geo_shape[2].position = sf::Vector2f(pos.x + size.x, pos.y + size.y);
+	geo_shape[3].position = sf::Vector2f(pos.x, pos.y + size.y);
 }
 
 void Object::setVelocity()

@@ -29,7 +29,8 @@ void ExtendedRenderWindow::drawActiveScene()
 	{
 		for (Object* o : active_scene->getSceneObjects())
 		{
-			this->draw(o->getGeoShape());
+			this->draw(o->getGeoShape());							 //WIP
 		}
 	}
+	this->setView(*(active_scene->getCamera()->getCameraView()));	 //Updates the sf::View position.
 }

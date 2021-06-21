@@ -27,6 +27,7 @@ protected:
 	sf::Vector2f world_position = sf::Vector2f(0.0f, 0.0f);
 	sf::Vector2f velocity = sf::Vector2f(0.0f, 0.0f);
 	sf::VertexArray geo_shape = sf::VertexArray(sf::Quads,4);	//Geometric boundary of the object
+	sf::Vector2f size = sf::Vector2f(0.0f, 0.0f);				//Geo_shape size
 	int rotation = 0;											//Rotation value of the object
 	//Textures
 	//Actions
