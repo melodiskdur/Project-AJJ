@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="includes\Action.h" />
     <ClInclude Include="includes\Camera.h" />
     <ClInclude Include="includes\ExtendedRenderWindow.h" />
     <ClInclude Include="Controller.h" />
@@ -26,6 +27,7 @@
     <ClInclude Include="includes\Scene.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Action.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\ExtendedRenderWindow.cpp" />
     <ClCompile Include="Controller.cpp" />

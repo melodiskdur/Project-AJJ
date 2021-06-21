@@ -21,6 +21,36 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
     geo_shape[3].color = sf::Color::Yellow;
 
     std::cout << "Object created" << std::endl;
+
+    //For testing purposes
+    Action * actionUp = new Action;
+    Action* actionDown = new Action;
+    Action* actionLeft = new Action;
+    Action* actionRight = new Action;
+    actionUp->setActionName("Up");
+    actionUp->setParentObject(this);
+    actionUp->setActionParameter(&this->world_position.y);
+    actionUp->setParameterManipulation(-this->velocity.y);
+
+    actionDown->setActionName("Down");
+    actionDown->setActionParameter(&this->world_position.y);
+    actionDown->setParameterManipulation(this->velocity.y);
+    actionDown->setParentObject(this);
+
+    actionLeft->setActionName("Left");
+    actionLeft->setActionParameter(&this->world_position.x);
+    actionLeft->setParameterManipulation(-this->velocity.y);
+    actionLeft->setParentObject(this);
+
+    actionRight->setActionName("Right");
+    actionRight->setActionParameter(&this->world_position.x);
+    actionRight->setParameterManipulation(-this->velocity.y);
+    actionRight->setParentObject(this);
+
+    object_actions.push_back(actionUp);
+    object_actions.push_back(actionDown);
+    object_actions.push_back(actionLeft);
+    object_actions.push_back(actionRight);
 }
 
 Object::~Object()
@@ -58,9 +88,9 @@ void Object::setWorldPosition(sf::Vector2f pos)
 	geo_shape[3].position = sf::Vector2f(pos.x, pos.y + size.y);
 }
 
-void Object::setVelocity()
+void Object::setVelocity(sf::Vector2f vel)
 {
-
+    this->velocity = vel;
 }
 
 void Object::setGeoShape(sf::VertexArray shape)
@@ -71,4 +101,18 @@ void Object::setGeoShape(sf::VertexArray shape)
 void Object::setRotation(int rot)
 {
 
+}
+
+//Others
+void Object::onActionRequest(std::string action_name)
+{
+    for (int i = 0; i < object_actions.size(); i++)
+    {
+        if (action_name.compare(object_actions[i]->getActionName()) == 0)
+        {
+            object_actions[i]->triggerAction();
+            this->setWorldPosition(world_position);
+            break;
+        }
+    }
 }

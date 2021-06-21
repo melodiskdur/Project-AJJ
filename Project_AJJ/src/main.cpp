@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <cmath>
+#include "Action.h"
 #include "Object.h"
 #include "Controller.h"
 #include "ExtendedRenderWindow.h"
@@ -20,6 +21,7 @@ Scene* drawTestScene()
 	testScene->addSceneObjects(groundTiles);
 	Object* anotherObject = new Object(sf::Vector2f(300.0f, 300.0f), sf::Vector2f(100.f, 100.f));
 	testScene->addSceneObject(anotherObject);
+	groundTiles[2]->setVelocity(sf::Vector2f(0.01, 0.01));
 	return testScene;
 }
 
@@ -51,10 +53,11 @@ int main()
 
 		// clear the window with black color
 		window.clear(sf::Color::Black);
-
 		// draw everything here...
 		time = clock.getElapsedTime();
 		test_scene->getSceneObjects()[8]->setWorldPosition(sf::Vector2f(300.0f + 50*std::cos(time.asSeconds()), 300.0f + 50*std::sin(time.asSeconds())));
+		test_scene->getSceneObjects()[2]->onActionRequest("Left");
+		test_scene->getSceneObjects()[2]->onActionRequest("Up");
 		window.drawActiveScene();
 
 		// end the current frame
