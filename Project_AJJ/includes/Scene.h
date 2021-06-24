@@ -4,6 +4,8 @@
 #include <SFML/Graphics.hpp>
 #include "Object.h"
 #include "Camera.h"
+#include "PhysicsAttribute.h"
+#include "CollisionDetection.h"
 
 /* Scene
 	Creates an environment in which many Objects, as well as a Camera object, can be placed.
