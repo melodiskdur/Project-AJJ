@@ -52,6 +52,11 @@ int main()
 	contr2.bindActionToKey(contr2.getObject()->getActions()[1], sf::Keyboard::Key::Down);
 	contr2.bindActionToKey(contr2.getObject()->getActions()[2], sf::Keyboard::Key::Left);
 	contr2.bindActionToKey(contr2.getObject()->getActions()[3], sf::Keyboard::Key::Right);
+
+	contr2.bindActionToKey(contr2.getObject()->getActions()[4], { sf::Keyboard::Key::Up,  sf::Keyboard::Key::Z, sf::Keyboard::Key::X, sf::Keyboard::Key::C });
+	contr2.bindActionToKey(contr2.getObject()->getActions()[5], { sf::Keyboard::Key::Down, sf::Keyboard::Key::Z });
+	contr2.bindActionToKey(contr2.getObject()->getActions()[6], { sf::Keyboard::Key::Left, sf::Keyboard::Key::Z });
+	contr2.bindActionToKey(contr2.getObject()->getActions()[7], { sf::Keyboard::Key::Right, sf::Keyboard::Key::Z} );
 	/////////////////////////////////////
 	int i = 1;
 	while (window.isOpen())

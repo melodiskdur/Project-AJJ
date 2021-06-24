@@ -27,6 +27,12 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
     Action* actionDown = new Action;
     Action* actionLeft = new Action;
     Action* actionRight = new Action;
+
+    Action* speedUp = new Action;
+    Action* speedDown = new Action;
+    Action* speedLeft = new Action;
+    Action* speedRight = new Action;
+
     actionUp->setActionName("Up");
     actionUp->setParentObject(this);
     actionUp->setActionParameter(&this->world_position.y);
@@ -47,10 +53,34 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
     actionRight->setParameterManipulation(this->velocity.x);
     actionRight->setParentObject(this);
 
+    speedUp->setActionName("SpeedUp");
+    speedUp->setParentObject(this);
+    speedUp->setActionParameter(&this->world_position.y);
+    speedUp->setParameterManipulation(2*-this->velocity.y);
+
+    speedDown->setActionName("SpeedDown");
+    speedDown->setParentObject(this);
+    speedDown->setActionParameter(&this->world_position.y);
+    speedDown->setParameterManipulation(2*this->velocity.y);
+
+    speedLeft->setActionName("SpeedLeft");
+    speedLeft->setParentObject(this);
+    speedLeft->setActionParameter(&this->world_position.x);
+    speedLeft->setParameterManipulation(-2*this->velocity.x);
+
+    speedRight->setActionName("SpeedRight");
+    speedRight->setParentObject(this);
+    speedRight->setActionParameter(&this->world_position.x);
+    speedRight->setParameterManipulation(2*this->velocity.x);
+
     object_actions.push_back(actionUp);
     object_actions.push_back(actionDown);
     object_actions.push_back(actionLeft);
     object_actions.push_back(actionRight);
+    object_actions.push_back(speedUp);
+    object_actions.push_back(speedDown);
+    object_actions.push_back(speedLeft);
+    object_actions.push_back(speedRight);
 }
 
 Object::~Object()

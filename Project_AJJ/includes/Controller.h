@@ -10,7 +10,7 @@ Base class for controlling the object ingame.
 
 struct ActionKey
 {
-	sf::Keyboard::Key key;
+	std::vector<sf::Keyboard::Key> keys;
 	Action* action;
 };
 
@@ -22,6 +22,7 @@ public:
 
 	void getUserInput();
 	void bindActionToKey(Action* action, sf::Keyboard::Key key);
+	void bindActionToKey(Action* action, std::vector<sf::Keyboard::Key> keys);
 
 	//Setters
 	void setObject(Object* obj);
