@@ -27,6 +27,7 @@ void ExtendedRenderWindow::drawActiveScene()
 {
 	if (active_scene != nullptr)
 	{
+		active_scene->updateSceneFrame();
 		for (Object* o : active_scene->getSceneObjects())
 		{
 			this->draw(o->getGeoShape());							 //WIP

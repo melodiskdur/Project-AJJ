@@ -19,10 +19,12 @@ public:
 	//Getters
 	sf::View* getCameraView();
 	sf::Vector2f getCameraPosition();
+	sf::FloatRect getCameraViewRect();
 
 	//Setters
 	void setCameraView(sf::View* view);
 	void setCameraPosition(sf::Vector2f pos);
+	void setCameraViewRect();
 
 	//
 	//Allows the camera to follow an object.
@@ -32,6 +34,7 @@ public:
 private:
 	sf::View* camera_view;				// Display region.
 	sf::Vector2f camera_position;		// Camera central point within a scene.
+	sf::FloatRect camera_view_rect;		// The part of the scene that is seen from the camera POV.
 	Object* target_object = nullptr;	// Object to follow.
 };
 

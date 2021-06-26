@@ -7,12 +7,14 @@
 #include "ExtendedRenderWindow.h"
 #include "Scene.h"
 #include "Camera.h"
+#include "CollisionDetection.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Time.hpp>
 
 Scene* drawTestScene()
 {
 	Scene* testScene = new Scene();
+	
 	std::vector<Object*> groundTiles;
 	for (int i = 0; i < 8; i++)
 	{
@@ -33,11 +35,15 @@ int main()
 	ExtendedRenderWindow window(sf::Vector2u(800, 600), "Project AJJ");
 	Scene* test_scene = drawTestScene();
 	Camera scene_camera;
+	CollisionDetection* col_det = new CollisionDetection(test_scene->getSceneObjects());
+	test_scene->setCollisionDetection(col_det);
 	test_scene->setCamera(&scene_camera);
 	window.setActiveScene(test_scene);
 	scene_camera.lockOnObject(test_scene->getSceneObjects()[2]);
 	sf::Clock clock;
 	sf::Time time;
+
+	CollisionDetection colDec = CollisionDetection(test_scene->getSceneObjects());
 
 	Controller contr;
 	contr.setObject(test_scene->getSceneObjects()[2]);
@@ -78,7 +84,6 @@ int main()
 		}
 
 		contr.getUserInput();
-
 		contr2.getUserInput();
 
 		// clear the window with black color
