@@ -1,40 +1,19 @@
 #include "CollisionDetection.h"
 
-/*
-*						CollisionDetection
-*/
+/* * * * * * * * * * * * * * * * * * * * * * * * * *
+*					CollisionDetection             *
+ * * * * * * * * * * * * * * * * * * * * * * * * * */
 CollisionDetection::CollisionDetection(std::vector<Object*>& objects):
 	PhysicsAttribute("Collision Detection")
 {
-	std::cout << "ColDec\n";
 	scene_objects = &objects;
 	root = new QuadTree();
 ;}
 
 CollisionDetection::~CollisionDetection()
 {
-
+	delete root;
 }
-
-/*
-void CollisionDetection::test()
-{
-	for (int i = 0; i < scene_objects->size(); i++)
-	{
-		sf::Vector2f temp_i = scene_objects->at(i)->getWorldPosition();
-		for (int j = i + 1; j < scene_objects->size(); j++)
-		{
-			sf::Vector2f temp_j = scene_objects->at(j)->getWorldPosition();
-
-			if (std::abs(temp_i.x - temp_j.x) < 10.0f && std::abs(temp_i.y - temp_j.y) < 10.0f)
-			{
-				std::cout << "Collision detected\n";
-			}
-			
-		}
-	}
-}
-*/
 
 void CollisionDetection::checkForCollisions(sf::FloatRect view_rect)
 {
@@ -49,21 +28,24 @@ void CollisionDetection::checkForCollisions(sf::FloatRect view_rect)
 	{
 		collision_candidates.clear();
 		collision_candidates = root->getCollisionCandidates(scene_objects->at(i));
-		sf::FloatRect object_i = sf::FloatRect(scene_objects->at(i)->getWorldPosition(), scene_objects->at(i)->getSize());
+		sf::FloatRect object_i = sf::FloatRect(scene_objects->at(i)->getWorldPosition(), scene_objects->at(i)->getSize());		//Object i's collision box.
 		for (int j = 0; j < collision_candidates.size(); j++)
 		{
-			sf::FloatRect object_j = sf::FloatRect(scene_objects->at(j)->getWorldPosition(), scene_objects->at(j)->getSize());
+			sf::FloatRect object_j = sf::FloatRect(scene_objects->at(j)->getWorldPosition(), scene_objects->at(j)->getSize());  //Object j's collision box.
 			if (object_i.intersects(object_j) && object_i != object_j)
 			{
 				std::cout << "Collision Detected!\n";
+				/*
+				*        COLLISION HANDLING WILL BE DONE HERE!
+				*/
 			}
 		}
 	}
 }
 
-/*
-*							QuadTree
-*/
+/* * * * * * * * * * * * * * * * * * * * * * * * * *
+*					   QuadTree                    *
+ * * * * * * * * * * * * * * * * * * * * * * * * * */
 QuadTree::QuadTree()
 {
 	tree_level = 0;
@@ -104,12 +86,14 @@ std::vector<sf::FloatRect> QuadTree::getSubTreeBoundaries()
 std::vector<Object*> QuadTree::getCollisionCandidates(Object* current)
 {
 	std::vector<Object*> candidates;
-	int sub_index = objectIndex(current);
-	if (has_sub_trees && sub_index != SUBTREE::ROOT)
-	{
+	int sub_index = objectIndex(current);					//Get the sub tree that "current" belongs to. Returns SUBTREE:ROOT if it belongs to this node.
+	if (has_sub_trees && sub_index != SUBTREE::ROOT)		
+	{	//If "current" belongs to one of the node's sub trees. Retreives and returns the objects of the sub tree that "current" belongs to.
 		std::vector<Object*> sub_candidates = sub_trees[sub_index]->getCollisionCandidates(current);
 		candidates.insert(candidates.end(), sub_candidates.begin(), sub_candidates.end());
+		return sub_candidates;
 	}
+	//If "current" does NOT belong to any of the node's sub trees. Retreives and returns the objects of this node (sub tree objects will be included).
 	candidates.insert(candidates.end(), tree_objects.begin(), tree_objects.end());
 	return candidates;
 }
@@ -130,7 +114,7 @@ void QuadTree::clearTree()
 	{
 		if (sub_trees[i] != nullptr)
 		{
-			sub_trees[i]->clearTree();
+			sub_trees[i]->clearTree();					//Recursively removes objects and frees Quad Tree memory.
 			delete sub_trees[i];
 			sub_trees[i] = nullptr;
 		}
@@ -186,7 +170,7 @@ int QuadTree::objectIndex(Object* object)
 	sf::Vector2f object_lowerright = object_upperleft + object->getSize();  //Lower right corner of object.
 	for (int i = SUBTREE::UPPERLEFT; i < SUBTREE::LOWERLEFT; i++)
 	{
-		if (sub_tree_bounds[i].contains(object_upperleft) &&		//Checks if an object fits within any of the subtrees' boundaries. 
+		if (sub_tree_bounds[i].contains(object_upperleft) &&		//Checks if an object rectangle fits within any of the subtrees' boundaries. 
 			sub_tree_bounds[i].contains(object_lowerright))			
 			return i;
 	}
