@@ -10,6 +10,27 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Time.hpp>
 
+/*KOMMENTARER
+* La till TextureIds som är en enumclass där varje namn motsvarar ett område i atlasen
+* Se TextureAtlas.cpp för dessa områden. På detta sätt behöver vi endast länka textureId till
+* Object då den inte behöver hela textureatlas. 
+* Den enda klasss som har TextureAtlas är ExtendedRenderWindow
+* då det är den som ritar ut och därmed behöver hämta sprites.
+* Så Object ha ett TextureId, Action en animation som updateras i triggerAction().
+* Kanske något vi kan göra med actiontype sen också.
+* 
+* I object har jag skapat en testanimation med några sprites och kopplat den till
+* right,left,up,down. Du ser därför ingen sprite när den står stilla i början
+* Får göra en till action som är när inga knappar trycks ned för att få en Idle/Standby läge
+* 
+* Det som behöver implementeras är att duration för varje frame tas med
+* Skrev mer om det i Animation::update(), kolla där.
+* 
+* Tror det var allt...
+* RADERA DETTA MEDDELANDE EFTER LÄSNING!!! VIKTIGT
+* 
+*/
+
 Scene* drawTestScene()
 {
 	Scene* testScene = new Scene();
@@ -31,6 +52,13 @@ int main()
 
 	//Test environment
 	ExtendedRenderWindow window(sf::Vector2u(800, 600), "Project AJJ");
+
+	//------------TextureAtlas test---------------
+	TextureAtlas* test_texture_atlas = new TextureAtlas();
+	test_texture_atlas->loadAtlas("assets/texture_atlas_test.png");
+	window.setTextureAtlas(test_texture_atlas);
+	//--------------------------------------------
+
 	Scene* test_scene = drawTestScene();
 	Camera scene_camera;
 	test_scene->setCamera(&scene_camera);

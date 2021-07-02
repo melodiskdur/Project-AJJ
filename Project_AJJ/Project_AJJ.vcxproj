@@ -20,20 +20,29 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\Action.h" />
+    <ClInclude Include="includes\Animation.h" />
     <ClInclude Include="includes\Camera.h" />
     <ClInclude Include="includes\Controller.h" />
     <ClInclude Include="includes\ExtendedRenderWindow.h" />
     <ClInclude Include="includes\Object.h" />
     <ClInclude Include="includes\Scene.h" />
+    <ClInclude Include="includes\TextureAtlas.h" />
+    <ClInclude Include="includes\TextureIds.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Action.cpp" />
+    <ClCompile Include="src\Animation.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Controller.cpp" />
     <ClCompile Include="src\ExtendedRenderWindow.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\Scene.cpp" />
+    <ClCompile Include="src\TextureAtlas.cpp" />
+    <ClCompile Include="src\TextureIds.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\texture_atlas_test.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
