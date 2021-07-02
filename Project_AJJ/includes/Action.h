@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Object.h"
+#include "Animation.h"
 #include <string>
 #include <iostream>
 
@@ -23,6 +24,7 @@ public:
 	ACTIONTYPE getActionType();
 	Object* getParentObject();
 	float* getActionParameter();
+	Animation* getAnimation();
 
 	//Setters
 	void setActionName(std::string name);
@@ -30,6 +32,7 @@ public:
 	void setParentObject(Object* parent);
 	void setActionParameter(float* parameter);
 	void setParameterManipulation(float manipulation_value);
+	void setAnimation(Animation* animation);
 
 	//Others
 	void triggerAction();
@@ -42,5 +45,6 @@ private:
 	float parameter_manipulation;	    //The value of which the parameter shall be manipulated by.
 
 	//Animation
+	Animation* animation = nullptr;		//An animation, sequence of sprites
 };
 

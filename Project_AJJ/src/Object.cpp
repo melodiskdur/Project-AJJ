@@ -53,6 +53,23 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
     actionRight->setParameterManipulation(this->velocity.x);
     actionRight->setParentObject(this);
 
+    //---------------Animation test---------------
+    Animation* a_test = new Animation();
+    a_test->addFrame(TEXTURE_ID::RUN_1, 0.2);
+    a_test->addFrame(TEXTURE_ID::RUN_2, 0.2);
+    a_test->addFrame(TEXTURE_ID::RUN_3, 0.2);
+    a_test->addFrame(TEXTURE_ID::RUN_4, 0.2);
+    a_test->addFrame(TEXTURE_ID::RUN_5, 0.2);
+    a_test->addFrame(TEXTURE_ID::RUN_6, 0.2);
+    a_test->addFrame(TEXTURE_ID::RUN_7, 0.2);
+    a_test->addFrame(TEXTURE_ID::RUN_8, 0.2);
+    a_test->addFrame(TEXTURE_ID::RUN_9, 0.2);
+    actionRight->setAnimation(a_test);
+    actionLeft->setAnimation(a_test);
+    actionUp->setAnimation(a_test);
+    actionDown->setAnimation(a_test);
+    //--------------------------------------------
+
     speedUp->setActionName("SpeedUp");
     speedUp->setParentObject(this);
     speedUp->setActionParameter(&this->world_position.y);

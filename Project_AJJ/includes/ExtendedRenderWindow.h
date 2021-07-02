@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include "TextureAtlas.h"
+#include "TextureIds.h"
 #include "Scene.h"
 
 /* ExtendedRenderWindow
@@ -16,14 +18,17 @@ public:
 
 	//Getters
 	Scene* getActiveScene();
+	TextureAtlas* getTextureAtlas();
 	
 	//Setters
 	void setActiveScene(Scene* scene);
+	void setTextureAtlas(TextureAtlas* tex_atl);
 	
 	//Etc
 	//Draws a frame of the active Scene-object.
 	void drawActiveScene();
 private:
 	Scene* active_scene = nullptr;			//Active Scene-object.
+	TextureAtlas* texture_atlas = nullptr;	//TextureAtlas object
 };
 

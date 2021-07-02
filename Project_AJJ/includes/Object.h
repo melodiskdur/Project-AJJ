@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/PrimitiveType.hpp>
 #include "Action.h"
+#include "TextureIds.h"
 
 class Action;
 
@@ -21,12 +22,14 @@ public:
 	sf::VertexArray getGeoShape();
 	int getRotation();
 	std::vector<Action*> getActions();
+	TEXTURE_ID getTextureId() { return this->active_texture; };
 
 	//Setters
 	void setWorldPosition(sf::Vector2f pos);
 	void setVelocity(sf::Vector2f vel);
 	void setGeoShape(sf::VertexArray shape);
 	void setRotation(int rot);
+	void setTextureId(TEXTURE_ID texture_id) { this->active_texture = texture_id; };
 	//void setActions(std::vector<int> actions);
 
 	//Others
@@ -35,14 +38,21 @@ public:
 	void onActionRequest(std::string action_name);
 
 protected:
+
+	//Parameters
 	sf::Vector2f world_position = sf::Vector2f(0.0f, 0.0f);
 	sf::Vector2f velocity = sf::Vector2f(0.1f, 0.1f);
 	sf::VertexArray geo_shape = sf::VertexArray(sf::Quads,4);	//Geometric boundary of the object
 	sf::Vector2f size = sf::Vector2f(0.0f, 0.0f);				//Geo_shape size
 	int rotation = 0;											//Rotation value of the object
-	//Textures
+
 	//Actions
 	std::vector<Action*> object_actions;
+
+	//Textures
+	TEXTURE_ID active_texture = TEXTURE_ID::NONE;
+
 	//PhysicsAttributes
+
 private:
 };
