@@ -33,6 +33,12 @@
     <ClInclude Include="includes\Controller.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="includes\PhysicsAttribute.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\CollisionDetection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="includes\TextureIds.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -63,6 +69,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Controller.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PhysicsAttribute.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CollisionDetection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\TextureIds.cpp">

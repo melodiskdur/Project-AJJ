@@ -2,7 +2,6 @@
 
 Scene::Scene()
 {
-
 }
 
 Scene::~Scene()
@@ -29,7 +28,7 @@ std::vector<sf::Sprite*> Scene::getObjectSprites()
 }
 */
 
-std::vector<Object*> Scene::getSceneObjects()
+std::vector<Object*>& Scene::getSceneObjects()
 {
 	return scene_objects;
 }
@@ -41,6 +40,11 @@ void Scene::setCamera(Camera* camera)
 	scene_camera = camera;
 }
 
+void Scene::setCollisionDetection(CollisionDetection* col)
+{
+	col_det = col;
+}
+
 //Etc
 void Scene::addSceneObject(Object* object)
 {
@@ -50,4 +54,9 @@ void Scene::addSceneObject(Object* object)
 void Scene::addSceneObjects(std::vector<Object*> objects)
 {
 	scene_objects.insert(scene_objects.end(), objects.begin(), objects.end());
+}
+
+void Scene::updateSceneFrame()
+{
+	col_det->checkForCollisions(scene_camera->getCameraViewRect());
 }

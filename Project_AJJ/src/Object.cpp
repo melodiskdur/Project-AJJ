@@ -115,6 +115,11 @@ sf::Vector2f Object::getVelocity()
 	return this->velocity;
 }
 
+sf::Vector2f Object::getSize()
+{
+    return this->size;
+}
+
 sf::VertexArray Object::getGeoShape()
 {
 	return this->geo_shape;

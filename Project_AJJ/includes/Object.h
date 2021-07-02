@@ -18,6 +18,7 @@ public:
 	//Getters
 	sf::Vector2f getWorldPosition();
 	sf::Vector2f getVelocity();
+	sf::Vector2f getSize();
 	sf::VertexArray getGeoShape();
 	int getRotation();
 	std::vector<Action*> getActions();
