@@ -160,6 +160,14 @@ void Object::setRotation(int rot)
 
 }
 
+void Object::setColor(sf::Color color)
+{
+    this->geo_shape[0].color = color;
+    this->geo_shape[1].color = color;
+    this->geo_shape[2].color = color;
+    this->geo_shape[3].color = color;
+}
+
 //Others
 void Object::onActionRequest(std::string action_name)
 {

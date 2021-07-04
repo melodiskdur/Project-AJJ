@@ -41,6 +41,7 @@ void ExtendedRenderWindow::drawActiveScene()
 		{
 			this->draw(obj->getGeoShape());							 //WIP
 
+
 			//------------Animation test-----------
 			//get the objects sprite
 			sf::Sprite sprite = this->texture_atlas->getSprite(obj->getTextureId());
@@ -54,6 +55,8 @@ void ExtendedRenderWindow::drawActiveScene()
 			sprite.scale((obj_gs[1].position.x - obj_gs[0].position.x) / (sprite_r.width), (obj_gs[2].position.y - obj_gs[1].position.y) / (sprite_r.height));
 			this->draw(sprite);
 			//-------------------------------------
+
+			//this->active_scene->updateSceneFrame();
 		}
 	}
 	this->setView(*(active_scene->getCamera()->getCameraView()));	 //Updates the sf::View position.

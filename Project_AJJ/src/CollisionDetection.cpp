@@ -34,7 +34,9 @@ void CollisionDetection::checkForCollisions(sf::FloatRect view_rect)
 			sf::FloatRect object_j = sf::FloatRect(scene_objects->at(j)->getWorldPosition(), scene_objects->at(j)->getSize());  //Object j's collision box.
 			if (object_i.intersects(object_j) && object_i != object_j)
 			{
-				std::cout << "Collision Detected!\n";
+				scene_objects->at(i)->setColor(sf::Color::White);
+				scene_objects->at(j)->setColor(sf::Color::White);
+				//std::cout << "Collision Detected!\n";
 				/*
 				*        COLLISION HANDLING WILL BE DONE HERE!
 				*/

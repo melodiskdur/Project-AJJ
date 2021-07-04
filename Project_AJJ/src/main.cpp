@@ -54,6 +54,7 @@ int main()
 
 	//Test environment
 	ExtendedRenderWindow window(sf::Vector2u(800, 600), "Project AJJ");
+	window.setFramerateLimit(140);
 
 	//------------TextureAtlas test---------------
 	TextureAtlas* test_texture_atlas = new TextureAtlas();
@@ -71,7 +72,7 @@ int main()
 	sf::Clock clock;
 	sf::Time time;
 
-	CollisionDetection colDec = CollisionDetection(test_scene->getSceneObjects());
+	//CollisionDetection colDec = CollisionDetection(test_scene->getSceneObjects());
 
 	Controller contr;
 	contr.setObject(test_scene->getSceneObjects()[2]);
