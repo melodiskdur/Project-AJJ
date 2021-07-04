@@ -9,7 +9,10 @@ class QuadTree;
 
 /* CollisionDetection
 *  Subclass of PhysicsAttribute. Once added to a Scene instance, it can be used
-   to handle the collision detection between the objects in that Scene.
+*  to handle the collision detection between the objects in that Scene.
+*
+*  The actual collision detection is then done between an object and all the objects
+*  in the same node or any sub trees of that node. 
 */
 class CollisionDetection : public PhysicsAttribute
 {

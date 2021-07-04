@@ -1,5 +1,7 @@
 #include "Animation.h"
 
+sf::Clock Animation::animation_clock;
+
 //Constructor
 Animation::Animation()
 {
@@ -51,15 +53,18 @@ void Animation::setActiveFrame(Frame frame)
 //Update the active frame index ie go to the next frame
 void Animation::update()
 {
-	//WIP
-	//Need to add so that the duration of the sprite is taken into account
-	//Now it simply goes to the next frame when the gameloop restarts
+	total_progress = Animation::animation_clock.getElapsedTime().asMilliseconds();
 
 	//if we aren't at the last frame
 	if ( (this->active_frame_index + 1) < this->frames.size())
-	{
-		//got to the next frame
-		this->active_frame_index += 1;
+	{	
+		//If the time difference between the total progress and the last frame update is greater than the frame duration.
+		if (total_progress - last_update > frames[active_frame_index].duration)
+		{
+			//got to the next frame
+			this->active_frame_index += 1;
+			last_update = total_progress;
+		}
 	}
 	else
 	{

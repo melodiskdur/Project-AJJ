@@ -41,6 +41,9 @@ private:
 
 	double total_progress = 0.0; //the current timestamp in the animation
 	double total_length = 0.0; //the length of the whole animation
+	double last_update = 0.0; //stuff
+
+	static sf::Clock animation_clock;
 
 protected:
 
