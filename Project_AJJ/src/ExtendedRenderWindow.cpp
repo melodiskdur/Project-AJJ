@@ -17,9 +17,9 @@ Scene* ExtendedRenderWindow::getActiveScene()
 	return active_scene;
 }
 
-TextureAtlas* ExtendedRenderWindow::getTextureAtlas()
+TextureManager* ExtendedRenderWindow::getTextureManager()
 {
-	return this->texture_atlas;
+	return this->texture_manager;
 }
 
 //Setters
@@ -28,9 +28,9 @@ void ExtendedRenderWindow::setActiveScene(Scene* scene)
 	active_scene = scene;
 }
 
-void ExtendedRenderWindow::setTextureAtlas(TextureAtlas* tex_atl)
+void ExtendedRenderWindow::setTextureManager(TextureManager* tex_mag)
 {
-	this->texture_atlas = tex_atl;
+	this->texture_manager = tex_mag;
 }
 
 void ExtendedRenderWindow::drawActiveScene()
@@ -41,10 +41,13 @@ void ExtendedRenderWindow::drawActiveScene()
 		{
 			this->draw(obj->getGeoShape());							 //WIP
 
-
 			//------------Animation test-----------
 			//get the objects sprite
-			sf::Sprite sprite = this->texture_atlas->getSprite(obj->getTextureId());
+			TextureAtlas* obj_atlas = this->texture_manager->getAtlas(obj->getTextureName());
+			if (obj_atlas == nullptr)
+				continue;
+
+			sf::Sprite sprite = obj_atlas->getSprite(obj->getFrame().texture_id, obj->getFrame().frame_index);
 
 			//set the position of the sprite to the same as the objects
 			sprite.setPosition(obj->getWorldPosition());

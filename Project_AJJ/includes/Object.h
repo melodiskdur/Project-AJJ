@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/PrimitiveType.hpp>
 #include "Action.h"
+#include "Animation.h"
 #include "TextureIds.h"
 
 class Action;
@@ -21,15 +22,19 @@ public:
 	sf::Vector2f getSize();
 	sf::VertexArray getGeoShape();
 	int getRotation();
+	sf::String getTextureName();
 	std::vector<Action*> getActions();
 	TEXTURE_ID getTextureId() { return this->active_texture; };
+	Frame getFrame() { return this->current_frame; };
 
 	//Setters
 	void setWorldPosition(sf::Vector2f pos);
 	void setVelocity(sf::Vector2f vel);
 	void setGeoShape(sf::VertexArray shape);
 	void setRotation(int rot);
+	void setTextureName(sf::String name);
 	void setTextureId(TEXTURE_ID texture_id) { this->active_texture = texture_id; };
+	void setFrame(Frame frame) { this->current_frame = frame; };
 	void setColor(sf::Color color);
 	//void setActions(std::vector<int> actions);
 
@@ -51,7 +56,9 @@ protected:
 	std::vector<Action*> object_actions;
 
 	//Textures
+	sf::String object_texture_name = "";				//Name of the texture atlas that we want to draw frames of this object from.
 	TEXTURE_ID active_texture = TEXTURE_ID::NONE;
+	Frame current_frame;
 
 	//PhysicsAttributes
 

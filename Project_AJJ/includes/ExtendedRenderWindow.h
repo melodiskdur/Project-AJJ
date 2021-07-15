@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include "TextureAtlas.h"
 #include "TextureIds.h"
+#include "TextureManager.h"
 #include "Scene.h"
 
 /* ExtendedRenderWindow
@@ -18,17 +19,17 @@ public:
 
 	//Getters
 	Scene* getActiveScene();
-	TextureAtlas* getTextureAtlas();
+	TextureManager* getTextureManager();
 	
 	//Setters
 	void setActiveScene(Scene* scene);
-	void setTextureAtlas(TextureAtlas* tex_atl);
+	void setTextureManager(TextureManager* tex_mag);
 	
 	//Etc
 	//Draws a frame of the active Scene-object.
 	void drawActiveScene();
 private:
-	Scene* active_scene = nullptr;			//Active Scene-object.
-	TextureAtlas* texture_atlas = nullptr;	//TextureAtlas object
+	Scene* active_scene = nullptr;			    //Active Scene-object.
+	TextureManager* texture_manager = nullptr;	//TextureManager-object.
 };
 

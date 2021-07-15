@@ -81,7 +81,7 @@ void Action::triggerAction()
 	if (this->animation != nullptr)
 	{
 		//set the texture to the active frame
-		parent_object->setTextureId(this->animation->getActiveFrame().texture_id);
+		parent_object->setFrame(this->animation->getActiveFrame());
 		//update the animation
 		this->animation->update();
 	}

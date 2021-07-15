@@ -55,15 +55,16 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
 
     //---------------Animation test---------------
     Animation* a_test = new Animation();
-    a_test->addFrame(TEXTURE_ID::RUN_1, 200.0f);
-    a_test->addFrame(TEXTURE_ID::RUN_2, 200.0f);
-    a_test->addFrame(TEXTURE_ID::RUN_3, 100.0f);
-    a_test->addFrame(TEXTURE_ID::RUN_4, 100.0f);
-    a_test->addFrame(TEXTURE_ID::RUN_5, 50.0f);
-    a_test->addFrame(TEXTURE_ID::RUN_6, 30.0f);
-    a_test->addFrame(TEXTURE_ID::RUN_7, 100.0f);
-    a_test->addFrame(TEXTURE_ID::RUN_8, 150.0f);
-    a_test->addFrame(TEXTURE_ID::RUN_9, 200.0f);
+    a_test->addFrame(TEXTURE_ID::RUN, 0, 200.0f);
+    a_test->addFrame(TEXTURE_ID::RUN, 1, 200.0f);
+    a_test->addFrame(TEXTURE_ID::RUN, 2, 200.0f);
+    a_test->addFrame(TEXTURE_ID::RUN, 3, 200.0f);
+    a_test->addFrame(TEXTURE_ID::RUN, 4, 200.0f);
+    a_test->addFrame(TEXTURE_ID::RUN, 5, 200.0f);
+    a_test->addFrame(TEXTURE_ID::RUN, 6, 200.0f);
+    a_test->addFrame(TEXTURE_ID::RUN, 7, 200.0f);
+    a_test->addFrame(TEXTURE_ID::RUN, 8, 200.0f);
+    a_test->addFrame(TEXTURE_ID::RUN, 9, 200.0f);
     actionRight->setAnimation(a_test);
     actionLeft->setAnimation(a_test);
     actionUp->setAnimation(a_test);
@@ -130,6 +131,11 @@ int Object::getRotation()
 	return this->rotation;
 }
 
+sf::String Object::getTextureName()
+{
+    return object_texture_name;
+}
+
 std::vector<Action*> Object::getActions()
 {
     return object_actions;
@@ -158,6 +164,11 @@ void Object::setGeoShape(sf::VertexArray shape)
 void Object::setRotation(int rot)
 {
 
+}
+
+void Object::setTextureName(sf::String name)
+{
+    object_texture_name = name;
 }
 
 void Object::setColor(sf::Color color)

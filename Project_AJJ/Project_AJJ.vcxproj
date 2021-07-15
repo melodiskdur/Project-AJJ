@@ -30,6 +30,8 @@
     <ClInclude Include="includes\Scene.h" />
     <ClInclude Include="includes\TextureAtlas.h" />
     <ClInclude Include="includes\TextureIds.h" />
+    <ClInclude Include="includes\TextureManager.h" />
+    <ClInclude Include="resource1.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Action.cpp" />
@@ -44,8 +46,10 @@
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\TextureAtlas.cpp" />
     <ClCompile Include="src\TextureIds.cpp" />
+    <ClCompile Include="src\TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="assets\rogue_atlas.png" />
     <Image Include="assets\texture_atlas_test.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
