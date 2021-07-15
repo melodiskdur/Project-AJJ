@@ -18,6 +18,7 @@ public:
 	//Getters
 	sf::Vector2f getWorldPosition();
 	sf::Vector2f getVelocity();
+	sf::Vector2f getMaxVelocity() { return this->max_velocity; };
 	sf::Vector2f getSize();
 	sf::VertexArray getGeoShape();
 	int getRotation();
@@ -27,6 +28,7 @@ public:
 	//Setters
 	void setWorldPosition(sf::Vector2f pos);
 	void setVelocity(sf::Vector2f vel);
+	void setMaxVelocity(sf::Vector2f max_vel) { this->max_velocity = max_vel; };
 	void setGeoShape(sf::VertexArray shape);
 	void setRotation(int rot);
 	void setTextureId(TEXTURE_ID texture_id) { this->active_texture = texture_id; };
@@ -41,8 +43,9 @@ public:
 protected:
 
 	//Parameters
-	sf::Vector2f world_position = sf::Vector2f(0.0f, 0.0f);
-	sf::Vector2f velocity = sf::Vector2f(1.f, 1.f);
+	sf::Vector2f world_position = sf::Vector2f(0.0f, 0.0f);		//Position on-screen
+	sf::Vector2f velocity = sf::Vector2f(0.0f, 0.0f);			//Current velocity
+	sf::Vector2f max_velocity = sf::Vector2f(0.0f, 0.0f);		//Maximum velocity
 	sf::VertexArray geo_shape = sf::VertexArray(sf::Quads,4);	//Geometric boundary of the object
 	sf::Vector2f size = sf::Vector2f(0.0f, 0.0f);				//Geo_shape size
 	int rotation = 0;											//Rotation value of the object

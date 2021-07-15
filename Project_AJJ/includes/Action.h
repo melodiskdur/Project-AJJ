@@ -30,7 +30,7 @@ public:
 	void setActionName(std::string name);
 	void setActionType(ACTIONTYPE type);
 	void setParentObject(Object* parent);
-	void setActionParameter(float* parameter);
+	void setActionParameter(float* action_parameter);
 	void setParameterManipulation(float manipulation_value);
 	void setAnimation(Animation* animation);
 

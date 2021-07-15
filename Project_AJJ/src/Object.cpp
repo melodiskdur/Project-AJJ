@@ -22,7 +22,10 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
 
     std::cout << "Object created" << std::endl;
 
-    //For testing purposes
+    //------------For testing purposes---------------
+
+    this->max_velocity = { 3.f,3.f };
+
     Action * actionUp = new Action;
     Action* actionDown = new Action;
     Action* actionLeft = new Action;
@@ -33,24 +36,27 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
     Action* speedLeft = new Action;
     Action* speedRight = new Action;
 
+    //increase speed by:
+    float vel_inc = 0.1f;
+
     actionUp->setActionName("Up");
     actionUp->setParentObject(this);
     actionUp->setActionParameter(&this->world_position.y);
-    actionUp->setParameterManipulation(-this->velocity.y);
+    actionUp->setParameterManipulation(-vel_inc);
 
     actionDown->setActionName("Down");
     actionDown->setActionParameter(&this->world_position.y);
-    actionDown->setParameterManipulation(this->velocity.y);
+    actionDown->setParameterManipulation(vel_inc);
     actionDown->setParentObject(this);
 
     actionLeft->setActionName("Left");
     actionLeft->setActionParameter(&this->world_position.x);
-    actionLeft->setParameterManipulation(-this->velocity.x);
+    actionLeft->setParameterManipulation(-vel_inc);
     actionLeft->setParentObject(this);
 
     actionRight->setActionName("Right");
     actionRight->setActionParameter(&this->world_position.x);
-    actionRight->setParameterManipulation(this->velocity.x);
+    actionRight->setParameterManipulation(vel_inc);
     actionRight->setParentObject(this);
 
     //---------------Animation test---------------
@@ -73,22 +79,22 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
     speedUp->setActionName("SpeedUp");
     speedUp->setParentObject(this);
     speedUp->setActionParameter(&this->world_position.y);
-    speedUp->setParameterManipulation(2*-this->velocity.y);
+    speedUp->setParameterManipulation(2*-vel_inc);
 
     speedDown->setActionName("SpeedDown");
     speedDown->setParentObject(this);
     speedDown->setActionParameter(&this->world_position.y);
-    speedDown->setParameterManipulation(2*this->velocity.y);
+    speedDown->setParameterManipulation(2* vel_inc);
 
     speedLeft->setActionName("SpeedLeft");
     speedLeft->setParentObject(this);
     speedLeft->setActionParameter(&this->world_position.x);
-    speedLeft->setParameterManipulation(-2*this->velocity.x);
+    speedLeft->setParameterManipulation(-2*vel_inc);
 
     speedRight->setActionName("SpeedRight");
     speedRight->setParentObject(this);
     speedRight->setActionParameter(&this->world_position.x);
-    speedRight->setParameterManipulation(2*this->velocity.x);
+    speedRight->setParameterManipulation(2*vel_inc);
 
     object_actions.push_back(actionUp);
     object_actions.push_back(actionDown);
@@ -148,6 +154,25 @@ void Object::setWorldPosition(sf::Vector2f pos)
 void Object::setVelocity(sf::Vector2f vel)
 {
     this->velocity = vel;
+
+    if (vel.x > this->max_velocity.x)
+    {
+        this->velocity.x = this->max_velocity.x;
+    }
+    else if (vel.x < -this->max_velocity.x)
+    {
+        this->velocity.x = -this->max_velocity.x;
+    }
+
+    if (vel.y > this->max_velocity.y)
+    {
+        this->velocity.y = this->max_velocity.y;
+    }
+    else if (vel.y < -this->max_velocity.y)
+    {
+        this->velocity.y = -this->max_velocity.y;
+    }
+
 }
 
 void Object::setGeoShape(sf::VertexArray shape)
