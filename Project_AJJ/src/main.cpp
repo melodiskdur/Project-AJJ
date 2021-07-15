@@ -57,9 +57,12 @@ int main()
 	window.setFramerateLimit(140);
 
 	//------------TextureAtlas test---------------
-	TextureAtlas* test_texture_atlas = new TextureAtlas();
-	test_texture_atlas->loadAtlas("assets/texture_atlas_test.png");
-	window.setTextureAtlas(test_texture_atlas);
+	TextureManager* tex_mag = new TextureManager();
+	tex_mag->loadAtlas("Rogue", "assets/rogue_atlas.png");
+	TextureAtlas* robot = tex_mag->getAtlas("Rogue");
+	robot->createRegionGrid(10, 10);
+	robot->assignTextureId(TEXTURE_ID::RUN, sf::Vector2u(0, 2), sf::Vector2u(9, 2));
+	window.setTextureManager(tex_mag);
 	//--------------------------------------------
 
 	Scene* test_scene = drawTestScene();
@@ -72,7 +75,11 @@ int main()
 	sf::Clock clock;
 	sf::Time time;
 
-	//CollisionDetection colDec = CollisionDetection(test_scene->getSceneObjects());
+	//-----------------------Add Atlas Name to Objects---------------------
+	for (int i = 0; i < test_scene->getSceneObjects().size(); i++)
+	{
+		test_scene->getSceneObjects()[i]->setTextureName("Rogue");
+	}
 
 	Controller contr;
 	contr.setObject(test_scene->getSceneObjects()[2]);
@@ -120,12 +127,12 @@ int main()
 		// draw everything here...
 		time = clock.getElapsedTime();
 		test_scene->getSceneObjects()[8]->setWorldPosition(sf::Vector2f(300.0f + 50*std::cos(time.asSeconds()), 300.0f + 50*std::sin(time.asSeconds())));
-		//test_scene->getSceneObjects()[2]->onActionRequest("Left");
-		//test_scene->getSceneObjects()[2]->onActionRequest("Up");
 		window.drawActiveScene();
 
 		// end the current frame
 		window.display();
 	}
+	delete col_det;
+	delete tex_mag;
 	return 0;
 }

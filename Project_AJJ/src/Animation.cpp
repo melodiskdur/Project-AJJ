@@ -44,10 +44,16 @@ void Animation::addFrame(TEXTURE_ID texture_id, double duration)
 	this->total_length += duration;
 }
 
+void Animation::addFrame(TEXTURE_ID texture_id, int index, double duration)
+{
+	this->addFrame(texture_id, duration);
+	this->frames.back().frame_index = index;
+}
+
 //Sets the active frame index
 void Animation::setActiveFrame(Frame frame)
 {
-	this->active_frame_index = static_cast<int>(frame.texture_id);
+	this->active_frame_index = frame.frame_index;
 }
 
 //Update the active frame index ie go to the next frame
