@@ -60,12 +60,15 @@ sf::Sprite TextureAtlas::getSprite(TEXTURE_ID texture_id, int frame_index)
 {
 	int sprite_index = 0;
 	
+	//Returns a "null"-sprite if there's no texture_id.
 	if (texture_id == TEXTURE_ID::NONE)
 	{
 		this->sprite.setTextureRect(sf::IntRect(0,0,0,0));
 		return this->sprite;
 	}
 
+	//Checks for first instance of texture_id in the vector texture_regions and then checks
+	//if the element at frame_index steps forward from the first instance also has the corresponding texture_id.
 	for (int i = 0; i < texture_regions.size(); i++)
 	{
 		if (texture_regions[i]->texture_id == texture_id)
@@ -85,6 +88,16 @@ sf::Sprite TextureAtlas::getSprite(TEXTURE_ID texture_id, int frame_index)
 sf::Sprite TextureAtlas::getSprite(sf::String region_name, int frame_index)
 {
 	int sprite_index = 0;
+	
+	//Returns "null"-sprite if there's no region_name.
+	if (region_name == "")
+	{
+		this->sprite.setTextureRect(sf::IntRect(0, 0, 0, 0));
+		return this->sprite;
+	}
+
+	//Searches texture_regions for the first instance of region_name and then
+	//checks if the element at frame_index forward also has the corresponding region_name.
 	for (int i = 0; i < texture_regions.size(); i++)
 	{
 		if (texture_regions[i]->region_name == region_name)
@@ -153,14 +166,18 @@ void TextureAtlas::createRegionGrid(int rows, int columns)
 	this->columns = columns;
 	this->clearTextureRegions();
 	int posx, posy;
+	//Calculates size of each grid cell/Region instance.
 	sf::Vector2u tex_size = atlas->getSize();
 	int width = (int) (tex_size.x / columns);
 	int height = (int) (tex_size.y / rows);
+	//Creates an j x i - grid of Regions. 
 	for (int i = 0; i < rows; i++)
 	{
+		//y-coordinate of upper left corner.
 		posy = i * height;
 		for (int j = 0; j < columns; j++)
 		{
+			//x-coordinate of upper left corner.
 			posx = j * width;
 			Region* temp = new Region;
 			temp->region_rect = sf::IntRect(posx, posy, width, height);
@@ -173,9 +190,11 @@ void TextureAtlas::createRegionGrid(int rows, int columns)
 
 void TextureAtlas::assignTextureId(TEXTURE_ID id, int first_row, int last_row)
 {
+	//Checks that first_row and last_row are reasonable.
 	if (first_row > last_row || last_row > this->rows)
 		return;
 	int frame_index = 0;
+	//Assigns id to all grid cells/Regions inbetween first_row and last_row.
 	for (int i = first_row; i < last_row + 1; i++)
 	{
 		for (int j = 0; j < this->columns; j++)
@@ -194,14 +213,17 @@ void TextureAtlas::assignTextureId(TEXTURE_ID id, int row)
 
 void TextureAtlas::assignTextureId(TEXTURE_ID id, sf::Vector2u first_cell, sf::Vector2u last_cell)
 {
+	//Checks if the grid cell parameters are reasonable.
 	if (first_cell.x > this->columns || first_cell.y > this->rows ||
 		last_cell.x > this->columns || last_cell.y > this->rows ||
 		first_cell.y > last_cell.y || (first_cell.y == last_cell.y && first_cell.x > last_cell.x))
 		return;
 
 	int frame_index = 0;
+	//Correlates the first_cell and last_cell to indices in the texture_regions vector.
 	int first_index = first_cell.x + this->columns * first_cell.y;
 	int last_index = last_cell.x + this->columns * last_cell.y;
+	//Iterates over these indices and adds id to each Region in texture_regions.
 	for (int i = first_index; i < last_index; i++)
 	{
 		texture_regions[i]->texture_id = id;
@@ -212,6 +234,7 @@ void TextureAtlas::assignTextureId(TEXTURE_ID id, sf::Vector2u first_cell, sf::V
 
 void TextureAtlas::assignRegionName(sf::String region_name, sf::Vector2u tex_cell, int frame_index)
 {
+	//Checks if the grid cell is reasonable.
 	if (tex_cell.x > this->columns || tex_cell.y > this->rows)
 		return;
 	texture_regions[tex_cell.x + this->columns * tex_cell.y]->region_name = region_name;
@@ -220,9 +243,11 @@ void TextureAtlas::assignRegionName(sf::String region_name, sf::Vector2u tex_cel
 
 void TextureAtlas::assignRegionNames(sf::String region_name, int first_row, int last_row)
 {
+	//Checks if first_row nad last_row are reasonable.
 	if (first_row > last_row || last_row > this->rows)
 		return;
 	int frame_index = 0;
+	//Adds region_name to Regions inbetween first_row and last_row.
 	for (int i = first_row; i < last_row + 1; i++)
 	{
 		for (int j = 0; j < this->columns; j++)
