@@ -1,0 +1,13 @@
+#pragma once
+#include <stdlib.h>
+#include <iostream>
+#include <cmath>
+#include "Action.h"
+#include "Object.h"
+#include "Controller.h"
+#include "ExtendedRenderWindow.h"
+#include "Scene.h"
+#include "Camera.h"
+#include "CollisionDetection.h"
+#include <SFML/Graphics.hpp>
+#include <SFML/System/Time.hpp>
