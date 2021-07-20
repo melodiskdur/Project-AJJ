@@ -71,31 +71,17 @@ void Action::setAnimation(Animation* animation)
 //update pos and the animation
 void Action::triggerAction()
 {
-	//DIRECTION PROBLEM****
-
 	//-----------update the action_parameter-----------
 	std::cout << "par_man: " << parameter_manipulation << std::endl;
 
+	//easier to use variables
 	sf::Vector2f obj_wrl_pos = this->parent_object->getWorldPosition();
 	sf::Vector2f obj_vel = this->parent_object->getVelocity();
 	sf::Vector2f obj_max_vel = this->parent_object->getMaxVelocity();
-	/*
-	if (obj_vel.x > obj_max_vel.x)
-		obj_vel.x = obj_max_vel.x;
-	else if(obj_vel.x < -obj_max_vel.x)
-		obj_vel.x = -obj_max_vel.x;
-
-	if(obj_vel.y > obj_max_vel.y)
-		obj_vel.y = obj_max_vel.y;
-	else if(obj_vel.y < -obj_max_vel.y)
-		obj_vel.y = -obj_max_vel.y;
-	*/
-
+	
 	//if the actionparameter is the objects x-coordinate
 	if (*action_parameter == obj_wrl_pos.x)
 	{
-		//std::cout << "leftright" << std::endl;
-
 		//add the parameter_manipulation to the objects velocity in that direction
 		this->parent_object->setVelocity({ obj_vel.x + parameter_manipulation, obj_vel.y });
 
@@ -105,8 +91,6 @@ void Action::triggerAction()
 	//else if the actionparameter is the objects y-coordinate
 	else if(*action_parameter == obj_wrl_pos.y)
 	{
-		//std::cout << "updown" << std::endl;
-
 		//add the parameter_manipulation to the objects velocity in that direction
 		this->parent_object->setVelocity({ obj_vel.x, obj_vel.y + parameter_manipulation });
 
@@ -114,7 +98,11 @@ void Action::triggerAction()
 		*action_parameter = *action_parameter + obj_vel.y;
 	}
 
-	std::cout << this->parent_object->getVelocity().x << " , " << this->parent_object->getVelocity().y << std::endl;
+	/*print out the current velocity
+	std::cout << "( " << this->parent_object->getVelocity().x << " , " 
+		<< this->parent_object->getVelocity().y << " )" << std::endl;
+	*/
+
 	//---------------------------------------------------
 
 
@@ -125,9 +113,9 @@ void Action::triggerAction()
 	//if the action has an animation
 	if (this->animation != nullptr)
 	{
-		//set the texture to the active frame
+		//set the texture to the active frame(update sprite)
 		parent_object->setFrame(this->animation->getActiveFrame());
-		//update the animation
+		//update the animation, got to the next frame
 		this->animation->update();
 	}
 }

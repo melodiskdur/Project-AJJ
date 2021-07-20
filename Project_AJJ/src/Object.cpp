@@ -159,25 +159,20 @@ void Object::setWorldPosition(sf::Vector2f pos)
 
 void Object::setVelocity(sf::Vector2f vel)
 {
+    //set velocity
     this->velocity = vel;
 
+    //check if the velocity is bigger than max
+    //if so, lower it to the maximum velocity
     if (vel.x > this->max_velocity.x)
-    {
         this->velocity.x = this->max_velocity.x;
-    }
     else if (vel.x < -this->max_velocity.x)
-    {
         this->velocity.x = -this->max_velocity.x;
-    }
 
     if (vel.y > this->max_velocity.y)
-    {
         this->velocity.y = this->max_velocity.y;
-    }
     else if (vel.y < -this->max_velocity.y)
-    {
         this->velocity.y = -this->max_velocity.y;
-    }
 
 }
 
@@ -207,9 +202,11 @@ void Object::setColor(sf::Color color)
 //Others
 void Object::onActionRequest(std::string action_name)
 {
-
+    //loop all actions assigned to this object
     for (int i = 0; i < object_actions.size(); i++)
     {
+        //if the input action_name equals one action assigned to this object
+        //then trigger that specific action and break the loop
         if (action_name.compare(object_actions[i]->getActionName()) == 0)
         {
             object_actions[i]->triggerAction();
