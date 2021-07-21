@@ -146,6 +146,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\FirstScene.cpp" />
+    <ClCompile Include="src\ResourceLoader.cpp" />
     <ClCompile Include="src\TestObject.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -154,6 +156,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="includes\FirstScene.h" />
+    <ClInclude Include="includes\ResourceLoader.h" />
     <ClInclude Include="includes\TestObject.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

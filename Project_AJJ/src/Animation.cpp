@@ -59,6 +59,13 @@ void Animation::addFrame(TEXTURE_ID texture_id, int index, double duration)
 	this->frames.back().frame_index = index;
 }
 
+void Animation::addFrame(sf::String region_name, int index, double duration)
+{
+	this->addFrame(TEXTURE_ID::NONE, duration);
+	this->frames.back().frame_index = index;
+	this->frames.back().region_name = region_name;
+}
+
 //Sets the active frame index
 void Animation::setActiveFrame(Frame frame)
 {

@@ -47,7 +47,7 @@ void ExtendedRenderWindow::drawActiveScene()
 			if (obj_atlas == nullptr)
 				continue;
 
-			sf::Sprite sprite = obj_atlas->getSprite(obj->getFrame().texture_id, obj->getFrame().frame_index);
+			sf::Sprite sprite = obj_atlas->getSprite(obj->getFrame().texture_id, obj->getFrame().region_name, obj->getFrame().frame_index);
 
 			//set the position of the sprite to the same as the objects
 			sprite.setPosition(obj->getWorldPosition());

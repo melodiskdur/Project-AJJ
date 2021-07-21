@@ -19,9 +19,6 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
     geo_shape[1].color = sf::Color::Blue;
     geo_shape[2].color = sf::Color::Green;
     geo_shape[3].color = sf::Color::Yellow;
-
-    //std::cout << "Object created" << std::endl;
-
 }
 
 Object::~Object()
