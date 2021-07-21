@@ -41,8 +41,8 @@ private:
 	std::string action_name;
 	ACTIONTYPE action_type = ACTIONTYPE::MOVE;
 	Object* parent_object = nullptr;
-	float* action_parameter;			//Parameter from parent object that the action shall manipulate.
-	float parameter_manipulation;	    //The value of which the parameter shall be manipulated by.
+	float* action_parameter = nullptr;			//Parameter from parent object that the action shall manipulate.
+	float parameter_manipulation = 0;	    //The value of which the parameter shall be manipulated by.
 
 	//Animation
 	Animation* animation = nullptr;		//An animation, sequence of sprites

@@ -1,5 +1,7 @@
 #pragma once
 #include "Object.h"
+#include "Action.h"
+#include "Animation.h"
 
 class TestObject :
     public Object
