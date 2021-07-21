@@ -1,5 +1,7 @@
 #include "Project_AJJ.h"
 #include "includes/TestObject.h"
+#include "includes/FirstScene.h"
+#include "includes/ResourceLoader.h"
 
 /*KOMMENTARER
 * La till TextureIds som är en enumclass där varje namn motsvarar ett område i atlasen
@@ -47,39 +49,44 @@ int main()
 	window.setFramerateLimit(140);
 
 	//------------TextureAtlas test---------------
-	TextureManager* tex_mag = new TextureManager();
-	tex_mag->loadAtlas("Rogue", "../Project_AJJ/assets/rogue_atlas.png");
-	TextureAtlas* robot = tex_mag->getAtlas("Rogue");
-	robot->createRegionGrid(10, 10);
-	robot->assignTextureId(TEXTURE_ID::RUN, sf::Vector2u(0, 2), sf::Vector2u(9, 2));
+	TextureManager* tex_mag = ResourceLoader::loadResources();
 	window.setTextureManager(tex_mag);
+
 	//--------------------------------------------
 
-	Scene* test_scene = drawTestScene();
+	Scene* test_scene = FirstScene::createScene();
 	Camera scene_camera;
 	CollisionDetection* col_det = new CollisionDetection(test_scene->getSceneObjects());
 	test_scene->setCollisionDetection(col_det);
 	test_scene->setCamera(&scene_camera);
 	window.setActiveScene(test_scene);
-	scene_camera.lockOnObject(test_scene->getSceneObjects()[2]);
 	sf::Clock clock;
 	sf::Time time;
 
-	//-----------------------Add Atlas Name to Objects---------------------
-	for (int i = 0; i < test_scene->getSceneObjects().size(); i++)
-	{
-		test_scene->getSceneObjects()[i]->setTextureName("Rogue");
-	}
+	//----------------------- Create Players & Lock View --------------------
+
+	Object* player_1 = new Object(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(100.0f, 100.0f));
+	Object* player_2 = new Object(sf::Vector2f(150.0f, 100.0f), sf::Vector2f(100.0f, 100.0f));
+	player_1->setTextureName("Rogue");
+	player_2->setTextureName("Rogue");
+	std::vector<Object*> player_vector = {player_1, player_2};
+
+	test_scene->addSceneObject(player_1);
+	test_scene->addSceneObject(player_2);
+
+	test_scene->getCamera()->lockOnObject(player_1);
+
+	//------------------------ Add Controls To Players --------------------
 
 	Controller contr;
-	contr.setObject(test_scene->getSceneObjects()[2]);
+	contr.setObject(player_1);
 	contr.bindActionToKey(contr.getObject()->getActions()[0], sf::Keyboard::Key::W);
 	contr.bindActionToKey(contr.getObject()->getActions()[1], sf::Keyboard::Key::S);
 	contr.bindActionToKey(contr.getObject()->getActions()[2], sf::Keyboard::Key::A);
 	contr.bindActionToKey(contr.getObject()->getActions()[3], sf::Keyboard::Key::D);
 
 	Controller contr2;
-	contr2.setObject(test_scene->getSceneObjects()[3]);
+	contr2.setObject(player_2);
 	contr2.bindActionToKey(contr2.getObject()->getActions()[0], sf::Keyboard::Key::Up);
 	contr2.bindActionToKey(contr2.getObject()->getActions()[1], sf::Keyboard::Key::Down);
 	contr2.bindActionToKey(contr2.getObject()->getActions()[2], sf::Keyboard::Key::Left);
@@ -99,7 +106,7 @@ int main()
 			{
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
 				{
-					scene_camera.lockOnObject(test_scene->getSceneObjects()[(2 + (i % 2))]);
+					scene_camera.lockOnObject(player_vector[i % 2]);
 					i++;
 				}
 			}

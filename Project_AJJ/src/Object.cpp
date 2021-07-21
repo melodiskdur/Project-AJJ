@@ -105,6 +105,7 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
     object_actions.push_back(speedDown);
     object_actions.push_back(speedLeft);
     object_actions.push_back(speedRight);
+
 }
 
 Object::~Object()

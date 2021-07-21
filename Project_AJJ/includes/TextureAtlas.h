@@ -39,6 +39,7 @@ public:
 	//Getters
 	int getWidth(TEXTURE_ID texture_id);
 	int getHeight(TEXTURE_ID texture_id);
+	sf::Sprite getSprite(TEXTURE_ID texture_id, sf::String region_name, int frame_index);
 	sf::Sprite getSprite(TEXTURE_ID texture_id);
 	sf::Sprite getSprite(TEXTURE_ID texture_id, int frame_index);
 	sf::Sprite getSprite(sf::String region_name, int frame_index);

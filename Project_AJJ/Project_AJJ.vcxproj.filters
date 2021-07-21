@@ -106,5 +106,11 @@
     <Image Include="assets\rogue_atlas.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="assets\platformertiles.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\boss.PNG">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
