@@ -1,26 +1,7 @@
 #include "Project_AJJ.h"
 #include "includes/TestObject.h"
-
-/*KOMMENTARER
-* La till TextureIds som är en enumclass där varje namn motsvarar ett område i atlasen
-* Se TextureAtlas.cpp för dessa områden. På detta sätt behöver vi endast länka textureId till
-* Object då den inte behöver hela textureatlas.
-* Den enda klasss som har TextureAtlas är ExtendedRenderWindow
-* då det är den som ritar ut och därmed behöver hämta sprites.
-* Så Object ha ett TextureId, Action en animation som updateras i triggerAction().
-* Kanske något vi kan göra med actiontype sen också.
-*
-* I object har jag skapat en testanimation med några sprites och kopplat den till
-* right,left,up,down. Du ser därför ingen sprite när den står stilla i början
-* Får göra en till action som är när inga knappar trycks ned för att få en Idle/Standby läge
-*
-* Det som behöver implementeras är att duration för varje frame tas med
-* Skrev mer om det i Animation::update(), kolla där.
-*
-* Tror det var allt...
-* RADERA DETTA MEDDELANDE EFTER LÄSNING!!! VIKTIGT
-*
-*/
+#include "includes/FirstScene.h"
+#include "includes/ResourceLoader.h"
 
 Scene* drawTestScene()
 {
@@ -47,34 +28,42 @@ int main()
 	window.setFramerateLimit(140);
 
 	//------------TextureAtlas test---------------
-	TextureManager* tex_mag = new TextureManager();
-	tex_mag->loadAtlas("Rogue", "../Project_AJJ/assets/rogue_atlas.png");
+	TextureManager* tex_mag = ResourceLoader::loadResources();
 	TextureAtlas* robot = tex_mag->getAtlas("Rogue");
 	robot->createRegionGrid(10, 10);
 	robot->assignTextureId(TEXTURE_ID::RUN, sf::Vector2u(0, 2), sf::Vector2u(9, 2));
 	robot->assignTextureId(TEXTURE_ID::IDLE, sf::Vector2u(0, 5), sf::Vector2u(9, 5));
 	robot->assignTextureId(TEXTURE_ID::ATTACK, sf::Vector2u(0, 3), sf::Vector2u(9, 3));
 	window.setTextureManager(tex_mag);
+
 	//--------------------------------------------
 
-	Scene* test_scene = drawTestScene();
+	Scene* test_scene = FirstScene::createScene();
 	Camera scene_camera;
 	CollisionDetection* col_det = new CollisionDetection(test_scene->getSceneObjects());
 	test_scene->setCollisionDetection(col_det);
 	test_scene->setCamera(&scene_camera);
 	window.setActiveScene(test_scene);
-	scene_camera.lockOnObject(test_scene->getSceneObjects()[2]);
 	sf::Clock clock;
 	sf::Time time;
 
-	//-----------------------Add Atlas Name to Objects---------------------
-	for (int i = 0; i < test_scene->getSceneObjects().size(); i++)
-	{
-		test_scene->getSceneObjects()[i]->setTextureName("Rogue");
-	}
+	//----------------------- Create Players & Lock View --------------------
+
+	Object* player_1 = new Object(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(100.0f, 100.0f));
+	Object* player_2 = new Object(sf::Vector2f(150.0f, 100.0f), sf::Vector2f(100.0f, 100.0f));
+	player_1->setTextureName("Rogue");
+	player_2->setTextureName("Rogue");
+	std::vector<Object*> player_vector = {player_1, player_2};
+
+	test_scene->addSceneObject(player_1);
+	test_scene->addSceneObject(player_2);
+
+	test_scene->getCamera()->lockOnObject(player_1);
+
+	//------------------------ Add Controls To Players --------------------
 
 	Controller contr;
-	contr.setObject(test_scene->getSceneObjects()[2]);
+	contr.setObject(player_1);
 	contr.bindActionToKey(contr.getObject()->getActions()[0], sf::Keyboard::Key::Unknown); //IDLE
 	contr.bindActionToKey(contr.getObject()->getActions()[1], sf::Keyboard::Key::W);
 	contr.bindActionToKey(contr.getObject()->getActions()[2], sf::Keyboard::Key::S);
@@ -85,7 +74,7 @@ int main()
 	
 
 	Controller contr2;
-	contr2.setObject(test_scene->getSceneObjects()[3]);
+	contr2.setObject(player_2);
 	contr2.bindActionToKey(contr2.getObject()->getActions()[0], sf::Keyboard::Key::Unknown); //IDLE
 	contr2.bindActionToKey(contr2.getObject()->getActions()[1], sf::Keyboard::Key::Up);
 	contr2.bindActionToKey(contr2.getObject()->getActions()[2], sf::Keyboard::Key::Down);
@@ -97,8 +86,7 @@ int main()
 	contr2.bindActionToKey(contr2.getObject()->getActions()[7], { sf::Keyboard::Key::Down, sf::Keyboard::Key::L });
 	contr2.bindActionToKey(contr2.getObject()->getActions()[8], { sf::Keyboard::Key::Left, sf::Keyboard::Key::L });
 	contr2.bindActionToKey(contr2.getObject()->getActions()[9], { sf::Keyboard::Key::Right, sf::Keyboard::Key::L });
-	/////////////////////////////////////
-
+  
 	int i = 1;
 	while (window.isOpen())
 	{
@@ -108,7 +96,7 @@ int main()
 			{
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
 				{
-					scene_camera.lockOnObject(test_scene->getSceneObjects()[(2 + (i % 2))]);
+					scene_camera.lockOnObject(player_vector[i % 2]);
 					i++;
 				}
 			}

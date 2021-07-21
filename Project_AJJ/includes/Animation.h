@@ -16,6 +16,7 @@ struct Frame
 	TEXTURE_ID texture_id;	//the sprite to be shown
 	int frame_index; //The column to be shown
 	double duration;		//how long it will be shown
+	sf::String region_name = "";
 };
 
 class Animation
@@ -33,6 +34,7 @@ public:
 	//Add a frame to the animation
 	void addFrame(TEXTURE_ID texture_id, double duration);
 	void addFrame(TEXTURE_ID texture_id, int index, double duration);
+	void addFrame(sf::String region_name, int index, double duration);
 
 	void update();
 

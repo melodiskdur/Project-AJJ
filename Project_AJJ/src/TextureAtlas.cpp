@@ -49,6 +49,13 @@ int TextureAtlas::getHeight(TEXTURE_ID texture_id)
 	return TEXTURE_REGIONS[static_cast<int>(texture_id)].height;
 }
 
+sf::Sprite TextureAtlas::getSprite(TEXTURE_ID texture_id, sf::String region_name, int frame_index)
+{
+	if (region_name != "")
+		return getSprite(region_name, frame_index);
+	return getSprite(texture_id, frame_index);
+}
+
 sf::Sprite TextureAtlas::getSprite(TEXTURE_ID texture_id)
 {
 	//return a specific area of the sprite sheet/texture atlas
