@@ -71,16 +71,25 @@ void Action::setAnimation(Animation* animation)
 //update pos and the animation
 void Action::triggerAction()
 {
-	//-----------update the action_parameter-----------
-	std::cout << "par_man: " << parameter_manipulation << std::endl;
+	//-----------UPDATE ACTION_PARAMETER-----------
+
+	//std::cout << "par_man: " << parameter_manipulation << std::endl;
 
 	//easier to use variables
 	sf::Vector2f obj_wrl_pos = this->parent_object->getWorldPosition();
 	sf::Vector2f obj_vel = this->parent_object->getVelocity();
 	sf::Vector2f obj_max_vel = this->parent_object->getMaxVelocity();
-	
+
+	//check if the action wants to manipulate any parameters
+	if (action_parameter == nullptr)
+	{
+		//this->parent_object->setVelocity({ 0, 0 });
+
+		//if not(the action_parameter equals nullptr), the answer is no.
+		//then, do nothing
+	}
 	//if the actionparameter is the objects x-coordinate
-	if (*action_parameter == obj_wrl_pos.x)
+ 	else if (*action_parameter == obj_wrl_pos.x)
 	{
 		//add the parameter_manipulation to the objects velocity in that direction
 		this->parent_object->setVelocity({ obj_vel.x + parameter_manipulation, obj_vel.y });
@@ -97,12 +106,7 @@ void Action::triggerAction()
 		//update the action parameter with the velocity in that direction
 		*action_parameter = *action_parameter + obj_vel.y;
 	}
-
-	/*print out the current velocity
-	std::cout << "( " << this->parent_object->getVelocity().x << " , " 
-		<< this->parent_object->getVelocity().y << " )" << std::endl;
-	*/
-
+	
 	//---------------------------------------------------
 
 

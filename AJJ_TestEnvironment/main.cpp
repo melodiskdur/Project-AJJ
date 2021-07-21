@@ -34,7 +34,7 @@ Scene* drawTestScene()
 	testScene->addSceneObjects(groundTiles);
 	TestObject* anotherObject = new TestObject(sf::Vector2f(300.0f, 300.0f), sf::Vector2f(100.f, 100.f));
 	testScene->addSceneObject(anotherObject);
-	groundTiles[2]->setVelocity(sf::Vector2f(0.01, 0.01));
+	groundTiles[2]->setVelocity(sf::Vector2f(0, 0));
 	return testScene;
 }
 
@@ -52,6 +52,8 @@ int main()
 	TextureAtlas* robot = tex_mag->getAtlas("Rogue");
 	robot->createRegionGrid(10, 10);
 	robot->assignTextureId(TEXTURE_ID::RUN, sf::Vector2u(0, 2), sf::Vector2u(9, 2));
+	robot->assignTextureId(TEXTURE_ID::IDLE, sf::Vector2u(0, 5), sf::Vector2u(9, 5));
+	robot->assignTextureId(TEXTURE_ID::ATTACK, sf::Vector2u(0, 3), sf::Vector2u(9, 3));
 	window.setTextureManager(tex_mag);
 	//--------------------------------------------
 
@@ -73,23 +75,30 @@ int main()
 
 	Controller contr;
 	contr.setObject(test_scene->getSceneObjects()[2]);
-	contr.bindActionToKey(contr.getObject()->getActions()[0], sf::Keyboard::Key::W);
-	contr.bindActionToKey(contr.getObject()->getActions()[1], sf::Keyboard::Key::S);
-	contr.bindActionToKey(contr.getObject()->getActions()[2], sf::Keyboard::Key::A);
-	contr.bindActionToKey(contr.getObject()->getActions()[3], sf::Keyboard::Key::D);
+	contr.bindActionToKey(contr.getObject()->getActions()[0], sf::Keyboard::Key::Unknown); //IDLE
+	contr.bindActionToKey(contr.getObject()->getActions()[1], sf::Keyboard::Key::W);
+	contr.bindActionToKey(contr.getObject()->getActions()[2], sf::Keyboard::Key::S);
+	contr.bindActionToKey(contr.getObject()->getActions()[3], sf::Keyboard::Key::A);
+	contr.bindActionToKey(contr.getObject()->getActions()[4], sf::Keyboard::Key::D);
+
+	contr.bindActionToKey(contr.getObject()->getActions()[5], sf::Keyboard::Key::LShift); //FUN-TEST ATTACK
+	
 
 	Controller contr2;
 	contr2.setObject(test_scene->getSceneObjects()[3]);
-	contr2.bindActionToKey(contr2.getObject()->getActions()[0], sf::Keyboard::Key::Up);
-	contr2.bindActionToKey(contr2.getObject()->getActions()[1], sf::Keyboard::Key::Down);
-	contr2.bindActionToKey(contr2.getObject()->getActions()[2], sf::Keyboard::Key::Left);
-	contr2.bindActionToKey(contr2.getObject()->getActions()[3], sf::Keyboard::Key::Right);
+	contr2.bindActionToKey(contr2.getObject()->getActions()[0], sf::Keyboard::Key::Unknown); //IDLE
+	contr2.bindActionToKey(contr2.getObject()->getActions()[1], sf::Keyboard::Key::Up);
+	contr2.bindActionToKey(contr2.getObject()->getActions()[2], sf::Keyboard::Key::Down);
+	contr2.bindActionToKey(contr2.getObject()->getActions()[3], sf::Keyboard::Key::Left);
+	contr2.bindActionToKey(contr2.getObject()->getActions()[4], sf::Keyboard::Key::Right);
+	contr2.bindActionToKey(contr2.getObject()->getActions()[5], sf::Keyboard::Key::RShift); //FUN-TEST ATTACK
 
-	contr2.bindActionToKey(contr2.getObject()->getActions()[4], { sf::Keyboard::Key::Up,  sf::Keyboard::Key::Z, sf::Keyboard::Key::X, sf::Keyboard::Key::C });
-	contr2.bindActionToKey(contr2.getObject()->getActions()[5], { sf::Keyboard::Key::Down, sf::Keyboard::Key::Z });
-	contr2.bindActionToKey(contr2.getObject()->getActions()[6], { sf::Keyboard::Key::Left, sf::Keyboard::Key::Z });
-	contr2.bindActionToKey(contr2.getObject()->getActions()[7], { sf::Keyboard::Key::Right, sf::Keyboard::Key::Z });
+	contr2.bindActionToKey(contr2.getObject()->getActions()[6], { sf::Keyboard::Key::Up,  sf::Keyboard::Key::L });
+	contr2.bindActionToKey(contr2.getObject()->getActions()[7], { sf::Keyboard::Key::Down, sf::Keyboard::Key::L });
+	contr2.bindActionToKey(contr2.getObject()->getActions()[8], { sf::Keyboard::Key::Left, sf::Keyboard::Key::L });
+	contr2.bindActionToKey(contr2.getObject()->getActions()[9], { sf::Keyboard::Key::Right, sf::Keyboard::Key::L });
 	/////////////////////////////////////
+
 	int i = 1;
 	while (window.isOpen())
 	{
@@ -109,8 +118,8 @@ int main()
 			}
 		}
 
-		contr.getUserInput();
-		contr2.getUserInput();
+		contr.processUserInput();
+		contr2.processUserInput();
 
 		// clear the window with black color
 		window.clear(sf::Color::Black);

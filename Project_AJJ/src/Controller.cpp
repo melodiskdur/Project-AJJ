@@ -32,12 +32,14 @@ void Controller::setObject(Object* obj)
 	this->obj = obj;
 }
 
-void Controller::getUserInput()
+void Controller::processUserInput()
 {
 	bool action_state;												//Assumes action state.
+	bool action_triggered = false;
 	for (int i = 0; i < action_keys.size(); i++)
 	{
 		action_state = true;
+
 		for (int j = 0; j < action_keys[i].keys.size(); j++)
 		{
 			if (!sf::Keyboard::isKeyPressed(action_keys[i].keys[j])) //If one of the binded action keys is not pressed, 
@@ -46,16 +48,22 @@ void Controller::getUserInput()
 				break;
 			}
 		}
+
 		if (action_state)
-			action_keys[i].action->triggerAction();					 //If the action state remained true, action is triggered.
+		{
+			std::cout << action_keys[i].action->getActionName() << std::endl;
+			action_keys[i].action->triggerAction();					//If the action state remained true, action is triggered.
+			action_triggered = true;								//Set action_triggered to true
+		}	
 	}
-	/*
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-		obj->onActionRequest("Left");
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-		obj->onActionRequest("Right");
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-		obj->onActionRequest("Up");
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-		obj->onActionRequest("Down");*/
+	if (!action_triggered)									//if the action_state is false and any previous actions were'nt triggered
+	{
+		//MAKE THIS A SEPERATE FUNKTION CALLED update. Change the current update functions name to ex gotonextframe.
+		this->action_keys[0].action->getParentObject()->setFrame(this->action_keys[0].action->getAnimation()->getActiveFrame());
+		this->action_keys[0].action->getAnimation()->update();
+		this->action_keys[0].action->getParentObject()->setVelocity({ 0,0 });
+	}
+	
+	
+	
 }

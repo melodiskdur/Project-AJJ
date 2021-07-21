@@ -20,7 +20,7 @@ public:
 	Controller();
 	virtual ~Controller();
 
-	void getUserInput();
+	void processUserInput();
 	void bindActionToKey(Action* action, sf::Keyboard::Key key);
 	void bindActionToKey(Action* action, std::vector<sf::Keyboard::Key> keys);
 
