@@ -32,10 +32,11 @@ void Controller::setObject(Object* obj)
 	this->obj = obj;
 }
 
+
 void Controller::processUserInput()
 {
 	bool action_state;												//Assumes action state.
-	bool action_triggered = false;
+	bool action_triggered = false;									//If any action were triggered
 	for (int i = 0; i < action_keys.size(); i++)
 	{
 		action_state = true;
@@ -56,12 +57,9 @@ void Controller::processUserInput()
 			action_triggered = true;								//Set action_triggered to true
 		}	
 	}
-	if (!action_triggered)									//if the action_state is false and any previous actions were'nt triggered
+	if (!action_triggered)											//if no actions were triggered
 	{
-		//MAKE THIS A SEPERATE FUNKTION CALLED update. Change the current update functions name to ex gotonextframe.
-		this->action_keys[0].action->getParentObject()->setFrame(this->action_keys[0].action->getAnimation()->getActiveFrame());
-		this->action_keys[0].action->getAnimation()->update();
-		this->action_keys[0].action->getParentObject()->setVelocity({ 0,0 });
+		this->action_keys[0].action->triggerAction();				//trigger the idle action
 	}
 	
 	

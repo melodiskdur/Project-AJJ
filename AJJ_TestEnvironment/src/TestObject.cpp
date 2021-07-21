@@ -50,49 +50,16 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size)
   
     //---------------Animation test---------------
     
-    Animation* idle_anim = new Animation();
-    idle_anim->addFrame(TEXTURE_ID::IDLE, 0, 200.0f);
-    idle_anim->addFrame(TEXTURE_ID::IDLE, 1, 200.0f);
-    idle_anim->addFrame(TEXTURE_ID::IDLE, 2, 200.0f);
-    idle_anim->addFrame(TEXTURE_ID::IDLE, 3, 200.0f);
-    idle_anim->addFrame(TEXTURE_ID::IDLE, 4, 200.0f);
-    idle_anim->addFrame(TEXTURE_ID::IDLE, 5, 200.0f);
-    idle_anim->addFrame(TEXTURE_ID::IDLE, 6, 200.0f);
-    idle_anim->addFrame(TEXTURE_ID::IDLE, 7, 200.0f);
-    idle_anim->addFrame(TEXTURE_ID::IDLE, 8, 200.0f);
-    idle_anim->addFrame(TEXTURE_ID::IDLE, 9, 200.0f);
-
+    Animation* idle_anim = new Animation(TEXTURE_ID::IDLE, 0, 9, 200.0f);
     idle->setAnimation(idle_anim);
     
-    Animation* run_anim = new Animation();
-    run_anim->addFrame(TEXTURE_ID::RUN, 0, 200.0f);
-    run_anim->addFrame(TEXTURE_ID::RUN, 1, 200.0f);
-    run_anim->addFrame(TEXTURE_ID::RUN, 2, 200.0f);
-    run_anim->addFrame(TEXTURE_ID::RUN, 3, 200.0f);
-    run_anim->addFrame(TEXTURE_ID::RUN, 4, 200.0f);
-    run_anim->addFrame(TEXTURE_ID::RUN, 5, 200.0f);
-    run_anim->addFrame(TEXTURE_ID::RUN, 6, 200.0f);
-    run_anim->addFrame(TEXTURE_ID::RUN, 7, 200.0f);
-    run_anim->addFrame(TEXTURE_ID::RUN, 8, 200.0f);
-    run_anim->addFrame(TEXTURE_ID::RUN, 9, 200.0f);
-    
+    Animation* run_anim = new Animation(TEXTURE_ID::RUN, 0, 9, 200.0f);
     actionRight->setAnimation(run_anim);
     actionLeft->setAnimation(run_anim);
     actionUp->setAnimation(run_anim);
     actionDown->setAnimation(run_anim);
 
-    Animation* atk_anim = new Animation();
-    atk_anim->addFrame(TEXTURE_ID::ATTACK, 0, 50.0f);
-    atk_anim->addFrame(TEXTURE_ID::ATTACK, 1, 50.0f);
-    atk_anim->addFrame(TEXTURE_ID::ATTACK, 2, 50.0f);
-    atk_anim->addFrame(TEXTURE_ID::ATTACK, 3, 50.0f);
-    atk_anim->addFrame(TEXTURE_ID::ATTACK, 4, 50.0f);
-    atk_anim->addFrame(TEXTURE_ID::ATTACK, 5, 50.0f);
-    atk_anim->addFrame(TEXTURE_ID::ATTACK, 6, 50.0f);
-    atk_anim->addFrame(TEXTURE_ID::ATTACK, 7, 50.0f);
-    atk_anim->addFrame(TEXTURE_ID::ATTACK, 8, 50.0f);
-    atk_anim->addFrame(TEXTURE_ID::ATTACK, 9, 50.0f);
-
+    Animation* atk_anim = new Animation(TEXTURE_ID::ATTACK, 0, 9, 50.0f);
     attack->setAnimation(atk_anim);
 
     //--------------------------------------------

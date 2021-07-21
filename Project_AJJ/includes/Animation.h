@@ -22,6 +22,7 @@ class Animation
 {
 public:
 	Animation();
+	Animation(TEXTURE_ID texture_id, int start_index, int stop_index, double duration);
 	~Animation();
 
 	//Getters

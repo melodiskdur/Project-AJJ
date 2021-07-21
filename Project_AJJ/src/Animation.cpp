@@ -8,6 +8,15 @@ Animation::Animation()
 
 }
 
+//Constructor
+Animation::Animation(TEXTURE_ID texture_id, int start_index, int stop_index, double duration)
+{
+	for (int i = start_index; i <= stop_index; i++)
+	{
+		addFrame(texture_id, i, duration);
+	}
+}
+
 //Destructor
 Animation::~Animation()
 {
