@@ -15,25 +15,25 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
     geo_shape[3].position = sf::Vector2f(pos.x, pos.y + size.y);
 
     //hardcoded example colors
-    geo_shape[0].color = sf::Color::Red;
-    geo_shape[1].color = sf::Color::Blue;
-    geo_shape[2].color = sf::Color::Green;
-    geo_shape[3].color = sf::Color::Yellow;
+    geo_shape[0].color = sf::Color::Transparent;
+    geo_shape[1].color = sf::Color::Transparent;
+    geo_shape[2].color = sf::Color::Transparent;
+    geo_shape[3].color = sf::Color::Transparent;
 }
 
 Object::~Object()
 {
-	std::cout << "Object deleted" << std::endl;
+    std::cout << "Object deleted" << std::endl;
 }
 
 sf::Vector2f Object::getWorldPosition()
 {
-	return this->world_position;
+    return this->world_position;
 }
 
 sf::Vector2f Object::getVelocity()
 {
-	return this->velocity;
+    return this->velocity;
 }
 
 sf::Vector2f Object::getSize()
@@ -43,12 +43,12 @@ sf::Vector2f Object::getSize()
 
 sf::VertexArray Object::getGeoShape()
 {
-	return this->geo_shape;
+    return this->geo_shape;
 }
 
 int Object::getRotation()
 {
-	return this->rotation;
+    return this->rotation;
 }
 
 sf::String Object::getTextureName()
@@ -63,12 +63,12 @@ std::vector<Action*> Object::getActions()
 
 void Object::setWorldPosition(sf::Vector2f pos)
 {
-	//update object position and the quad shapes vertices
-	this->world_position = pos;
-	geo_shape[0].position = sf::Vector2f(pos.x, pos.y);
-	geo_shape[1].position = sf::Vector2f(pos.x + size.x, pos.y);
-	geo_shape[2].position = sf::Vector2f(pos.x + size.x, pos.y + size.y);
-	geo_shape[3].position = sf::Vector2f(pos.x, pos.y + size.y);
+    //update object position and the quad shapes vertices
+    this->world_position = pos;
+    geo_shape[0].position = sf::Vector2f(pos.x, pos.y);
+    geo_shape[1].position = sf::Vector2f(pos.x + size.x, pos.y);
+    geo_shape[2].position = sf::Vector2f(pos.x + size.x, pos.y + size.y);
+    geo_shape[3].position = sf::Vector2f(pos.x, pos.y + size.y);
 }
 
 void Object::setVelocity(sf::Vector2f vel)

@@ -22,6 +22,7 @@ public:
 	TextureManager* getTextureManager();
 	
 	//Setters
+	//Sets active scene and creates RenderTexture-pointers for each SceneLayer in active_scene.
 	void setActiveScene(Scene* scene);
 	void setTextureManager(TextureManager* tex_mag);
 	
@@ -31,5 +32,11 @@ public:
 private:
 	Scene* active_scene = nullptr;			    //Active Scene-object.
 	TextureManager* texture_manager = nullptr;	//TextureManager-object.
+	std::vector<sf::RenderTexture*> scene_layer_textures;
+
+	//Used internally to clear all RenderTextures in preparation for the next frame draw.
+	void clearSceneLayerTextures();
+	//Draws layers in descending order (layer_num). Used internally in drawActiveScene().
+	void drawLayers();
 };
 

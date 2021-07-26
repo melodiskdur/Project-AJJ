@@ -22,6 +22,7 @@ TextureManager* ResourceLoader::loadResources()
 	//Set up Boss.
 	TextureAtlas* boss = tex_mag->getAtlas("Boss");
 	boss->createRegionGrid(1, 1);
+	boss->assignRegionName("Boss", sf::Vector2u(0, 0), 0);
 
 	return tex_mag;
 }

@@ -75,8 +75,8 @@ std::vector<sf::FloatRect> QuadTree::getSubTreeBoundaries()
 	std::vector<sf::FloatRect> sub_tree_bounds;
 	int half_width = (int) (this->tree_boundary.width / 2);
 	int half_height = (int) (this->tree_boundary.height / 2);
-	int root_x = this->tree_boundary.left;
-	int root_y = this->tree_boundary.top;
+	int root_x = static_cast<int>(this->tree_boundary.left);
+	int root_y = static_cast<int>(this->tree_boundary.top);
 	sub_tree_bounds.resize(4);
 	sub_tree_bounds[SUBTREE::UPPERLEFT] = sf::FloatRect(root_x, root_y, half_width, half_height);
 	sub_tree_bounds[SUBTREE::UPPERRIGHT] = sf::FloatRect(root_x + half_width, root_y, half_width, half_height);

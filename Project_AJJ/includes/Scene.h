@@ -9,6 +9,22 @@
 
 class CollisionDetection;
 
+/* SceneLayer
+*  Struct that contains a vector of objects as well as some parameters to calculate how
+*  far away the layer is (depth), the scaling of the layer (scale) as well as the previous
+*  position of the scene camera. A larger depth corresponds to a slower parallax. A depth of 1
+*  yields no parallax at all. Depths in range ]0, 1[ result in a reverse parallax, useful if the
+*  layer is in the foreground of the game scene layer.
+ */
+typedef struct _SceneLayer
+{
+	std::vector<Object*> layer_objects;
+	float depth;
+	float scale;
+    signed int layer_num;	    //Rendering order. x = 0: interactive scene layer. x > 0 background, x < 0 : foreground.
+	sf::Vector2f last_cam_pos;
+} SceneLayer;
+
 /* Scene
 	Creates an environment in which many Objects, as well as a Camera object, can be placed.
 	The Scene can then be rendered onto a surface (ExtendedRenderWindow is recommended for this
@@ -26,19 +42,34 @@ public:
 	Camera* getCamera();
 	//std::vector<sf::Sprite*> getObjectSprites();
 	std::vector<Object*>& getSceneObjects();
+	std::vector<SceneLayer*>& getSceneLayers();
 	
 	//Setters
 	void setCamera(Camera* camera);
 	void setCollisionDetection(CollisionDetection* col);
 	
-	//
-	//Adds object(s) 
+	//Others
+	// Instantiates a new SceneLayer given that the layer_num has not already been occupied.
+	void createSceneLayer(signed int layer_num, float depth, float scale);
+	//Adds object(s) to scene (the interactive part e.g players, tiles, mobs).
 	void addSceneObject(Object* object);
 	void addSceneObjects(std::vector<Object*> objects);
+	//Adds object(s) to a SceneLayer with corresponding SceneLayer::layer_num.
+	void addObjectToSceneLayer(Object* object, int layer_num);
+	void addObjectsToSceneLayer(std::vector<Object*> objects, int layer_num);
 	//Updates the scene (object positions etc) for the drawing of the next frame.
 	void updateSceneFrame();
+	//Updates scene layers.
+	void updateSceneLayers();
 private:
 	Camera* scene_camera = nullptr;
 	std::vector<Object*> scene_objects;
 	CollisionDetection* col_det = nullptr;
+	std::vector<SceneLayer*> scene_layers;
+
+	//Adds a layer into vector scene_layers and sorts it in descending order (layer.layer_num). Returns
+	//false if there already is a layer with the same layer_num.
+	bool addLayer(SceneLayer* layer);
+	//Sets the SceneLayer offset with respect to the Scene camera's movement and position. Called in Scene::updateSceneLayers.
+	sf::Vector2f calculateLayerOffset(SceneLayer* layer);
 };
