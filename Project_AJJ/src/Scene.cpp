@@ -2,6 +2,7 @@
 
 Scene::Scene()
 {
+	this->createSceneLayer(0, 1.0f, 1.0f);
 }
 
 Scene::~Scene()
@@ -67,11 +68,13 @@ void Scene::createSceneLayer(signed int layer_num, float depth, float scale)
 void Scene::addSceneObject(Object* object)
 {
 	scene_objects.push_back(object);
+	this->addObjectToSceneLayer(object, 0);
 }
 
 void Scene::addSceneObjects(std::vector<Object*> objects)
 {
 	scene_objects.insert(scene_objects.end(), objects.begin(), objects.end());
+	this->addObjectsToSceneLayer(objects, 0);
 }
 
 void Scene::addObjectToSceneLayer(Object* object, int layer_num)

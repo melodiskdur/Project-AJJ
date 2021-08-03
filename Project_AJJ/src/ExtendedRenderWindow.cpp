@@ -47,30 +47,6 @@ void ExtendedRenderWindow::drawActiveScene()
 	{
 		//All layers are drawn.
 		this->drawLayers();
-		for (Object* obj : active_scene->getSceneObjects())
-		{
-			this->draw(obj->getGeoShape());							 //WIP
-
-			//------------Animation test-----------
-			//get the objects sprite
-			TextureAtlas* obj_atlas = this->texture_manager->getAtlas(obj->getTextureName());
-			if (obj_atlas == nullptr)
-				continue;
-
-			sf::Sprite sprite = obj_atlas->getSprite(obj->getFrame().texture_id, obj->getFrame().region_name, obj->getFrame().frame_index);
-
-			//set the position of the sprite to the same as the objects
-			sprite.setPosition(obj->getWorldPosition());
-
-			//correct scaling of the sprite so that it fits the object
-			sf::VertexArray obj_gs = obj->getGeoShape();
-			sf::FloatRect sprite_r = sprite.getLocalBounds();
-			sprite.scale((obj_gs[1].position.x - obj_gs[0].position.x) / (sprite_r.width), (obj_gs[2].position.y - obj_gs[1].position.y) / (sprite_r.height));
-			this->draw(sprite);
-			//-------------------------------------
-
-			//this->active_scene->updateSceneFrame();
-		}
 	}
 	this->setView(*(active_scene->getCamera()->getCameraView()));	 //Updates the sf::View position.
 }
@@ -91,7 +67,6 @@ void ExtendedRenderWindow::drawLayers()
 	{
 		//Clears each RenderTexture in preparation for rendering.
 		this->scene_layer_textures[i]->clear(sf::Color::Transparent);
-
 		//Calculates the Drawable and positioning of each object in each layer.
 		for (Object* o : layers[i]->layer_objects)
 		{
@@ -106,19 +81,28 @@ void ExtendedRenderWindow::drawLayers()
 			sf::FloatRect sprite_r = obj_sprite.getLocalBounds();
 			//Scaling to fit within object boundaries.
 			obj_sprite.scale((obj_gs[1].position.x - obj_gs[0].position.x) / (sprite_r.width), (obj_gs[2].position.y - obj_gs[1].position.y) / (sprite_r.height));
-			//Draws object to RenderTexture.
-			this->scene_layer_textures[i]->draw(obj_sprite);
+			
+			if (layers[i]->layer_num == 0)
+				//Draws object directly onto RenderWindow if main scene layer.
+				this->draw(obj_sprite);
+			else
+				//Draws object to RenderTexture if any other layer.
+				this->scene_layer_textures[i]->draw(obj_sprite);
 		}
 
-		//Camera-view must be equal to the active_scene's camera-view.
-		this->scene_layer_textures[i]->setView(*(active_scene->getCamera()->getCameraView()));
-		//Renders the texture.
-		this->scene_layer_textures[i]->display();
-		//Converts texture to a sprite.
-		sf::Sprite layer_sprite(this->scene_layer_textures[i]->getTexture());
-		//Sets texture sprite-position to equal the camera view_rect (what we see on screen).
-		layer_sprite.move(this->active_scene->getCamera()->getCameraViewRect().left, this->active_scene->getCamera()->getCameraViewRect().top);
-		//Texture sprite is drawn onto ExtenderRenderWindow for rendering onto the window screen.
-		this->draw(layer_sprite);
+		//Converts all layer textures (except main scene layer (0) ) to sprites and draws them onto RenderWindow.
+		if (layers[i]->layer_num != 0)
+		{
+			//Camera-view must be equal to the active_scene's camera-view.
+			this->scene_layer_textures[i]->setView(*(active_scene->getCamera()->getCameraView()));
+			//Renders the texture.
+			this->scene_layer_textures[i]->display();
+			//Converts texture to a sprite.
+			sf::Sprite layer_sprite(this->scene_layer_textures[i]->getTexture());
+			//Sets texture sprite-position to equal the camera view_rect (what we see on screen).
+			layer_sprite.move(this->active_scene->getCamera()->getCameraViewRect().left, this->active_scene->getCamera()->getCameraViewRect().top);
+			//Texture sprite is drawn onto ExtenderRenderWindow for rendering onto the window screen.
+			this->draw(layer_sprite);
+		}
 	}
 }
