@@ -97,7 +97,7 @@ int main()
 		window.clear(sf::Color::Black);
 		// draw everything here...
 		time = clock.getElapsedTime();
-		test_scene->getSceneObjects()[8]->setWorldPosition(sf::Vector2f(300.0f + 50 * std::cos(time.asSeconds()), 300.0f + 50 * std::sin(time.asSeconds())));
+		//test_scene->getSceneObjects()[8]->setWorldPosition(sf::Vector2f(300.0f + 50 * std::cos(time.asSeconds()), 300.0f + 50 * std::sin(time.asSeconds())));
 		window.drawActiveScene();
 
 		// end the current frame

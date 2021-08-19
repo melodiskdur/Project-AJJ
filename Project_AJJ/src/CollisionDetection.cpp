@@ -18,25 +18,32 @@ CollisionDetection::~CollisionDetection()
 void CollisionDetection::checkForCollisions(sf::FloatRect view_rect)
 {
 	std::vector<Object*> collision_candidates;
+	std::vector<Object*> rendered_objects;
 	root->clearTree();
+	root->setRootBoundaries(view_rect);
 	for (int i = 0; i < scene_objects->size(); i++)
 	{
-		root->insertObject(scene_objects->at(i));
+		//Collision detection only needs to be done for objects within the camera's view.
+		if (view_rect.contains(scene_objects->at(i)->getWorldPosition()))
+		{
+			rendered_objects.push_back(scene_objects->at(i));
+			root->insertObject(scene_objects->at(i));
+		}
 	}
 
-	for (int i = 0; i < scene_objects->size(); i++)
+	for (int i = 0; i < rendered_objects.size(); i++)
 	{
 		collision_candidates.clear();
-		collision_candidates = root->getCollisionCandidates(scene_objects->at(i));
-		sf::FloatRect object_i = sf::FloatRect(scene_objects->at(i)->getWorldPosition(), scene_objects->at(i)->getSize());		//Object i's collision box.
+		collision_candidates = root->getCollisionCandidates(rendered_objects.at(i));
+		sf::FloatRect object_i = sf::FloatRect(rendered_objects.at(i)->getWorldPosition(), rendered_objects.at(i)->getSize());		//Object i's collision box.
 		for (int j = 0; j < collision_candidates.size(); j++)
 		{
-			sf::FloatRect object_j = sf::FloatRect(scene_objects->at(j)->getWorldPosition(), scene_objects->at(j)->getSize());  //Object j's collision box.
+			sf::FloatRect object_j = sf::FloatRect(rendered_objects.at(j)->getWorldPosition(), rendered_objects.at(j)->getSize());  //Object j's collision box.
 			if (object_i.intersects(object_j) && object_i != object_j)
 			{
-				scene_objects->at(i)->setColor(sf::Color::White);
-				scene_objects->at(j)->setColor(sf::Color::White);
-				//std::cout << "Collision Detected!\n";
+				rendered_objects.at(i)->setColor(sf::Color::White);
+				rendered_objects.at(j)->setColor(sf::Color::White);
+				std::cout << "Collision Detected!\n";
 				/*
 				*        COLLISION HANDLING WILL BE DONE HERE!
 				*/
@@ -51,8 +58,23 @@ void CollisionDetection::checkForCollisions(sf::FloatRect view_rect)
 QuadTree::QuadTree()
 {
 	tree_level = 0;
-	for (QuadTree* s : sub_trees)
-		s = nullptr;
+	sub_trees.resize(4);
+	for (int i = 0; i < 4; i++)
+		sub_trees[i] = new QuadTree(tree_level + 1);
+}
+
+QuadTree::QuadTree(int level)
+{
+	this->tree_level = level;
+	sub_trees.resize(4);
+	if (level == QuadTree::max_level - 1)
+	{
+		for (int i = 0; i < 4; i++)
+			sub_trees[i] = nullptr;
+		return;
+	}
+	for (int i = 0; i < 4; i++)
+		sub_trees[i] = new QuadTree(tree_level + 1);
 }
 
 QuadTree::QuadTree(int level, sf::FloatRect boundary)
@@ -61,12 +83,11 @@ QuadTree::QuadTree(int level, sf::FloatRect boundary)
 	tree_boundary = boundary;
 	for (QuadTree* s : sub_trees)
 		s = nullptr;
-
 }
 
 QuadTree::~QuadTree()
 {
-	clearTree();
+	freeTree();
 }
 
 //Getters
@@ -107,30 +128,35 @@ void QuadTree::setRootBoundaries(sf::FloatRect boundaries)
 		tree_boundary = boundaries;
 }
 
+void QuadTree::setLevel(int level)
+{
+	this->tree_level = level;
+}
+
+void QuadTree::setBoundary(sf::FloatRect boundary)
+{
+	this->tree_boundary = boundary;
+}
+
 //Others
 void QuadTree::clearTree()
 {
-	tree_objects.clear();
-	this->has_sub_trees = false;
+	this->tree_objects.clear();
 	for (int i = SUBTREE::UPPERLEFT; i < SUBTREE::LOWERLEFT + 1; i++)
 	{
-		if (sub_trees[i] != nullptr)
-		{
-			sub_trees[i]->clearTree();					//Recursively removes objects and frees Quad Tree memory.
-			delete sub_trees[i];
-			sub_trees[i] = nullptr;
-		}
+		if (this->sub_trees[i] != nullptr)
+			this->sub_trees[i]->clearTree();
 	}
+	this->has_sub_trees = false;
 }
 
 void QuadTree::splitTree()
 {
 	std::vector<sf::FloatRect> sub_tree_bounds = this->getSubTreeBoundaries();
-	int next_level = this->tree_level + 1;
-	sub_trees[SUBTREE::UPPERLEFT] = new QuadTree(next_level, sub_tree_bounds[SUBTREE::UPPERLEFT]);
-	sub_trees[SUBTREE::UPPERRIGHT] = new QuadTree(next_level, sub_tree_bounds[SUBTREE::UPPERRIGHT]);
-	sub_trees[SUBTREE::LOWERRIGHT] = new QuadTree(next_level, sub_tree_bounds[SUBTREE::LOWERRIGHT]);
-	sub_trees[SUBTREE::LOWERLEFT] = new QuadTree(next_level, sub_tree_bounds[SUBTREE::LOWERLEFT]);
+	sub_trees[SUBTREE::UPPERLEFT]->setBoundary(sub_tree_bounds[SUBTREE::UPPERLEFT]);
+	sub_trees[SUBTREE::UPPERRIGHT]->setBoundary(sub_tree_bounds[SUBTREE::UPPERRIGHT]);
+	sub_trees[SUBTREE::LOWERRIGHT]->setBoundary(sub_tree_bounds[SUBTREE::LOWERRIGHT]);
+	sub_trees[SUBTREE::LOWERLEFT]->setBoundary(sub_tree_bounds[SUBTREE::LOWERLEFT]);
 	this->has_sub_trees = true;
 }
 
@@ -178,3 +204,18 @@ int QuadTree::objectIndex(Object* object)
 	}
 	return (int)SUBTREE::ROOT;										//If the object doesn't fit within any of the subtrees
 }																	//it belongs to the root of the subtrees (this QuadTree basically).
+
+void QuadTree::freeTree()
+{
+	tree_objects.clear();
+	this->has_sub_trees = false;
+	for (int i = SUBTREE::UPPERLEFT; i < SUBTREE::LOWERLEFT + 1; i++)
+	{
+		if (sub_trees[i] != nullptr)
+		{
+			sub_trees[i]->freeTree();					//Recursively removes objects and frees Quad Tree memory.
+			delete sub_trees[i];
+			sub_trees[i] = nullptr;
+		}
+	}
+}

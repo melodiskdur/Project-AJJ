@@ -51,7 +51,6 @@ void Controller::processUserInput()
 
 		if (action_state)
 		{
-			std::cout << action_keys[i].action->getActionName() << std::endl;
 			action_keys[i].action->triggerAction();					//If the action state remained true, action is triggered.
 			action_triggered = true;								//Set action_triggered to true
 		}	

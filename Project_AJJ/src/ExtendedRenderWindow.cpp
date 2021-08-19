@@ -45,10 +45,11 @@ void ExtendedRenderWindow::drawActiveScene()
 {
 	if (active_scene != nullptr)
 	{
+		this->active_scene->updateSceneFrame();							 //Collision detection.
 		//All layers are drawn.
 		this->drawLayers();
+		this->setView(*(active_scene->getCamera()->getCameraView()));	 //Updates the sf::View position.
 	}
-	this->setView(*(active_scene->getCamera()->getCameraView()));	 //Updates the sf::View position.
 }
 
 //Private functions.
@@ -83,11 +84,16 @@ void ExtendedRenderWindow::drawLayers()
 			obj_sprite.scale((obj_gs[1].position.x - obj_gs[0].position.x) / (sprite_r.width), (obj_gs[2].position.y - obj_gs[1].position.y) / (sprite_r.height));
 			
 			if (layers[i]->layer_num == 0)
+			{
 				//Draws object directly onto RenderWindow if main scene layer.
+				this->draw(obj_gs);
 				this->draw(obj_sprite);
+			}
 			else
+			{
 				//Draws object to RenderTexture if any other layer.
 				this->scene_layer_textures[i]->draw(obj_sprite);
+			}
 		}
 
 		//Converts all layer textures (except main scene layer (0) ) to sprites and draws them onto RenderWindow.

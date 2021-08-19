@@ -127,7 +127,7 @@ void FirstScene::createWorldLayer(Scene* scene, sf::String texture_name, std::ve
 		{
 			if (map[i * cols + j] == -1)
 				continue;
-
+			
 			current_x = start_pos.x + j * object_size.x;
 			current_y = start_pos.y + i * object_size.y;
 			Object* tile = new Object(sf::Vector2f(current_x, current_y), object_size);
@@ -139,6 +139,7 @@ void FirstScene::createWorldLayer(Scene* scene, sf::String texture_name, std::ve
 			tile_frame.region_name = "Tile";
 			tile->setFrame(tile_frame);
 			scene->addSceneObject(tile);
+			
 		}
 	}
 }
