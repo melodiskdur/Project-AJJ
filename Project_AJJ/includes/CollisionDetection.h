@@ -46,6 +46,7 @@ class QuadTree
 
 public:
 	QuadTree();
+	QuadTree(int level);
 	QuadTree(int level, sf::FloatRect boundary);
 	~QuadTree();
 
@@ -60,9 +61,11 @@ public:
 	//The base rectangle from which the Quad Tree recursion starts from.
 	//Should correspond to the parameter view_rect in CollisionDetection::checkForCollisions().
 	void setRootBoundaries(sf::FloatRect boundaries);
+	void setLevel(int level);
+	void setBoundary(sf::FloatRect boundary);
 
 	//Others
-	//
+	//Resets all the nodes in the QuadTree.
 	void clearTree();
 	//Splits a node into 4 sub trees.
 	void splitTree();
@@ -70,13 +73,14 @@ public:
 	void insertObject(Object* object);
 	//Calculates and returns which sub tree of a node that an object belongs to.
 	int objectIndex(Object* object);
-
+	//Called ïn ~QuadTree to free up memory of all nodes.
+	void freeTree();
 private:
 	int tree_level;							//The level of which this node / sub tree is at.
 	const static int max_level = 5;			//Tree can't go deeper than this.
 	const static int max_objects = 10;		//A single node can't contain more objects than this.
 	sf::FloatRect tree_boundary;
-	QuadTree* sub_trees[4];
+	std::vector<QuadTree*> sub_trees;
 	bool has_sub_trees = false;
 	std::vector<Object*> tree_objects;
 };
