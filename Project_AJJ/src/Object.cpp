@@ -15,10 +15,10 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
     geo_shape[3].position = sf::Vector2f(pos.x, pos.y + size.y);
 
     //hardcoded example colors
-    geo_shape[0].color = sf::Color::Red;
-    geo_shape[1].color = sf::Color::Blue;
-    geo_shape[2].color = sf::Color::Green;
-    geo_shape[3].color = sf::Color::Yellow;
+    geo_shape[0].color = sf::Color::Transparent;
+    geo_shape[1].color = sf::Color::Transparent;
+    geo_shape[2].color = sf::Color::Transparent;
+    geo_shape[3].color = sf::Color::Transparent;
 }
 
 Object::~Object()

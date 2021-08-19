@@ -3,22 +3,6 @@
 #include "includes/FirstScene.h"
 #include "includes/ResourceLoader.h"
 
-Scene* drawTestScene()
-{
-	Scene* testScene = new Scene();
-
-	std::vector<Object*> groundTiles;
-	for (int i = 0; i < 8; i++)
-	{
-		groundTiles.push_back(new TestObject(sf::Vector2f(i * 100.0f, 500.0f), sf::Vector2f(60.f, 100.f)));
-	}
-	testScene->addSceneObjects(groundTiles);
-	TestObject* anotherObject = new TestObject(sf::Vector2f(300.0f, 300.0f), sf::Vector2f(100.f, 100.f));
-	testScene->addSceneObject(anotherObject);
-	groundTiles[2]->setVelocity(sf::Vector2f(0, 0));
-	return testScene;
-}
-
 int main()
 {
 	sf::Event event;
@@ -49,8 +33,8 @@ int main()
 
 	//----------------------- Create Players & Lock View --------------------
 
-	Object* player_1 = new Object(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(100.0f, 100.0f));
-	Object* player_2 = new Object(sf::Vector2f(150.0f, 100.0f), sf::Vector2f(100.0f, 100.0f));
+	TestObject* player_1 = new TestObject(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(100.0f, 100.0f));
+	TestObject* player_2 = new TestObject(sf::Vector2f(150.0f, 100.0f), sf::Vector2f(100.0f, 100.0f));
 	player_1->setTextureName("Rogue");
 	player_2->setTextureName("Rogue");
 	std::vector<Object*> player_vector = {player_1, player_2};
