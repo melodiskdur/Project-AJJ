@@ -8,6 +8,15 @@ Animation::Animation()
 
 }
 
+//Constructor
+Animation::Animation(TEXTURE_ID texture_id, int start_index, int stop_index, double duration)
+{
+	for (int i = start_index; i <= stop_index; i++)
+	{
+		addFrame(texture_id, i, duration);
+	}
+}
+
 //Destructor
 Animation::~Animation()
 {
@@ -64,7 +73,7 @@ void Animation::setActiveFrame(Frame frame)
 }
 
 //Update the active frame index ie go to the next frame
-void Animation::update()
+void Animation::updateAnimation()
 {
 	total_progress = Animation::animation_clock.getElapsedTime().asMilliseconds();
 
@@ -74,7 +83,7 @@ void Animation::update()
 		//If the time difference between the total progress and the last frame update is greater than the frame duration.
 		if (total_progress - last_update > frames[active_frame_index].duration)
 		{
-			//got to the next frame
+			//go to the next frame
 			this->active_frame_index += 1;
 			last_update = total_progress;
 		}

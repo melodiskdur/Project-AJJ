@@ -23,6 +23,7 @@ class Animation
 {
 public:
 	Animation();
+	Animation(TEXTURE_ID texture_id, int start_index, int stop_index, double duration);
 	~Animation();
 
 	//Getters
@@ -36,7 +37,7 @@ public:
 	void addFrame(TEXTURE_ID texture_id, int index, double duration);
 	void addFrame(sf::String region_name, int index, double duration);
 
-	void update();
+	void updateAnimation();
 
 private:
 	std::vector<Frame> frames; //a collection of frames

@@ -22,6 +22,11 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
     geo_shape[3].color = gc;
 }
 
+Object::Object()
+{
+    //empty constructor
+}
+
 Object::~Object()
 {
     std::cout << "Object deleted" << std::endl;
@@ -98,7 +103,15 @@ void Object::setVelocity(sf::Vector2f vel)
         this->velocity.y = this->max_velocity.y;
     else if (vel.y < -this->max_velocity.y)
         this->velocity.y = -this->max_velocity.y;
-
+    
+    /*
+    if ( sqrt(abs((vel.x * vel.x)) + abs((vel.y * vel.y))) > this->max_velocity.x )
+    {
+        float k = sqrt((this->max_velocity.x * this->max_velocity.x) / (abs((vel.x * vel.x)) + abs((vel.y * vel.y))) );
+        this->velocity.x = round(this->velocity.x * k);
+        this->velocity.y = round(this->velocity.y * k);
+    }
+    */
 }
 
 void Object::setGeoShape(sf::VertexArray shape)

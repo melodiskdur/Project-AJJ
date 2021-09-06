@@ -105,7 +105,8 @@ void Scene::addObjectsToSceneLayer(std::vector<Object*> objects, int layer_num)
 
 void Scene::updateSceneFrame()
 {
-	col_det->checkForCollisions(scene_camera->getCameraViewRect());
+	if(col_det != nullptr)
+		col_det->checkForCollisions(scene_camera->getCameraViewRect());
 }
 
 void Scene::updateSceneLayers()

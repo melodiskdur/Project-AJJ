@@ -26,11 +26,6 @@ Object* Action::getParentObject()
 	return parent_object;
 }
 
-float* Action::getActionParameter()
-{
-	return action_parameter;
-}
-
 Animation* Action::getAnimation()
 {
 	return this->animation;
@@ -52,11 +47,6 @@ void Action::setParentObject(Object* parent)
 	parent_object = parent;
 }
 
-void Action::setActionParameter(float* parameter)
-{
-	action_parameter = parameter;
-}
-
 void Action::setParameterManipulation(float manipulation_value)
 {
 	parameter_manipulation = manipulation_value;
@@ -67,59 +57,53 @@ void Action::setAnimation(Animation* animation)
 	this->animation = animation;
 }
 
-//Use the action, apply the parameter manipulation
-//update pos and the animation
 void Action::triggerAction()
 {
-	//-----------UPDATE ACTION_PARAMETER-----------
+	/*triggerAction
+	* This function triggers the specific action
+	*/
 
-	//std::cout << "par_man: " << parameter_manipulation << std::endl;
-
-	//easier to use variables
-	sf::Vector2f obj_wrl_pos = this->parent_object->getWorldPosition();
-	sf::Vector2f obj_vel = this->parent_object->getVelocity();
-	sf::Vector2f obj_max_vel = this->parent_object->getMaxVelocity();
-
-	//check if the action wants to manipulate any parameters
-	if (action_parameter == nullptr)
+	sf::Vector2f set_vel = this->parent_object->getVelocity();
+	
+	//horizontal movement
+	if (this->action_type == ACTIONTYPE::MOVE_LEFT || this->action_type == ACTIONTYPE::MOVE_RIGHT)
 	{
-	    this->parent_object->setVelocity({ 0, 0 });
-
-		//if not(the action_parameter equals nullptr), the answer is no.
-		//then, do nothing
+		set_vel.x += this->parameter_manipulation;
 	}
-	//if the actionparameter is the objects x-coordinate
- 	else if (*action_parameter == obj_wrl_pos.x)
+	//vertical movement
+	else if (this->action_type == ACTIONTYPE::MOVE_UP || this->action_type == ACTIONTYPE::MOVE_DOWN)
 	{
-		//add the parameter_manipulation to the objects velocity in that direction
-		this->parent_object->setVelocity({ obj_vel.x + parameter_manipulation, obj_vel.y });
-
-		//update the action parameter with the velocity in that direction
-		*action_parameter = *action_parameter + obj_vel.x;
+		set_vel.y += this->parameter_manipulation;
 	}
-	//else if the actionparameter is the objects y-coordinate
-	else if(*action_parameter == obj_wrl_pos.y)
-	{
-		//add the parameter_manipulation to the objects velocity in that direction
-		this->parent_object->setVelocity({ obj_vel.x, obj_vel.y + parameter_manipulation });
 
-		//update the action parameter with the velocity in that direction
-		*action_parameter = *action_parameter + obj_vel.y;
+	else if (this->action_type == ACTIONTYPE::ATTACK)
+	{
+		//DO SOMETHING
+	}
+	else if (this->action_type == ACTIONTYPE::IDLE)
+	{
+		//DO SOMETHING
+		//If an object has any actions other than Idle, Idle should also be added
+		//always index 0 in object_actions vector
+	}
+	else
+	{
+		//OBJECT HAS NO IDLE STATE, ADD IT
 	}
 	
-	//---------------------------------------------------
-
+	//set the velocity to the updated one
+	this->parent_object->setVelocity(set_vel);
 
 	//update the objects worldposition
-	parent_object->setWorldPosition(parent_object->getWorldPosition());
-
-
-	//if the action has an animation
+	this->parent_object->setWorldPosition({ this->parent_object->getWorldPosition().x + set_vel.x,
+											this->parent_object->getWorldPosition().y + set_vel.y});
+	
+	//if the action has an animation, update it
 	if (this->animation != nullptr)
 	{
 		//set the texture to the active frame(update sprite)
 		parent_object->setFrame(this->animation->getActiveFrame());
-		//update the animation, got to the next frame
-		this->animation->update();
+		//update the animation(got to the next frame)
+		this->animation->updateAnimation();
 	}
 }

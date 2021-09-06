@@ -36,6 +36,11 @@ sf::FloatRect Camera::getCameraViewRect()
 	return camera_view_rect;
 }
 
+float Camera::getCameraZoom()
+{
+	return this->current_zoom;
+}
+
 //Setters
 void Camera::setCameraView(sf::View* view)
 {
@@ -55,16 +60,34 @@ void Camera::setCameraViewRect()
 	float half_width = camera_view->getSize().x / 2;
 	float half_height = camera_view->getSize().y / 2;
 	sf::Vector2f upper_left = sf::Vector2f(camera_position.x - half_width, camera_position.y - half_height);
-	camera_view_rect = sf::FloatRect(upper_left, camera_view->getSize());
+	this->camera_view_rect = sf::FloatRect(upper_left, camera_view->getSize());
+}
+
+void Camera::setCameraZoom(float zoom_factor)
+{
+	if (zoom_factor < 2 && zoom_factor > 0)
+	{
+		std::cout << "zoom by: " << zoom_factor << std::endl;
+
+		this->camera_view->zoom(zoom_factor);
+		this->current_zoom = zoom_factor;
+	}
+
 }
 
 //Etc
 void Camera::lockOnObject(Object* object)
 {
-	target_object = object;
+	this->target_object = object;
 }
 
 void Camera::unlockFromObject()
 {
-	target_object = nullptr;
+	this->target_object = nullptr;
 }
+
+void Camera::addOrSubCameraZoom(float zoom_by_value) 
+{
+	setCameraZoom(this->current_zoom + zoom_by_value);
+}
+
