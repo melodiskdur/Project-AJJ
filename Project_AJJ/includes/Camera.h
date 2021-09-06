@@ -20,21 +20,27 @@ public:
 	sf::View* getCameraView();
 	sf::Vector2f getCameraPosition();
 	sf::FloatRect getCameraViewRect();
+	float getCameraZoom();
 
 	//Setters
 	void setCameraView(sf::View* view);
 	void setCameraPosition(sf::Vector2f pos);
 	void setCameraViewRect();
+	void setCameraZoom(float zoom_factor);
 
-	//
 	//Allows the camera to follow an object.
 	void lockOnObject(Object* object);
 	//Allows the camera to stop following an object.
 	void unlockFromObject();
+	//Zoom out/in with the camera
+	void addOrSubCameraZoom(float zoom_factor);
+	
+
 private:
 	sf::View* camera_view;				// Display region.
 	sf::Vector2f camera_position;		// Camera central point within a scene.
 	sf::FloatRect camera_view_rect;		// The part of the scene that is seen from the camera POV.
+	float current_zoom = 1;				// Default = 1. If z_f > 1, objects appear smaller.
 	Object* target_object = nullptr;	// Object to follow.
 };
 

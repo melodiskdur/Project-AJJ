@@ -43,7 +43,7 @@ void CollisionDetection::checkForCollisions(sf::FloatRect view_rect)
 			{
 				rendered_objects.at(i)->setColor(sf::Color::White);
 				rendered_objects.at(j)->setColor(sf::Color::White);
-				std::cout << "Collision Detected!\n";
+				//std::cout << "Collision Detected!\n";
 				/*
 				*        COLLISION HANDLING WILL BE DONE HERE!
 				*/

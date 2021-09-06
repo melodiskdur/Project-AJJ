@@ -7,7 +7,18 @@
 
 class Object;
 
-enum ACTIONTYPE {MOVE, JUMP};
+enum ACTIONTYPE 
+{ 
+	MOVE_LEFT, 
+	MOVE_RIGHT, 
+	MOVE_UP, 
+	MOVE_DOWN, 
+	JUMP, 
+	ATTACK, 
+	IDLE,
+	ZOOM_IN,
+	ZOOM_OUT
+};
 
 /* Action
 *  Provides a way to create actions that manipulate an Object instance's
@@ -23,14 +34,13 @@ public:
 	std::string getActionName();
 	ACTIONTYPE getActionType();
 	Object* getParentObject();
-	float* getActionParameter();
+	float getParameterManipulation() { return this->parameter_manipulation; };
 	Animation* getAnimation();
 
 	//Setters
 	void setActionName(std::string name);
 	void setActionType(ACTIONTYPE type);
 	void setParentObject(Object* parent);
-	void setActionParameter(float* action_parameter);
 	void setParameterManipulation(float manipulation_value);
 	void setAnimation(Animation* animation);
 
@@ -39,9 +49,8 @@ public:
 
 private:
 	std::string action_name;
-	ACTIONTYPE action_type = ACTIONTYPE::MOVE;
+	ACTIONTYPE action_type = ACTIONTYPE::IDLE;
 	Object* parent_object = nullptr;
-	float* action_parameter = nullptr;			//Parameter from parent object that the action shall manipulate.
 	float parameter_manipulation = 0;	    //The value of which the parameter shall be manipulated by.
 
 	//Animation

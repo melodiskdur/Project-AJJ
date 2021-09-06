@@ -73,7 +73,7 @@ void Animation::setActiveFrame(Frame frame)
 }
 
 //Update the active frame index ie go to the next frame
-void Animation::update()
+void Animation::updateAnimation()
 {
 	total_progress = Animation::animation_clock.getElapsedTime().asMilliseconds();
 
@@ -83,7 +83,7 @@ void Animation::update()
 		//If the time difference between the total progress and the last frame update is greater than the frame duration.
 		if (total_progress - last_update > frames[active_frame_index].duration)
 		{
-			//got to the next frame
+			//go to the next frame
 			this->active_frame_index += 1;
 			last_update = total_progress;
 		}

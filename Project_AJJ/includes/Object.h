@@ -14,9 +14,11 @@ class Object
 {
 public:
 	Object(sf::Vector2f pos, sf::Vector2f size);
+	Object();
 	virtual ~Object();
 
 	//Getters
+	int getId() { return this->obj_id; };
 	sf::Vector2f getWorldPosition();
 	sf::Vector2f getVelocity();
 	sf::Vector2f getMaxVelocity() { return this->max_velocity; };
@@ -27,8 +29,10 @@ public:
 	std::vector<Action*> getActions();
 	TEXTURE_ID getTextureId() { return this->active_texture; };
 	Frame getFrame() { return this->current_frame; };
+	float getVelocityIncrement() { return this->velocity_inc; };
 
 	//Setters
+	void setId(int id) { this->obj_id = id; };
 	void setWorldPosition(sf::Vector2f pos);
 	void setVelocity(sf::Vector2f vel);
 	void setMaxVelocity(sf::Vector2f max_vel) { this->max_velocity = max_vel; };
@@ -38,6 +42,7 @@ public:
 	void setTextureId(TEXTURE_ID texture_id) { this->active_texture = texture_id; };
 	void setFrame(Frame frame) { this->current_frame = frame; };
 	void setColor(sf::Color color);
+	void setVelocityIncrement(float vel_inc) { this->velocity_inc = vel_inc; };
 	//void setActions(std::vector<int> actions);
 
 	//Others
@@ -48,8 +53,10 @@ public:
 protected:
 
 	//Parameters
+	int obj_id;													//object id
 	sf::Vector2f world_position = sf::Vector2f(0.0f, 0.0f);		//Position on-screen
 	sf::Vector2f velocity = sf::Vector2f(0.0f, 0.0f);			//Current velocity
+	float velocity_inc = 0.0f;									//Velocity increment
 	sf::Vector2f max_velocity = sf::Vector2f(0.0f, 0.0f);		//Maximum velocity
 	sf::VertexArray geo_shape = sf::VertexArray(sf::Quads,4);	//Geometric boundary of the object
 	sf::Vector2f size = sf::Vector2f(0.0f, 0.0f);				//Geo_shape size
