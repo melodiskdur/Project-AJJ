@@ -3,9 +3,16 @@
 #include "Object.h"
 #include "Scene.h"
 #include "PhysicsAttribute.h"
+#include "Hitbox.h"
 #include <cmath>
 
 class QuadTree;
+
+typedef struct _ObjectTuple
+{
+	Object* obj_i = nullptr;
+	Object* obj_j = nullptr;
+} ObjectTuple;
 
 /* CollisionDetection
 *  Subclass of PhysicsAttribute. Once added to a Scene instance, it can be used
@@ -24,9 +31,14 @@ public:
 	//Runs collisition detection for all objects within the view_rect boundaries.
 	//The view_rect should be the Scene::camera_view_rect. 
 	void checkForCollisions(sf::FloatRect view_rect);
+
+	//Checks if tuple of colliding objects already exists within collisions vector.
+	bool tupleExists(Object* o_i, Object* o_j);
+
+	void handleCollisions();
 private:
 	std::vector<Object*>* scene_objects = nullptr;
-	
+	std::vector<ObjectTuple> collisions;
 	QuadTree* root = nullptr;								//The base of the QuadTree.
 };
 

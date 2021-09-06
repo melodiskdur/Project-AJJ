@@ -19,6 +19,8 @@ void CollisionDetection::checkForCollisions(sf::FloatRect view_rect)
 {
 	std::vector<Object*> collision_candidates;
 	std::vector<Object*> rendered_objects;
+	this->collisions.clear();
+	this->collisions.resize(0);
 	root->clearTree();
 	root->setRootBoundaries(view_rect);
 	for (int i = 0; i < scene_objects->size(); i++)
@@ -39,16 +41,38 @@ void CollisionDetection::checkForCollisions(sf::FloatRect view_rect)
 		for (int j = 0; j < collision_candidates.size(); j++)
 		{
 			sf::FloatRect object_j = sf::FloatRect(rendered_objects.at(j)->getWorldPosition(), rendered_objects.at(j)->getSize());  //Object j's collision box.
-			if (object_i.intersects(object_j) && object_i != object_j)
+			if ( (object_i.intersects(object_j) || object_j.intersects(object_i)) &&												//Intersection.
+				rendered_objects.at(i) != rendered_objects.at(j) &&																	//Not the same object.
+				!this->tupleExists(rendered_objects.at(i), rendered_objects.at(j)) )													//Collision is not already registered in vector.
 			{
-				rendered_objects.at(i)->setColor(sf::Color::White);
-				rendered_objects.at(j)->setColor(sf::Color::White);
-				//std::cout << "Collision Detected!\n";
-				/*
-				*        COLLISION HANDLING WILL BE DONE HERE!
-				*/
+				//std::cout << i << " collides with " << j << "\n";
+				ObjectTuple new_collision;
+				new_collision.obj_i = rendered_objects.at(i);
+				new_collision.obj_j = rendered_objects.at(j);
+				this->collisions.push_back(new_collision);
 			}
 		}
+	}
+	this->handleCollisions();
+}
+
+bool CollisionDetection::tupleExists(Object* o_i, Object* o_j)
+{
+	for (int i = 0; i < this->collisions.size(); i++)
+	{
+		if ((collisions[i].obj_i == o_i && collisions[i].obj_j == o_j) ||
+			(collisions[i].obj_i == o_j && collisions[i].obj_j == o_i))
+			return true;
+	}
+	return false;
+}
+
+void CollisionDetection::handleCollisions()
+{
+	for (int i = 0; i < this->collisions.size(); i++)
+	{
+		//Collision handling
+		Hitbox::separateHitboxes(collisions[i].obj_i, collisions[i].obj_j);
 	}
 }
 

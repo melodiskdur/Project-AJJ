@@ -18,7 +18,7 @@ public:
 	virtual ~Object();
 
 	//Getters
-	int getId() { return this->obj_id; };
+	int getId();
 	sf::Vector2f getWorldPosition();
 	sf::Vector2f getVelocity();
 	sf::Vector2f getMaxVelocity() { return this->max_velocity; };
@@ -32,7 +32,7 @@ public:
 	float getVelocityIncrement() { return this->velocity_inc; };
 
 	//Setters
-	void setId(int id) { this->obj_id = id; };
+	void setId(int id);
 	void setWorldPosition(sf::Vector2f pos);
 	void setVelocity(sf::Vector2f vel);
 	void setMaxVelocity(sf::Vector2f max_vel) { this->max_velocity = max_vel; };
@@ -44,7 +44,7 @@ public:
 	void setColor(sf::Color color);
 	void setVelocityIncrement(float vel_inc) { this->velocity_inc = vel_inc; };
 	//void setActions(std::vector<int> actions);
-
+	
 	//Others
 	//Called when the object is queried for an action. Looks through its vector for the action 
 	//with a name corresponding to std::string action_name.
