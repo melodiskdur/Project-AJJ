@@ -83,7 +83,7 @@ void Action::triggerAction()
 	//check if the action wants to manipulate any parameters
 	if (action_parameter == nullptr)
 	{
-		//this->parent_object->setVelocity({ 0, 0 });
+	    this->parent_object->setVelocity({ 0, 0 });
 
 		//if not(the action_parameter equals nullptr), the answer is no.
 		//then, do nothing

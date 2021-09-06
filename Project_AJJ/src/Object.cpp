@@ -27,6 +27,11 @@ Object::~Object()
     std::cout << "Object deleted" << std::endl;
 }
 
+int Object::getId()
+{
+    return this->obj_id;
+}
+
 sf::Vector2f Object::getWorldPosition()
 {
     return this->world_position;
@@ -60,6 +65,11 @@ sf::String Object::getTextureName()
 std::vector<Action*> Object::getActions()
 {
     return object_actions;
+}
+
+void Object::setId(int id)
+{
+    this->obj_id = id;
 }
 
 void Object::setWorldPosition(sf::Vector2f pos)

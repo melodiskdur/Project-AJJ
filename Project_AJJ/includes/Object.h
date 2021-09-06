@@ -17,6 +17,7 @@ public:
 	virtual ~Object();
 
 	//Getters
+	int getId();
 	sf::Vector2f getWorldPosition();
 	sf::Vector2f getVelocity();
 	sf::Vector2f getMaxVelocity() { return this->max_velocity; };
@@ -29,6 +30,7 @@ public:
 	Frame getFrame() { return this->current_frame; };
 
 	//Setters
+	void setId(int id);
 	void setWorldPosition(sf::Vector2f pos);
 	void setVelocity(sf::Vector2f vel);
 	void setMaxVelocity(sf::Vector2f max_vel) { this->max_velocity = max_vel; };
@@ -39,7 +41,7 @@ public:
 	void setFrame(Frame frame) { this->current_frame = frame; };
 	void setColor(sf::Color color);
 	//void setActions(std::vector<int> actions);
-
+	
 	//Others
 	//Called when the object is queried for an action. Looks through its vector for the action 
 	//with a name corresponding to std::string action_name.
@@ -48,6 +50,7 @@ public:
 protected:
 
 	//Parameters
+	int obj_id;
 	sf::Vector2f world_position = sf::Vector2f(0.0f, 0.0f);		//Position on-screen
 	sf::Vector2f velocity = sf::Vector2f(0.0f, 0.0f);			//Current velocity
 	sf::Vector2f max_velocity = sf::Vector2f(0.0f, 0.0f);		//Maximum velocity

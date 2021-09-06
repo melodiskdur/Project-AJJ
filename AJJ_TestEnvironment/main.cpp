@@ -33,11 +33,14 @@ int main()
 
 	//----------------------- Create Players & Lock View --------------------
 
-	TestObject* player_1 = new TestObject(sf::Vector2f(0.0f, 0.0f), sf::Vector2f(100.0f, 100.0f));
-	TestObject* player_2 = new TestObject(sf::Vector2f(150.0f, 100.0f), sf::Vector2f(100.0f, 100.0f));
+	TestObject* player_1 = new TestObject(sf::Vector2f(600.0f, 0.0f), sf::Vector2f(100.0f, 100.0f));
+	TestObject* player_2 = new TestObject(sf::Vector2f(500.0f, 100.0f), sf::Vector2f(100.0f, 100.0f));
 	player_1->setTextureName("Rogue");
 	player_2->setTextureName("Rogue");
 	std::vector<Object*> player_vector = {player_1, player_2};
+
+	player_1->setId(1337);
+	player_2->setId(420);
 
 	test_scene->addSceneObject(player_1);
 	test_scene->addSceneObject(player_2);

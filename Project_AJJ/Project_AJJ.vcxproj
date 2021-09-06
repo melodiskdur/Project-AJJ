@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="includes\Hitbox.h" />
     <ClInclude Include="Project_AJJ.h" />
     <ClInclude Include="includes\Action.h" />
     <ClInclude Include="includes\Animation.h" />
@@ -41,6 +42,7 @@
     <ClCompile Include="src\CollisionDetection.cpp" />
     <ClCompile Include="src\Controller.cpp" />
     <ClCompile Include="src\ExtendedRenderWindow.cpp" />
+    <ClCompile Include="src\Hitbox.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\PhysicsAttribute.cpp" />
