@@ -49,7 +49,7 @@ private:
 *  the Scene objects into the region that contains each object's world position.
 * 
 *  The Quad Tree can hold a number of levels corresponding to the variable max_levels.
-*/
+*/ 
 class QuadTree
 {
 	//Enum that is used to help keep track of which sub tree of a node is being accessed.

@@ -110,14 +110,14 @@ int main()
 			}
 		}
 
-		std::system("cls");		//clears the terminal. !!!APPARENTLY NOT SUPER, ONLY DEBUGGING PURPOSES!!!
+		//std::system("cls");		//clears the terminal. !!!APPARENTLY NOT SUPER, ONLY DEBUGGING PURPOSES!!!
 
 
 		//------------DATA CONTR-------------
-		std::cout << "\n-----CONTR 1----\n";
+		//std::cout << "\n-----CONTR 1----\n";
 		contr.processUserInput();
 		
-		
+		/*
 		std::cout << "\n{ ";
 		for (auto& active_action : contr.getActiveActions())
 			std::cout << active_action->getActionName() << ", ";
@@ -125,7 +125,7 @@ int main()
 		std::cout << contr.getObject()->getVelocity().x << " , " << contr.getObject()->getVelocity().y << std::endl;
 		std::cout << "-----------------\n\n";
 		//-----------------------------
-
+		*/
 
 		contr_2.processUserInput();
 		main_contr.processUserInput();

@@ -26,7 +26,7 @@ void MainController::triggerActiveActions()
 {
 	for (int i = this->num_of_active_actions - 1; i >= 0; i--)
 	{
-		std::cout << this->active_actions[i]->getActionName() << std::endl;
+		//std::cout << this->active_actions[i]->getActionName() << std::endl;
 		MainController::triggerAction(i);
 	}
 }

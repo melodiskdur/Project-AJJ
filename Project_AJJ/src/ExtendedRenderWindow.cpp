@@ -93,7 +93,7 @@ void ExtendedRenderWindow::drawLayers()
 			if (layers[i]->layer_num == 0)
 			{
 				//Draws object directly onto RenderWindow if main scene layer.
-				//this->draw(obj_gs);			//DEBUG PURPOSES
+				this->draw(obj_gs);			//DEBUG PURPOSES
 				this->draw(obj_sprite);
 			}
 			else
