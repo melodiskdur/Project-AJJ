@@ -121,17 +121,17 @@ int main()
 				window.close();
 			}
 		}
-
+    
 		main_contr.processUserInput();
 		std::cout << "\n{{ ";
 		for (auto& active_action : main_contr.getActiveActions())
 			std::cout << active_action->getActionName() << ", ";
 		std::cout << "}}\n";
-
+    
 		/////////////////////////////////////////////
 		//------------DATA CONTR_PLAYER_1-------------
 		//std::system("cls");		//clears the terminal
-
+    
 		std::cout << "\n-----CONTR 1----\n";
 
 		contr_player_1.processUserInput();
