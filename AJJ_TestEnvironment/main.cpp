@@ -16,7 +16,8 @@ int main()
 	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ");
 	window.setFramerateLimit(140);
 
-	//------------TextureAtlas test---------------
+	//------------------------- TextureAtlas test ----------------------------
+
 	TextureManager* tex_mag = ResourceLoader::loadResources();
 	TextureAtlas* robot = tex_mag->getAtlas("Rogue");
 	robot->createRegionGrid(10, 10);
@@ -25,17 +26,16 @@ int main()
 	robot->assignTextureId(TEXTURE_ID::ATTACK, sf::Vector2u(0, 3), sf::Vector2u(9, 3));
 	window.setTextureManager(tex_mag);
 
-	//--------------------------------------------
+	//------------------- Scene , Camera, CollisionDetection --------------------
 
 	Scene* test_scene = FirstScene::createScene();
 	Camera scene_camera;
 	CollisionDetection* col_det = new CollisionDetection(test_scene->getSceneObjects());
 	test_scene->setCollisionDetection(col_det);
 	test_scene->setCamera(&scene_camera);
-	//scene_camera.setCameraZoom(2); //Zoom. ERROR thrown when zoom is higher, say 8-9
 	window.setActiveScene(test_scene);
-	sf::Clock clock;
-	sf::Time time;
+	//sf::Clock clock;
+	//sf::Time time;
 
 	//----------------------- Create Players & Lock View --------------------
 
@@ -43,35 +43,31 @@ int main()
 	TestObject* player_2 = new TestObject(sf::Vector2f(500.0f, 100.0f), sf::Vector2f(100.0f, 100.0f));
 	player_1->setTextureName("Rogue");
 	player_2->setTextureName("Rogue");
-	std::vector<Object*> player_vector = {player_1, player_2};
-
 	player_1->setId(1337);
 	player_2->setId(420);
-
 	test_scene->addSceneObject(player_1);
 	test_scene->addSceneObject(player_2);
-
 	test_scene->getCamera()->lockOnObject(player_1);
 
 	//------------------------ Add Controls To Players --------------------
 
-	Controller contr;
-	contr.setObject(player_1);
-	contr.bindActionToKey(contr.getObject()->getActions()[0], sf::Keyboard::Key::Unknown); //IDLE
-	contr.bindActionToKey(contr.getObject()->getActions()[1], sf::Keyboard::Key::W);
-	contr.bindActionToKey(contr.getObject()->getActions()[2], sf::Keyboard::Key::S);
-	contr.bindActionToKey(contr.getObject()->getActions()[3], sf::Keyboard::Key::A);
-	contr.bindActionToKey(contr.getObject()->getActions()[4], sf::Keyboard::Key::D);
-	contr.bindActionToKey(contr.getObject()->getActions()[5], sf::Keyboard::Key::LShift); //FUN-TEST ATTACK
+	Controller contr_player_1;
+	contr_player_1.setObject(player_1);
+	contr_player_1.bindActionToKey(player_1->getActions()[0], sf::Keyboard::Key::Unknown); //IDLE
+	contr_player_1.bindActionToKey(player_1->getActions()[1], sf::Keyboard::Key::W);
+	contr_player_1.bindActionToKey(player_1->getActions()[2], sf::Keyboard::Key::S);
+	contr_player_1.bindActionToKey(player_1->getActions()[3], sf::Keyboard::Key::A);
+	contr_player_1.bindActionToKey(player_1->getActions()[4], sf::Keyboard::Key::D);
+	contr_player_1.bindActionToKey(player_1->getActions()[5], sf::Keyboard::Key::LShift); //FUN-TEST ATTACK
 
-	Controller contr_2;
-	contr_2.setObject(player_2);
-	contr_2.bindActionToKey(contr_2.getObject()->getActions()[0], sf::Keyboard::Key::Unknown); //IDLE
-	contr_2.bindActionToKey(contr_2.getObject()->getActions()[1], sf::Keyboard::Key::Up);
-	contr_2.bindActionToKey(contr_2.getObject()->getActions()[2], sf::Keyboard::Key::Down);
-	contr_2.bindActionToKey(contr_2.getObject()->getActions()[3], sf::Keyboard::Key::Left);
-	contr_2.bindActionToKey(contr_2.getObject()->getActions()[4], sf::Keyboard::Key::Right);
-	contr_2.bindActionToKey(contr_2.getObject()->getActions()[5], sf::Keyboard::Key::RShift); //FUN-TEST ATTACK
+	Controller contr_player_2;
+	contr_player_2.setObject(player_2);
+	contr_player_2.bindActionToKey(player_2->getActions()[0], sf::Keyboard::Key::Unknown); //IDLE
+	contr_player_2.bindActionToKey(player_2->getActions()[1], sf::Keyboard::Key::Up);
+	contr_player_2.bindActionToKey(player_2->getActions()[2], sf::Keyboard::Key::Down);
+	contr_player_2.bindActionToKey(player_2->getActions()[3], sf::Keyboard::Key::Left);
+	contr_player_2.bindActionToKey(player_2->getActions()[4], sf::Keyboard::Key::Right);
+	contr_player_2.bindActionToKey(player_2->getActions()[5], sf::Keyboard::Key::RShift); //FUN-TEST ATTACK
 
 	/*
 	contr_2.bindActionToKey(contr_2.getObject()->getActions()[6], { sf::Keyboard::Key::Up,  sf::Keyboard::Key::L }); //SPEED X2
@@ -80,69 +76,87 @@ int main()
 	contr_2.bindActionToKey(contr_2.getObject()->getActions()[9], { sf::Keyboard::Key::Right, sf::Keyboard::Key::L });
 	*/
 
-	TestMainControllerObject* main_contr_obj = new TestMainControllerObject();
-	main_contr_obj->setId(-1);
-
+	//--------------------------- Add Main Controller --------------------------------
+	
+	//create the main controller
 	MainController main_contr;
+	//create object
+	TestMainControllerObject* main_contr_obj = new TestMainControllerObject();
+	//set to -1 (reserved for the main controller)
+	main_contr_obj->setId(-1);
+	//set the object to the main controller
 	main_contr.setObject(main_contr_obj);
-	main_contr.setScene(test_scene);
-	main_contr.bindActionToKey(main_contr.getObject()->getActions()[0], sf::Keyboard::Key::Unknown);	//IDLE
-	main_contr.bindActionToKey(main_contr.getObject()->getActions()[1], sf::Keyboard::Key::I);			//ZOOM IN
-	main_contr.bindActionToKey(main_contr.getObject()->getActions()[2], sf::Keyboard::Key::O);			//ZOOM OUT
-	test_scene->addSceneObject(main_contr.getObject());
+	//set the window for the main controller
+	main_contr.setWindow(&window);
+	//add controllers 
+	main_contr.addController(&contr_player_1);
+	main_contr.addController(&contr_player_2);
+	//bind actions to specific keys
+	main_contr.bindActionToKey(main_contr_obj->getActions()[0], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Unknown });	//IDLE
+	main_contr.bindActionToKey(main_contr_obj->getActions()[1], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::I });			//ZOOM IN
+	main_contr.bindActionToKey(main_contr_obj->getActions()[2], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::O });			//ZOOM OUT
+	main_contr.bindActionToKey(main_contr_obj->getActions()[3], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Space });		//SWITCH PLAYERS TEST
+	main_contr.bindActionToKey(main_contr_obj->getActions()[4], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::P });	//PAUSE
+	main_contr.bindActionToKey(main_contr_obj->getActions()[5], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::L }); //PLAY
+	//last, add the main_controller_object to the scene
+	test_scene->addSceneObject(main_contr_obj);
 
-	int i = 1;
+	//---------------------------------- Game Loop -----------------------------------------
+
 	while (window.isOpen())
 	{
 		while (window.pollEvent(event))
 		{
 			if (event.type == sf::Event::KeyPressed)
 			{
+				/*
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
 				{
-					scene_camera.lockOnObject(player_vector[i % 2]);
-					i++;
+
 				}
+				*/
 			}
 			if (event.type == sf::Event::Closed)
 			{
 				window.close();
 			}
 		}
+    
+		main_contr.processUserInput();
+		std::cout << "\n{{ ";
+		for (auto& active_action : main_contr.getActiveActions())
+			std::cout << active_action->getActionName() << ", ";
+		std::cout << "}}\n";
+    
+		/////////////////////////////////////////////
+		//------------DATA CONTR_PLAYER_1-------------
+		//std::system("cls");		//clears the terminal
+    
+		std::cout << "\n-----CONTR 1----\n";
 
-		//std::system("cls");		//clears the terminal. !!!APPARENTLY NOT SUPER, ONLY DEBUGGING PURPOSES!!!
-
-
-		//------------DATA CONTR-------------
-		//std::cout << "\n-----CONTR 1----\n";
-		contr.processUserInput();
+		contr_player_1.processUserInput();
 		
-		/*
 		std::cout << "\n{ ";
-		for (auto& active_action : contr.getActiveActions())
+		for (auto& active_action : contr_player_1.getActiveActions())
 			std::cout << active_action->getActionName() << ", ";
 		std::cout << "}\n";
-		std::cout << contr.getObject()->getVelocity().x << " , " << contr.getObject()->getVelocity().y << std::endl;
+
+		std::cout << contr_player_1.getObject()->getVelocity().x << 
+			" , " << contr_player_1.getObject()->getVelocity().y << std::endl;
+
 		std::cout << "-----------------\n\n";
-		//-----------------------------
-		*/
+		//-------------------------------------------
+		//////////////////////////////////////////////
 
-		contr_2.processUserInput();
-		main_contr.processUserInput();
-
+		contr_player_2.processUserInput();
 		
-		
-
-		// clear the window with transparent(black) color
-		window.clear(sf::Color::Transparent);
+		//ADDED WINDOW.CLEAR AND WINDOW.DISPLAY IN drawActiveScene()!!!!!!!!!!!!!!!!!!!!
 
 		// draw everything here...
 		//time = clock.getElapsedTime();
 		//test_scene->getSceneObjects()[8]->setWorldPosition(sf::Vector2f(300.0f + 50 * std::cos(time.asSeconds()), 300.0f + 50 * std::sin(time.asSeconds())));
+		
 		window.drawActiveScene();
-
-		// end the current frame
-		window.display();
 	}
 	delete player_1;
 	delete player_2;

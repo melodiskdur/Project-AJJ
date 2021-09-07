@@ -11,14 +11,86 @@ MainController::~MainController()
 
 }
 
+void MainController::activateController(Controller* controller)
+{
+	controller->Controller::activateController();
+}
+
+void MainController::deactivateController(Controller* controller)
+{
+	controller->Controller::deactivateController();
+}
+
+void MainController::addController(Controller * new_controller)
+{ 
+	this->controllers.push_back(new_controller); 
+	this->num_of_controllers++;
+}
+
+void MainController::setWindow(ExtendedRenderWindow* window)
+{
+	this->window = window;
+	this->original_view_size = this->window->getActiveScene()->getCamera()->getCameraView()->getSize();
+}
+
 void MainController::triggerAction(int index)
 {
-	if (this->active_actions[index]->getActionType() == ACTIONTYPE::ZOOM_IN || 
-		this->active_actions[index]->getActionType() == ACTIONTYPE::ZOOM_OUT)
+	ACTIONTYPE type = this->active_actions[index]->getActionType();
+
+	Camera* camera = this->window->getActiveScene()->getCamera();
+
+	if (type == ACTIONTYPE::PAUSE && this->window->getWindowState())
 	{
-		float cur_zoom = this->scene->getCamera()->getCameraZoom();
-		this->scene->getCamera()->getCameraView()->setSize(800, 600); ///HHEEEEEEHUHWUHFUWH
-		this->scene->getCamera()->setCameraZoom(cur_zoom + this->active_actions[index]->getParameterManipulation());
+		for (auto& contr : this->controllers)
+		{
+			contr->Controller::deactivateController();
+		}
+		this->window->deactivateWindow();
+	}
+	if (type == ACTIONTYPE::PLAY && !this->window->getWindowState())
+	{
+		for (auto& contr : this->controllers)
+		{
+			contr->Controller::activateController();
+		}
+		this->window->activateWindow();
+	}
+	if (type == ACTIONTYPE::ZOOM_IN || type == ACTIONTYPE::ZOOM_OUT)
+	{
+		//get the current zoom_factor
+		float cur_zoom = camera->getCameraZoom();
+		//set the view-size to the original one. Needed
+		camera->getCameraView()->setSize(this->original_view_size);
+		//zoom the view by the current zoom_factor + the actions specific parameter manipulation value
+		camera->setCameraZoom(cur_zoom + this->active_actions[index]->getParameterManipulation());
+	}
+	if (type == ACTIONTYPE::SWITCH_CAMERA_LOCKED_OBJECT)
+	{
+		//get the id of the object that the camera is currently locked on
+		int locked_obj_id = camera->getTargetObject()->getId();
+
+		//HARDCODED FOR PLAYER_1 AND 2. ID: 420 AND 1337
+		//change id to other player
+		if (locked_obj_id == 420)
+			locked_obj_id = 1337;
+		else if (locked_obj_id == 1337)
+			locked_obj_id = 420;
+		else
+		{
+			//ERROR
+			locked_obj_id = 0;
+		}
+
+		//lock the camera to the next object
+		camera->lockOnObject(this->window->getActiveScene()->getObjectWithId(locked_obj_id));
+	}
+	if (type == ACTIONTYPE::STEP_FORWARD)
+	{
+
+	}
+	if (type == ACTIONTYPE::STEP_BACK)
+	{
+
 	}
 }
 
