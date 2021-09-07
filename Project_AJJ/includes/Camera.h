@@ -21,6 +21,7 @@ public:
 	sf::Vector2f getCameraPosition();
 	sf::FloatRect getCameraViewRect();
 	float getCameraZoom();
+	Object* getTargetObject() { return this->target_object; };
 
 	//Setters
 	void setCameraView(sf::View* view);

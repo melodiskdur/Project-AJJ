@@ -208,16 +208,23 @@ void Controller::triggerActiveActions()
 
 void Controller::processUserInput()
 {		
-	//construct the active_actions vector
-	constructActiveActions();
-
-	//if there are no active_actions
-	if (active_actions.empty())
+	if (this->controller_state)
 	{
-		active_actions.push_back(action_keys[0].action);				//add the idle/not-active action
-		this->num_of_active_actions++;
+		//construct the active_actions vector
+		constructActiveActions();
+
+		//if there are no active_actions
+		if (active_actions.empty())
+		{
+			active_actions.push_back(action_keys[0].action);				//add the idle/not-active action
+			this->num_of_active_actions++;
+		}
+
+		//last, trigger all the actions that have been activated
+		triggerActiveActions();
 	}
-	
-	//last, trigger all the actions that have been activated
-	triggerActiveActions();
+	else
+	{
+		std::cout << "not active\n";
+	}
 }

@@ -39,6 +39,20 @@ std::vector<SceneLayer*>& Scene::getSceneLayers()
 	return this->scene_layers;
 }
 
+Object* Scene::getObjectWithId(int id)
+{
+	for (auto& obj : this->scene_objects)
+	{
+		if (obj->getId() == id)
+		{
+			return obj;
+		}
+	}
+
+	std::cout << "ERROR: no object with id " << id << "in scene" << std::endl;
+	return nullptr;
+}
+
 //Setters
 void Scene::setCamera(Camera* camera)
 {

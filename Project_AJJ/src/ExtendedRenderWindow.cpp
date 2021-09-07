@@ -43,15 +43,38 @@ void ExtendedRenderWindow::setTextureManager(TextureManager* tex_mag)
 
 void ExtendedRenderWindow::drawActiveScene()
 {
-	if (active_scene != nullptr)
+	if (this->window_state)
 	{
-		this->active_scene->updateSceneFrame();							 //Collision detection.
-		//All layers are drawn.
-		
-		this->setView(*(active_scene->getCamera()->getCameraView()));	 //Updates the sf::View position.
-		this->drawLayers();
-		
+		// clear the window with transparent(black) color
+		this->clear(sf::Color::Transparent);
+
+		if (active_scene != nullptr)
+		{
+			this->active_scene->updateSceneFrame();							 //Collision detection.
+			//All layers are drawn.
+			this->setView(*(active_scene->getCamera()->getCameraView()));	 //Updates the sf::View position.
+			this->drawLayers();
+		}
+		// end the current frame. Display all changes
+		this->display();
 	}
+	else
+	{
+		sf::Text text;
+		sf::Font font;
+		font.loadFromFile("C:/Users/karla/source/repos/Project-AJJ/Project_AJJ/assets/MomCakeFont.otf");
+		text.setString("PAUSED");
+		text.setFont(font);
+		text.setCharacterSize(34); // in pixels, not points!
+		text.setFillColor(sf::Color::White);
+		text.setPosition({ this->getActiveScene()->getCamera()->getCameraViewRect().left + 10,
+							this->getActiveScene()->getCamera()->getCameraViewRect().top });
+
+		this->draw(text);
+		// end the current frame. Display all changes
+		this->display();
+	}
+
 }
 
 //Private functions.

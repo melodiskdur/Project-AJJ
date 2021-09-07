@@ -43,7 +43,8 @@ public:
 	//std::vector<sf::Sprite*> getObjectSprites();
 	std::vector<Object*>& getSceneObjects();
 	std::vector<SceneLayer*>& getSceneLayers();
-	
+	Object* getObjectWithId(int id);
+
 	//Setters
 	void setCamera(Camera* camera);
 	void setCollisionDetection(CollisionDetection* col);

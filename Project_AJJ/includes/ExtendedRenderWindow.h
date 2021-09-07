@@ -20,6 +20,7 @@ public:
 	//Getters
 	Scene* getActiveScene();
 	TextureManager* getTextureManager();
+	bool getWindowState() { return this->window_state; };
 	
 	//Setters
 	//Sets active scene and creates RenderTexture-pointers for each SceneLayer in active_scene.
@@ -29,10 +30,14 @@ public:
 	//Etc
 	//Draws a frame of the active Scene-object.
 	void drawActiveScene();
+	void deactivateWindow() { this->window_state = false; };
+	void activateWindow() { this->window_state = true; };
+
 private:
 	Scene* active_scene = nullptr;			    //Active Scene-object.
 	TextureManager* texture_manager = nullptr;	//TextureManager-object.
 	std::vector<sf::RenderTexture*> scene_layer_textures;
+	bool window_state = true;					//activated/deactivated
 
 	//Used internally to clear all RenderTextures in preparation for the next frame draw.
 	void clearSceneLayerTextures();

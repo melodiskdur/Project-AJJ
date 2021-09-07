@@ -65,14 +65,29 @@ void Camera::setCameraViewRect()
 
 void Camera::setCameraZoom(float zoom_factor)
 {
-	if (zoom_factor < 2 && zoom_factor > 0)
-	{
-		std::cout << "zoom by: " << zoom_factor << std::endl;
+	//NOTE:
+	//Limits for the zoom are [0,2]
+	//This is hardcoded for now. 
 
-		this->camera_view->zoom(zoom_factor);
-		this->current_zoom = zoom_factor;
+	//if the zoom_factor is the same as the current one, we dont bother updating
+	if (zoom_factor == this->current_zoom) { return; }
+
+	//make sure that the zoom_factor is within the limits
+	if (zoom_factor > 2)
+	{
+		zoom_factor = 2;
+	}
+	else if (zoom_factor < 0)
+	{
+		zoom_factor = 0;
 	}
 
+	//std::cout << "zoom by: " << zoom_factor << std::endl;
+
+	//zoom the camera_view
+	this->camera_view->zoom(zoom_factor);
+	//and update the current_zoom variable
+	this->current_zoom = zoom_factor;
 }
 
 //Etc
