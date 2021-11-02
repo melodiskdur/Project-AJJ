@@ -39,7 +39,9 @@ void MainController::triggerAction(int index)
 
 	Camera* camera = this->window->getActiveScene()->getCamera();
 
-	if (type == ACTIONTYPE::PAUSE && this->window->getWindowState())
+	bool window_active = this->window->getWindowState();
+
+	if (type == ACTIONTYPE::PAUSE && window_active)
 	{
 		for (auto& contr : this->controllers)
 		{
@@ -47,7 +49,7 @@ void MainController::triggerAction(int index)
 		}
 		this->window->deactivateWindow();
 	}
-	if (type == ACTIONTYPE::PLAY && !this->window->getWindowState())
+	if (type == ACTIONTYPE::PLAY && !window_active)
 	{
 		for (auto& contr : this->controllers)
 		{
@@ -55,7 +57,7 @@ void MainController::triggerAction(int index)
 		}
 		this->window->activateWindow();
 	}
-	if (type == ACTIONTYPE::ZOOM_IN || type == ACTIONTYPE::ZOOM_OUT)
+	if ((type == ACTIONTYPE::ZOOM_IN || type == ACTIONTYPE::ZOOM_OUT) && window_active)
 	{
 		//get the current zoom_factor
 		float cur_zoom = camera->getCameraZoom();
@@ -64,25 +66,36 @@ void MainController::triggerAction(int index)
 		//zoom the view by the current zoom_factor + the actions specific parameter manipulation value
 		camera->setCameraZoom(cur_zoom + this->active_actions[index]->getParameterManipulation());
 	}
-	if (type == ACTIONTYPE::SWITCH_CAMERA_LOCKED_OBJECT)
+	if (type == ACTIONTYPE::SWITCH_CAMERA_LOCKED_OBJECT && window_active)
 	{
 		//get the id of the object that the camera is currently locked on
 		int locked_obj_id = camera->getTargetObject()->getId();
 
-		//HARDCODED FOR PLAYER_1 AND 2. ID: 420 AND 1337
-		//change id to other player
-		if (locked_obj_id == 420)
-			locked_obj_id = 1337;
-		else if (locked_obj_id == 1337)
-			locked_obj_id = 420;
-		else
+		//loop all controllers
+		for (int i = 0; i < this->num_of_controllers; i++)
 		{
-			//ERROR
-			locked_obj_id = 0;
-		}
+			//if one of the controllers has the obj the camera is currently locked on
+			if (this->controllers[i]->getObject()->getId() == locked_obj_id)
+			{
+				//check if its the last element in the controllers vector
+				if (i + 1 == this->num_of_controllers)
+				{
+					//if so, go to the beginning
+					i = 0;
+				}
+				else
+				{
+					//else, go to the next controller in the vector
+					i++;
+				}
 
-		//lock the camera to the next object
-		camera->lockOnObject(this->window->getActiveScene()->getObjectWithId(locked_obj_id));
+				//lock the camera on the new object
+				camera->lockOnObject(this->controllers[i]->getObject());
+
+				//and end the loop
+				break;
+			}
+		}
 	}
 	if (type == ACTIONTYPE::STEP_FORWARD)
 	{
