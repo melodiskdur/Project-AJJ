@@ -14,7 +14,7 @@ int main()
 	float window_width = 800 * sc_f;
 	float window_height = 600 * sc_f;
 	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ");
-	window.setFramerateLimit(60);
+	window.setFramerateLimit(40);
 
 	//------------------------- TextureAtlas test ----------------------------
 

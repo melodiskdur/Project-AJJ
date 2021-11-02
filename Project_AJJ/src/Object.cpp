@@ -15,11 +15,12 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
     geo_shape[3].position = sf::Vector2f(pos.x, pos.y + size.y);
 
     //hardcoded example colors
-    sf::Color gc = sf::Color::Red;
+    sf::Color gc = sf::Color::Black;
     geo_shape[0].color = gc;
     geo_shape[1].color = gc;
     geo_shape[2].color = gc;
     geo_shape[3].color = gc;
+
 }
 
 Object::Object()
@@ -85,6 +86,19 @@ void Object::setWorldPosition(sf::Vector2f pos)
     geo_shape[1].position = sf::Vector2f(pos.x + size.x, pos.y);
     geo_shape[2].position = sf::Vector2f(pos.x + size.x, pos.y + size.y);
     geo_shape[3].position = sf::Vector2f(pos.x, pos.y + size.y);
+
+    //Debugging
+    sf::Vector2f vel = { this->velocity.x * 4, this->velocity.y * 4 };
+    vel_vec[0][0].position = geo_shape[0].position;
+    vel_vec[0][1].position = geo_shape[0].position + vel;
+    vel_vec[1][0].position = geo_shape[1].position;
+    vel_vec[1][1].position = geo_shape[1].position + vel;
+    vel_vec[2][0].position = geo_shape[2].position;
+    vel_vec[2][1].position = geo_shape[2].position + vel;
+    vel_vec[3][0].position = geo_shape[3].position;
+    vel_vec[3][1].position = geo_shape[3].position + vel;
+
+
 }
 
 void Object::setVelocity(sf::Vector2f vel)

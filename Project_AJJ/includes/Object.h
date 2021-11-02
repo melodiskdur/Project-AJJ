@@ -44,12 +44,17 @@ public:
 	void setColor(sf::Color color);
 	void setVelocityIncrement(float vel_inc) { this->velocity_inc = vel_inc; };
 	//void setActions(std::vector<int> actions);
-	
+
 	//Others
 	//Called when the object is queried for an action. Looks through its vector for the action 
 	//with a name corresponding to std::string action_name.
 	void onActionRequest(std::string action_name);
 
+	//DEBUGGING
+	sf::VertexArray vel_vec[4] = { sf::VertexArray(sf::Lines, 2), //UR
+								 sf::VertexArray(sf::Lines, 2), //UL
+								 sf::VertexArray(sf::Lines, 2), //LL
+								 sf::VertexArray(sf::Lines, 2) }; //LR
 protected:
 
 	//Parameters
@@ -58,7 +63,7 @@ protected:
 	sf::Vector2f velocity = sf::Vector2f(0.0f, 0.0f);			//Current velocity
 	float velocity_inc = 0.0f;									//Velocity increment
 	sf::Vector2f max_velocity = sf::Vector2f(0.0f, 0.0f);		//Maximum velocity
-	sf::VertexArray geo_shape = sf::VertexArray(sf::Quads,4);	//Geometric boundary of the object
+	sf::VertexArray geo_shape = sf::VertexArray(sf::Quads, 4);	//Geometric boundary of the object
 	sf::Vector2f size = sf::Vector2f(0.0f, 0.0f);				//Geo_shape size
 	int rotation = 0;											//Rotation value of the object
 
