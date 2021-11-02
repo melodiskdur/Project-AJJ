@@ -104,9 +104,9 @@ void Hitbox::singleObjectSeparation(Object* moving, Object* other)
 
 		//Set vertical t parameter.
 		t_vert = vel.x < 0 ? (other->getWorldPosition().x + other->getSize().x - ll.x) / vel.x	//Right side.
-			:				 (other->getWorldPosition().x - lr.x) / vel.x;						//Left side.
+			: (other->getWorldPosition().x - lr.x) / vel.x;										//Left side.
 		t_hori = vel.y < 0 ? (other->getWorldPosition().y + other->getSize().y - ll.y) / vel.y  //Bottom side.
-			:				 (other->getWorldPosition().y - lr.y) / vel.y;						//Top side.
+			: (other->getWorldPosition().y - lr.y) / vel.y;									 	//Top side.
 		//Calculate intersection points.
 		if (vel.x < 0)
 		{
@@ -146,7 +146,7 @@ void Hitbox::singleObjectSeparation(Object* moving, Object* other)
 			new_vel.x = 0;
 		}
 		//Horizontal check + adjustment.
-		if ((moving_hori[0].x + t_hori * vel.x > insec_hori[0].x && moving_hori[0].x + t_hori * vel.x < insec_hori[1].x) ||
+		else if ((moving_hori[0].x + t_hori * vel.x > insec_hori[0].x && moving_hori[0].x + t_hori * vel.x < insec_hori[1].x) ||
 			(moving_hori[1].x + t_hori * vel.x > insec_hori[0].x && moving_hori[1].x + t_hori * vel.x < insec_hori[1].x))
 		{
 			new_pos.y = vel.y < 0 ? other->getWorldPosition().y + other->getSize().y

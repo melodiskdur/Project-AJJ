@@ -73,17 +73,14 @@ void Camera::setCameraZoom(float zoom_factor)
 	if (zoom_factor == this->current_zoom) { return; }
 
 	//make sure that the zoom_factor is within the limits
-	if (zoom_factor > 2)
+	if (zoom_factor > this->max_zoom)
 	{
-		zoom_factor = 2;
+		zoom_factor = this->max_zoom;
 	}
-	else if (zoom_factor < 0)
+	else if (zoom_factor < this->max_zoom)
 	{
 		zoom_factor = 0;
 	}
-
-	//std::cout << "zoom by: " << zoom_factor << std::endl;
-
 	//zoom the camera_view
 	this->camera_view->zoom(zoom_factor);
 	//and update the current_zoom variable

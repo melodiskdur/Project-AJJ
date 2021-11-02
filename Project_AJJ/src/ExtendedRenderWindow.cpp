@@ -116,7 +116,13 @@ void ExtendedRenderWindow::drawLayers()
 			if (layers[i]->layer_num == 0)
 			{
 				//Draws object directly onto RenderWindow if main scene layer.
-				this->draw(obj_gs);			//DEBUG PURPOSES
+				//DEBUGGING
+				this->draw(obj_gs);		  
+				this->draw(o->vel_vec[0]);
+				this->draw(o->vel_vec[1]);
+				this->draw(o->vel_vec[2]);
+				this->draw(o->vel_vec[3]);	
+				//END DEBUGGING
 				this->draw(obj_sprite);
 			}
 			else
@@ -132,7 +138,12 @@ void ExtendedRenderWindow::drawLayers()
 			//Converts texture to a sprite.
 			sf::Sprite layer_sprite(this->scene_layer_textures[i]->getTexture());
 			//Sets texture sprite-position to equal the camera view_rect (what we see on screen).
+
+			//Scale each render texture
 			layer_sprite.move(this->active_scene->getCamera()->getCameraViewRect().left, this->active_scene->getCamera()->getCameraViewRect().top);
+			float zoom_factor = this->active_scene->getCamera()->getCameraZoom();
+			layer_sprite.scale(sf::Vector2f({ zoom_factor, zoom_factor}));
+
 			//Texture sprite is drawn onto ExtenderRenderWindow for rendering onto the window screen.
 			this->draw(layer_sprite);
 
