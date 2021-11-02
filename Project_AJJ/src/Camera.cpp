@@ -77,7 +77,7 @@ void Camera::setCameraZoom(float zoom_factor)
 	{
 		zoom_factor = this->max_zoom;
 	}
-	else if (zoom_factor < this->max_zoom)
+	else if (zoom_factor < 0)
 	{
 		zoom_factor = 0;
 	}
