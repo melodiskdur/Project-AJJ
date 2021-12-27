@@ -14,7 +14,7 @@ int main()
 	float window_width = 800 * sc_f;
 	float window_height = 600 * sc_f;
 	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ");
-	window.setFramerateLimit(40);
+	window.setFramerateLimit(5);
 
 	//------------------------- TextureAtlas test ----------------------------
 
@@ -26,11 +26,15 @@ int main()
 	robot->assignTextureId(TEXTURE_ID::ATTACK, sf::Vector2u(0, 3), sf::Vector2u(9, 3));
 	window.setTextureManager(tex_mag);
 
-	//------------------- Scene , Camera, CollisionDetection --------------------
+	//------------------- Scene , Camera, PhysicsManager, CollisionDetection, Hitbox --------------------
 
 	Scene* test_scene = FirstScene::createScene();
 	Camera scene_camera;
 	CollisionDetection* col_det = new CollisionDetection(test_scene->getSceneObjects());
+	//PhysicsManager* phys_mag = new PhysicsManager(test_scene->getSceneObjects());
+	//Hitbox* hitbox = new Hitbox();
+	//phys_mag->addAttribute(col_det);
+	//phys_mag->addAttribute(hitbox);
 	test_scene->setCollisionDetection(col_det);
 	test_scene->setCamera(&scene_camera);
 	window.setActiveScene(test_scene);
@@ -96,8 +100,8 @@ int main()
 	main_contr.bindActionToKey(main_contr_obj->getActions()[1], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::I });			//ZOOM IN
 	main_contr.bindActionToKey(main_contr_obj->getActions()[2], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::O });			//ZOOM OUT
 	main_contr.bindActionToKey(main_contr_obj->getActions()[3], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Space });		//SWITCH PLAYERS TEST
-	main_contr.bindActionToKey(main_contr_obj->getActions()[4], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::P });	//PAUSE
-	main_contr.bindActionToKey(main_contr_obj->getActions()[5], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::L }); //PLAY
+	main_contr.bindActionToKey(main_contr_obj->getActions()[4], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::P });			//PAUSE
+	main_contr.bindActionToKey(main_contr_obj->getActions()[5], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::L });			//PLAY
 	//last, add the main_controller_object to the scene
 	test_scene->addSceneObject(main_contr_obj);
 
@@ -123,19 +127,21 @@ int main()
 		}
     
 		main_contr.processUserInput();
+		/*
 		std::cout << "\n{{ ";
 		for (auto& active_action : main_contr.getActiveActions())
 			std::cout << active_action->getActionName() << ", ";
 		std::cout << "}}\n";
-    
+		*/
 		/////////////////////////////////////////////
 		//------------DATA CONTR_PLAYER_1-------------
 		//std::system("cls");		//clears the terminal
     
-		std::cout << "\n-----CONTR 1----\n";
+		
+		//std::cout << "\n-----CONTR 1----\n";
 
 		contr_player_1.processUserInput();
-		
+		/*
 		std::cout << "\n{ ";
 		for (auto& active_action : contr_player_1.getActiveActions())
 			std::cout << active_action->getActionName() << ", ";
@@ -145,6 +151,7 @@ int main()
 			" , " << contr_player_1.getObject()->getVelocity().y << std::endl;
 
 		std::cout << "-----------------\n\n";
+		*/
 		//-------------------------------------------
 		//////////////////////////////////////////////
 

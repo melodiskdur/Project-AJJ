@@ -43,5 +43,10 @@ private:
 	void clearSceneLayerTextures();
 	//Draws layers in descending order (layer_num). Used internally in drawActiveScene().
 	void drawLayers();
+
+	// Debugging.
+	bool debugger_mode = false;
+	// Debugging.
+	void debugDraw();
 };
 

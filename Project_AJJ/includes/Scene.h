@@ -44,6 +44,7 @@ public:
 	std::vector<Object*>& getSceneObjects();
 	std::vector<SceneLayer*>& getSceneLayers();
 	Object* getObjectWithId(int id);
+	CollisionDetection* getCollisionDetection();
 
 	//Setters
 	void setCamera(Camera* camera);

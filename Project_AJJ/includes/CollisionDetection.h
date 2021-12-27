@@ -27,19 +27,28 @@ public:
 	//Constructor that takes a pointer to a Scene's object vector as parameter.
 	CollisionDetection(std::vector<Object*>& objects);
 	~CollisionDetection();
-
 	//Runs collisition detection for all objects within the view_rect boundaries.
-	//The view_rect should be the Scene::camera_view_rect. 
+	//The view_rect should be the Scene::camera_view_rect. Different versions below.
+	std::vector<ObjectTuple> getCollisions(sf::FloatRect view_rect);
 	void checkForCollisions(sf::FloatRect view_rect);
-
 	//Checks if tuple of colliding objects already exists within collisions vector.
 	bool tupleExists(Object* o_i, Object* o_j);
-
 	void handleCollisions();
+	// Returns true if a tuple of collision candidates has at least one moving object.
+	bool atLeastOneMoving(Object* i, Object* j);
+	// Returns true if two objects have intersecting boundaries.
+	bool areIntersecting(sf::FloatRect ibox, sf::FloatRect jbox);
+	// Checks and removes collisions that have been resolved.
+	void removeResolved();
+	// Debugging.
+	std::vector<sf::VertexArray> getGrid();
 private:
 	std::vector<Object*>* scene_objects = nullptr;
 	std::vector<ObjectTuple> collisions;
 	QuadTree* root = nullptr;								//The base of the QuadTree.
+
+	// Debugging.
+	std::vector<sf::FloatRect> grid_lines;
 };
 
 /* QuadTree
@@ -65,8 +74,9 @@ public:
 	//Getters
 	//Helper function to split and return a node's region into four.
 	std::vector<sf::FloatRect> getSubTreeBoundaries();
-	//Calculates and returns a vector of objects that are within the
-	//the same region of the Object* current, i.e potential collisions.
+	// Calculates and returns a vector of objects that are within the
+	// the same region of the Object* current, i.e potential collisions.
+	// Can only be run from the ACTUAL root of the Quad Tree.
 	std::vector<Object*> getCollisionCandidates(Object* current);
 
 	//Setters
@@ -85,8 +95,12 @@ public:
 	void insertObject(Object* object);
 	//Calculates and returns which sub tree of a node that an object belongs to.
 	int objectIndex(Object* object);
-	//Called ïn ~QuadTree to free up memory of all nodes.
+	//Called in ~QuadTree to free up memory of all nodes.
 	void freeTree();
+
+	// Debugging.
+	void setGridVector(std::vector<sf::FloatRect>* grid);
+
 private:
 	int tree_level;							//The level of which this node / sub tree is at.
 	const static int max_level = 5;			//Tree can't go deeper than this.
@@ -95,4 +109,13 @@ private:
 	std::vector<QuadTree*> sub_trees;
 	bool has_sub_trees = false;
 	std::vector<Object*> tree_objects;
+
+	// Function used inside getCollisionCandidates(). Recursively adds all
+	// sub-tree objects of a QuadTree node to a pointer to an Object vector.
+	void collisionCandidateSearch(std::vector<Object*>* candidates);
+	// Function to retreive a pointer of a subtree which contains a given Object.
+	QuadTree* retreiveSubtreeOf(QuadTree* root, Object* o);
+
+	// Debugging
+	std::vector<sf::FloatRect>* grid_lines = nullptr;
 };

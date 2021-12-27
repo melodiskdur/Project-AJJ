@@ -53,6 +53,12 @@ Object* Scene::getObjectWithId(int id)
 	return nullptr;
 }
 
+CollisionDetection* Scene::getCollisionDetection()
+{
+	return this->col_det;
+}
+
+
 //Setters
 void Scene::setCamera(Camera* camera)
 {
@@ -126,16 +132,17 @@ void Scene::updateSceneFrame()
 void Scene::updateSceneLayers()
 {
 	sf::Vector2f offset;
+
 	for (int i = 0; i < this->scene_layers.size(); i++)
 	{
 		SceneLayer* current = this->scene_layers[i];					 //For readability.
 		offset = this->calculateLayerOffset(current);					 //Get position offset.
-		current->last_cam_pos = this->scene_camera->getCameraPosition();//Update layer cam info.
+		current->last_cam_pos = this->scene_camera->getCameraPosition(); //Update layer cam info.
 		//Reduces the world position of each object in every layer by the calculated offset vector.
 		for (Object* o : current->layer_objects)
 		{
 			o->setWorldPosition(o->getWorldPosition() - offset);
-		}
+ 		}
 	}
 }
 

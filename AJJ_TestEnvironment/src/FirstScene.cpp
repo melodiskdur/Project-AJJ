@@ -106,7 +106,7 @@ static std::vector<int> fg_layer1 =
 Scene* FirstScene::createScene()
 {
 	Scene* first_scene = new Scene();
-	//FirstScene::createWorldLayer(first_scene, "Dirt Tiles", world_map, 10, 35, sf::Vector2f(-50.0f, -350.0f), sf::Vector2f(80.0f, 80.0f));
+	FirstScene::createWorldLayer(first_scene, "Dirt Tiles", world_map, 10, 35, sf::Vector2f(-50.0f, -350.0f), sf::Vector2f(80.0f, 80.0f));
 	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", bg_layer1, 10, 35, 1, 1.3f, 0.9f, sf::Vector2f(-50.0f, -350.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
 	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", bg_layer2, 13, 25, 2, 10.0f, 0.8f, sf::Vector2f(50.0f, -350.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
 	FirstScene::createBackgroundLayer(first_scene, "Boss", bg_layer_1_5, 10, 25, 3, 1.8f, 0.7f, sf::Vector2f(-50.0f, -350.0f), sf::Vector2f(200.0f, 200.0f), "Boss");

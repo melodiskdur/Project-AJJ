@@ -12,6 +12,8 @@ class PhysicsAttribute
 public:
 	PhysicsAttribute(std::string attrib_name);
 	virtual ~PhysicsAttribute();
+	
+	std::string getId();
 
 protected:
 	std::string attribute_name;

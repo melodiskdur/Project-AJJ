@@ -15,12 +15,24 @@ public:
     //Setters
 
     //Others
+    // Main function for separation. Calls the object seperation functions
+    // below depending on if only one or both objects are moving.
     static void separateHitboxes(Object* i, Object* j);
+    // Resolves collisions with only one moving object.
     static void singleObjectSeparation(Object* moving, Object* other);
+    // Resolves collisions where both objects are moving.
     static void dualObjectSeparation(Object*i, Object* j);
 
 private:
-    //enum SIDE_COLLISION {left_side, right_side, upper_side, lower_side};
-
+    // Returns how much the two objects are overlapping each other,
+    // along both the x- and the y-axis. (Used in dualObjectSeparation).
+    static sf::Vector2f getOverlaps(Object* i, Object* j);
+    // Simple checks to see if the two objects are travelling in parallell.
+    static bool sameXDirection(Object* i, Object* j);
+    static bool sameYDirection(Object* i, Object* j);
+    // Calculates and returns the factors t_x and t_y that the object
+    // x- and y-velocities must be multiplied by to undo the x- and y-
+    // overlaps. (Used in dualObjectSeparation).
+    static sf::Vector2f getT(Object* i, Object* j, sf::Vector2f overlaps);
 };
 

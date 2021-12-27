@@ -11,6 +11,10 @@ PhysicsAttribute::~PhysicsAttribute()
 }
 
 //Getters
+std::string PhysicsAttribute::getId()
+{
+	return this->attribute_name;
+}
 
 //Setters
 

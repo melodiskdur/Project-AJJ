@@ -55,6 +55,11 @@ void ExtendedRenderWindow::drawActiveScene()
 			this->setView(*(active_scene->getCamera()->getCameraView()));	 //Updates the sf::View position.
 			this->drawLayers();
 		}
+
+		// Debugging.
+		if (this->debugger_mode)
+			this->debugDraw();
+
 		// end the current frame. Display all changes
 		this->display();
 	}
@@ -74,7 +79,6 @@ void ExtendedRenderWindow::drawActiveScene()
 		// end the current frame. Display all changes
 		this->display();
 	}
-
 }
 
 //Private functions.
@@ -95,6 +99,9 @@ void ExtendedRenderWindow::drawLayers()
 		//Clears each RenderTexture in preparation for rendering.
 		this->scene_layer_textures[i]->clear(sf::Color::Transparent);
 
+		//Camera-view must be equal to the active_scene's camera-view.
+		this->scene_layer_textures[i]->setView(*(active_scene->getCamera()->getCameraView()));
+
 		//Calculates the Drawable and positioning of each object in each layer.
 		for (Object* o : layers[i]->layer_objects)
 		{
@@ -109,9 +116,6 @@ void ExtendedRenderWindow::drawLayers()
 			sf::FloatRect sprite_r = obj_sprite.getLocalBounds();
 			//Scaling to fit within object boundaries.
 			obj_sprite.scale((obj_gs[1].position.x - obj_gs[0].position.x) / (sprite_r.width), (obj_gs[2].position.y - obj_gs[1].position.y) / (sprite_r.height));
-			
-			//Camera-view must be equal to the active_scene's camera-view.
-			this->scene_layer_textures[i]->setView(*(active_scene->getCamera()->getCameraView()));
 
 			if (layers[i]->layer_num == 0)
 			{
@@ -149,6 +153,19 @@ void ExtendedRenderWindow::drawLayers()
 
 			//Renders the texture.
 			this->scene_layer_textures[i]->display();
+		}
+	}
+}
+
+// Debugging.
+void ExtendedRenderWindow::debugDraw()
+{
+	if (this->active_scene != nullptr)
+	{
+		std::vector<sf::VertexArray> grid = this->active_scene->getCollisionDetection()->getGrid();
+		for (int i = 0; i < grid.size(); i++)
+		{
+			this->draw(grid[i]);
 		}
 	}
 }

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\Hitbox.h" />
+    <ClInclude Include="includes\PhysicsManager.h" />
     <ClInclude Include="Project_AJJ.h" />
     <ClInclude Include="includes\Action.h" />
     <ClInclude Include="includes\Animation.h" />
@@ -46,6 +47,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\PhysicsAttribute.cpp" />
+    <ClCompile Include="src\PhysicsManager.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\TextureAtlas.cpp" />
     <ClCompile Include="src\TextureIds.cpp" />
