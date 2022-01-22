@@ -37,7 +37,7 @@ public:
 	// Returns true if a tuple of collision candidates has at least one moving object.
 	bool atLeastOneMoving(Object* i, Object* j);
 	// Returns true if two objects have intersecting boundaries.
-	bool areIntersecting(sf::FloatRect ibox, sf::FloatRect jbox);
+	static bool areIntersecting(sf::FloatRect ibox, sf::FloatRect jbox);
 	// Checks and removes collisions that have been resolved.
 	void removeResolved();
 	// Debugging.

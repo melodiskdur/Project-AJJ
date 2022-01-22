@@ -14,7 +14,7 @@ int main()
 	float window_width = 800 * sc_f;
 	float window_height = 600 * sc_f;
 	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ");
-	window.setFramerateLimit(5);
+	window.setFramerateLimit(60);
 
 	//------------------------- TextureAtlas test ----------------------------
 
@@ -31,11 +31,11 @@ int main()
 	Scene* test_scene = FirstScene::createScene();
 	Camera scene_camera;
 	CollisionDetection* col_det = new CollisionDetection(test_scene->getSceneObjects());
-	//PhysicsManager* phys_mag = new PhysicsManager(test_scene->getSceneObjects());
+	PhysicsManager* phys_mag = new PhysicsManager(test_scene->getSceneObjects());
 	//Hitbox* hitbox = new Hitbox();
-	//phys_mag->addAttribute(col_det);
-	//phys_mag->addAttribute(hitbox);
+	phys_mag->addAttribute(col_det);
 	test_scene->setCollisionDetection(col_det);
+	test_scene->setPhysicsManager(phys_mag);
 	test_scene->setCamera(&scene_camera);
 	window.setActiveScene(test_scene);
 	//sf::Clock clock;

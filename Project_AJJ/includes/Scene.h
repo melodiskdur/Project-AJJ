@@ -4,10 +4,12 @@
 #include <SFML/Graphics.hpp>
 #include "Object.h"
 #include "Camera.h"
+#include "PhysicsManager.h"
 #include "PhysicsAttribute.h"
 #include "CollisionDetection.h"
 
 class CollisionDetection;
+class PhysicsManager;
 
 /* SceneLayer
 *  Struct that contains a vector of objects as well as some parameters to calculate how
@@ -49,6 +51,7 @@ public:
 	//Setters
 	void setCamera(Camera* camera);
 	void setCollisionDetection(CollisionDetection* col);
+	void setPhysicsManager(PhysicsManager* phys);
 	
 	//Others
 	// Instantiates a new SceneLayer given that the layer_num has not already been occupied.
@@ -67,6 +70,7 @@ private:
 	Camera* scene_camera = nullptr;
 	std::vector<Object*> scene_objects;
 	CollisionDetection* col_det = nullptr;
+	PhysicsManager* phys_mag = nullptr;
 	std::vector<SceneLayer*> scene_layers;
 
 	//Adds a layer into vector scene_layers and sorts it in descending order (layer.layer_num). Returns
