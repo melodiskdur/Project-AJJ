@@ -4,6 +4,7 @@
 #include "Animation.h"
 #include <string>
 #include <iostream>
+#include <math.h>
 
 class Object;
 
