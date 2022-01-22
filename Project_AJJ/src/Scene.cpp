@@ -71,7 +71,12 @@ void Scene::setCamera(Camera* camera)
 
 void Scene::setCollisionDetection(CollisionDetection* col)
 {
-	col_det = col;
+	this->col_det = col;
+}
+
+void Scene::setPhysicsManager(PhysicsManager* phys)
+{
+	this->phys_mag = phys;
 }
 
 //Etc
@@ -125,8 +130,8 @@ void Scene::addObjectsToSceneLayer(std::vector<Object*> objects, int layer_num)
 
 void Scene::updateSceneFrame()
 {
-	if(col_det != nullptr)
-		col_det->checkForCollisions(scene_camera->getCameraViewRect());
+	if(phys_mag != nullptr)
+		phys_mag->basicCollisionHandler(scene_camera->getCameraViewRect());
 }
 
 void Scene::updateSceneLayers()

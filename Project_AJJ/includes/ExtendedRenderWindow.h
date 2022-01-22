@@ -46,7 +46,7 @@ private:
 
 	// Debugging.
 	bool debugger_mode = false;
-	// Debugging.
 	void debugDraw();
+	// End debugging.
 };
 

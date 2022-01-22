@@ -95,9 +95,9 @@ void Action::triggerAction()
 	this->parent_object->setVelocity(set_vel);
 
 	//update the objects worldposition
-	this->parent_object->setWorldPosition({ this->parent_object->getWorldPosition().x + set_vel.x,
-											this->parent_object->getWorldPosition().y + set_vel.y});
-	
+	this->parent_object->setWorldPosition({ this->parent_object->getWorldPosition().x + this->parent_object->getVelocity().x,
+											this->parent_object->getWorldPosition().y + this->parent_object->getVelocity().y});
+
 	//if the action has an animation, update it
 	if (this->animation != nullptr)
 	{
