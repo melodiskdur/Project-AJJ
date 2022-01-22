@@ -159,6 +159,8 @@ void Controller::triggerActiveActions()
 		* that this does not happern.
 		*/
 	
+	//loop all active object actions
+
 	int hori_move = 0;													//horizontal movement has been/not been made
 	int vert_move = 0;													//vertical movement has been/not been made
 
@@ -203,7 +205,94 @@ void Controller::triggerActiveActions()
 	}
 
 	//break object movement in vert/hori direction if no actions were triggered in those directions
-	breakMovement(hori_move , vert_move , 2 );
+	//!!!!!!!!!!FIX THIS-only a fast solution. Should be implemented as a physics attribute ( friction or airresistance )!!!!!!!!!!!!!!!!
+	breakMovement(hori_move, vert_move, 2);
+
+	//correct horizontal movement to not overstep velocity-ellipsiod
+	correctMovement();
+}
+
+void Controller::correctMovement()
+{
+	sf::Vector2f obj_vel = this->obj->getVelocity();							//objects current velocity vector
+	sf::Vector2f cor_vel = obj_vel;												//objects corrected velocity vector
+	sf::Vector2f max_vel = this->obj->getMaxVelocity();							//objects maximum velocity 
+	float len_vel = sqrt(obj_vel.x * obj_vel.x + obj_vel.y * obj_vel.y);		//length of object velocity vector
+	const float PI = 3.1415927;													//constant for PI
+
+	//calculate the point on the velocity-ellipsiod from the angle of the objects velocity
+	//compare the vector given from the objects center to that point with len_vel
+	//if len_vel is greater, set len_vel to be equal to the newly calculated vector
+	//this calculation does not need to be done if the velocity-ellipsiod is a circle
+	//i.e. the maximum speed is the same for horizontal and vertical movements
+
+
+	if ((max_vel.x != max_vel.y) && (len_vel > max_vel.x || len_vel > max_vel.y))
+	{
+		//calculate degree of travel (horizontally mirrored xy axis.)
+		float deg = atan(obj_vel.y / obj_vel.x);
+
+		//set the degree to positive. To simplify correction
+		if (deg < 0)
+		{
+			deg = -deg;
+		}
+
+		//correct the degree of travel depending on direction
+		if (obj_vel.x > 0)
+		{
+			if (obj_vel.y < 0)
+			{
+				deg = 2 * PI - deg;
+			}
+		}
+		else if (obj_vel.x < 0)
+		{
+			if (obj_vel.y < 0)
+			{
+				deg = PI + deg;
+			}
+			else if (obj_vel.y > 0)
+			{
+				deg = PI - deg;
+			}
+			else
+			{
+				deg = PI;
+			}
+		}
+		else
+		{
+			if (obj_vel.y > 0)
+			{
+				deg = PI / 2;
+			}
+			else if (obj_vel.y < 0)
+			{
+				deg = (3 * PI) / 2;
+			}
+		}
+
+		//calculate x on the velocity-ellipsiod
+		float a = max_vel.x;
+		float b = max_vel.y;
+		float x = (a * b) / sqrt((b * b) + (a * a) * (tan(deg) * tan(deg)));
+		if (obj_vel.x < 0) { x = -x; }
+
+		//calculate y from the ellipse-formula
+		float y = sqrt((1 - ((x * x) / (a * a))) * (b * b));
+		if (obj_vel.y < 0) { y = -y; }
+
+		cor_vel = { x,y };
+	}
+	else if (len_vel > max_vel.x || len_vel > max_vel.y)
+	{
+		//normalize vector obj_vel and cap its length at the maximum stepsize/velocity
+		cor_vel = { (obj_vel.x / len_vel) * max_vel.x,(obj_vel.y / len_vel) * max_vel.y };
+	}
+
+	//update the objects worldposition
+	this->obj->setWorldPosition(this->obj->getWorldPosition() + cor_vel);
 }
 
 void Controller::processUserInput()

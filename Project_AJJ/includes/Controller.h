@@ -29,6 +29,7 @@ public:
 	void bindActionToKey(Action* action, std::vector<sf::Keyboard::Key> keys);
 	void deactivateController() { this->controller_state = false; };
 	void activateController() { this->controller_state = true; };
+	void correctMovement();
 
 	//Setters
 	void setObject(Object* obj);
