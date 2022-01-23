@@ -8,13 +8,13 @@
 int main()
 {
 	sf::Event event;
-
+	sf::Clock clock;
 	//Test environment
 	float sc_f = 1; //scale_factor for window width/height
 	float window_width = 800 * sc_f;
 	float window_height = 600 * sc_f;
 	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ");
-	window.setFramerateLimit(5);
+	window.setFramerateLimit(0);
 
 	//------------------------- TextureAtlas test ----------------------------
 
@@ -109,23 +109,31 @@ int main()
 
 	while (window.isOpen())
 	{
+		//Start debugging
+		sf::Time Framerate = clock.getElapsedTime();
+		clock.restart();
+		//End debugging
+
+		//for closing the window
 		while (window.pollEvent(event))
 		{
+			/*
 			if (event.type == sf::Event::KeyPressed)
 			{
-				/*
+				
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
 				{
 
 				}
-				*/
-			}
+				
+			}*/
 			if (event.type == sf::Event::Closed)
 			{
 				window.close();
 			}
 		}
-    
+		
+		
 		main_contr.processUserInput();
 		/*
 		std::cout << "\n{{ ";
@@ -164,6 +172,12 @@ int main()
 		//test_scene->getSceneObjects()[8]->setWorldPosition(sf::Vector2f(300.0f + 50 * std::cos(time.asSeconds()), 300.0f + 50 * std::sin(time.asSeconds())));
 		
 		window.drawActiveScene();
+		
+		//Start debugging
+		//prints out the framerate
+		std::cout << 1.0f / Framerate.asSeconds() << std::endl;
+		//End debugging
+		
 	}
 	delete player_1;
 	delete player_2;
