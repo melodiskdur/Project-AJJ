@@ -17,11 +17,11 @@ public:
     //Others
     // Main function for separation. Calls the object seperation functions
     // below depending on if only one or both objects are moving.
-    static void separateHitboxes(Object* i, Object* j);
+    static std::vector<ObjectData> separateHitboxes(Object* i, Object* j);
     // Resolves collisions with only one moving object.
-    static void singleObjectSeparation(Object* moving, Object* other);
+    static ObjectData singleObjectSeparation(Object* moving, Object* other);
     // Resolves collisions where both objects are moving.
-    static void dualObjectSeparation(Object*i, Object* j);
+    static std::vector<ObjectData> dualObjectSeparation(Object*i, Object* j);
 
 private:
     // Returns how much the two objects are overlapping each other,

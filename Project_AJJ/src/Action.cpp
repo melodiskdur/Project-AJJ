@@ -93,7 +93,7 @@ void Action::triggerAction()
 
 	//set the velocity to the updated one
 	this->parent_object->setVelocity(set_vel);
-	
+  
 	//if the action has an animation, update it
 	if (this->animation != nullptr)
 	{

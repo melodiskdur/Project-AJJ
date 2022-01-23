@@ -10,7 +10,7 @@ Hitbox::~Hitbox()
 {
 
 }
-void Hitbox::separateHitboxes(Object* i, Object* j)
+std::vector<ObjectData> Hitbox::separateHitboxes(Object* i, Object* j)
 {
 	sf::Vector2f wp_i = i->getWorldPosition();
 	sf::Vector2f wp_j = j->getWorldPosition();
@@ -23,15 +23,15 @@ void Hitbox::separateHitboxes(Object* i, Object* j)
 	sf::Vector2f vel_i = i->getVelocity();
 	sf::Vector2f vel_j = j->getVelocity();
 
+	// Return values.
+	std::vector<ObjectData> wp_and_vel_re;
+
 	// Exit if no objects are moving.
 	if (vel_i.x == 0 && vel_i.y == 0 && vel_j.x == 0 && vel_j.y == 0)
-		return;
+		return wp_and_vel_re;
 
 	sf::Vector2f abs_vel_i = sf::Vector2f(std::abs(i->getVelocity().x), std::abs(i->getVelocity().y));
 	sf::Vector2f abs_vel_j = sf::Vector2f(std::abs(j->getVelocity().x), std::abs(j->getVelocity().y));
-
-	sf::Vector2f new_wp_i = wp_i;
-	sf::Vector2f new_wp_j = wp_j;
 
 	// If i is inside j or if j is inside i.
 	if (    //i in j.
@@ -50,18 +50,18 @@ void Hitbox::separateHitboxes(Object* i, Object* j)
 		if ((abs_vel_i.x != 0 || abs_vel_i.y != 0)
 			&& abs_vel_j.x == 0 && abs_vel_j.y == 0)
 		{
-			Hitbox::singleObjectSeparation(i, j);
+			 wp_and_vel_re.push_back(Hitbox::singleObjectSeparation(i, j));
 		}
 		// If j is moving and i is not.
 		else if ((abs_vel_j.x != 0 || abs_vel_j.y != 0)
 			&& abs_vel_i.x == 0 && abs_vel_i.y == 0)
 		{
-			Hitbox::singleObjectSeparation(j, i);
+			wp_and_vel_re.push_back(Hitbox::singleObjectSeparation(j, i));
 		}
 		// If both are moving.
 		else
 		{
-			Hitbox::dualObjectSeparation(j, i);
+			wp_and_vel_re = Hitbox::dualObjectSeparation(j, i);
 		}
 	}
 	// If no object is encapsulated within the other.
@@ -70,23 +70,31 @@ void Hitbox::separateHitboxes(Object* i, Object* j)
 		if ((abs_vel_i.x != 0 || abs_vel_i.y != 0)
 			&& abs_vel_j.x == 0 && abs_vel_j.y == 0)
 		{
-			Hitbox::singleObjectSeparation(i, j);
+			wp_and_vel_re.push_back(Hitbox::singleObjectSeparation(i, j));
 		}
 	// If j is moving and i is not.
 		else if ((abs_vel_j.x != 0 || abs_vel_j.y != 0)
 			&& abs_vel_i.x == 0 && abs_vel_i.y == 0)
 		{
-			Hitbox::singleObjectSeparation(j, i);
+			wp_and_vel_re.push_back(Hitbox::singleObjectSeparation(j, i));
 		}
 	// If both are moving.
 		else
 		{
-			Hitbox::dualObjectSeparation(i, j);
+			wp_and_vel_re = Hitbox::dualObjectSeparation(i, j);
 		}
+
+	// Return the collected data.
+	return wp_and_vel_re;
 }
 
-void Hitbox::singleObjectSeparation(Object* moving, Object* other)
+ObjectData Hitbox::singleObjectSeparation(Object* moving, Object* other)
 {
+	// Return value.
+	ObjectData data;
+	data.m_object = moving;
+	data.m_colliding_object = other;
+
 	sf::Vector2f vel = moving->getVelocity();
 	sf::Vector2f prev_pos = moving->getWorldPosition() - vel;
 	sf::Vector2f ul = prev_pos;
@@ -172,12 +180,25 @@ void Hitbox::singleObjectSeparation(Object* moving, Object* other)
 			new_vel.y = 0;
 		}
 	}
-	moving->setVelocity(new_vel);
-	moving->setWorldPosition(new_pos);
+
+	// Add update velocities and return ObjectData.
+	data.m_colliding_hitbox = sf::FloatRect(other->getWorldPosition(), other->getSize());
+	data.m_vel = new_vel;
+	data.m_wp = new_pos;
+	return data;
 }
 
-void Hitbox::dualObjectSeparation(Object* i, Object* j)
+std::vector<ObjectData> Hitbox::dualObjectSeparation(Object* i, Object* j)
 {
+	// Return value.
+	std::vector<ObjectData> data;
+	ObjectData i_data;
+	ObjectData j_data;
+	i_data.m_object = i;
+	i_data.m_colliding_object = j;
+	j_data.m_object = j;
+	j_data.m_colliding_object = i;
+
 	// Positions.
 	sf::Vector2f ipos = i->getWorldPosition();
 	sf::Vector2f jpos = j->getWorldPosition();
@@ -267,10 +288,16 @@ void Hitbox::dualObjectSeparation(Object* i, Object* j)
 		jvel.y = 0;
 	}
 
-	i->setWorldPosition(ipos);
-	j->setWorldPosition(jpos);
-	i->setVelocity({ivel.x, ivel.y});
-	j->setVelocity({jvel.x, jvel.y});
+	// Store data in the vector to be returned.
+	i_data.m_wp = ipos;
+	i_data.m_vel = { ivel.x, ivel.y };
+	j_data.m_wp = jpos;
+	j_data.m_vel = { jvel.x, jvel.y };
+	i_data.m_colliding_hitbox = sf::FloatRect(j_data.m_wp, j->getSize());
+	j_data.m_colliding_hitbox = sf::FloatRect(i_data.m_wp, i->getSize());
+	data.push_back(i_data);
+	data.push_back(j_data);
+	return data;
 }
 
 sf::Vector2f Hitbox::getOverlaps(Object* i, Object* j)

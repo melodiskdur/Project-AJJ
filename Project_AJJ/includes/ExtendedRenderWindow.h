@@ -48,5 +48,6 @@ private:
 	bool debugger_mode = true;
 	// Debugging.
 	void debugDraw();
+	// End debugging.
 };
 
