@@ -13,9 +13,9 @@
 
 struct Frame
 {
-	TEXTURE_ID texture_id;	//the sprite to be shown
-	int frame_index; //The column to be shown
-	double duration;		//how long it will be shown
+	TEXTURE_ID texture_id;				//the sprite to be shown
+	int frame_index;					//The column to be shown
+	double duration;					//how long it will be shown
 	sf::String region_name = "";
 };
 
@@ -40,12 +40,12 @@ public:
 	void updateAnimation();
 
 private:
-	std::vector<Frame> frames; //a collection of frames
+	std::vector<Frame> frames;			//a collection of frames
 	int active_frame_index = 0;
 
-	double total_progress = 0.0; //the current timestamp in the animation
-	double total_length = 0.0; //the length of the whole animation
-	double last_update = 0.0; //stuff
+	double total_progress = 0.0;		//the current timestamp in the animation
+	double total_length = 0.0;			//the length of the whole animation
+	double last_update = 0.0;			//stuff
 
 	static sf::Clock animation_clock;
 

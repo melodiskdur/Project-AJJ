@@ -3,18 +3,22 @@
 #include "includes/FirstScene.h"
 #include "includes/ResourceLoader.h"
 #include "includes/TestMainControllerObject.h"
-#include "includes//MainController.h"
+#include "includes/MainController.h"
+#include "includes/Menu.h"
 
 int main()
 {
 	sf::Event event;
 	sf::Clock clock;
+
 	//Test environment
 	float sc_f = 1; //scale_factor for window width/height
 	float window_width = 800 * sc_f;
 	float window_height = 600 * sc_f;
 	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ");
-	window.setFramerateLimit(60);
+	window.setFramerateLimit(150);
+
+	Menu main_menu(window_width, window_height);
 
 	//------------------------- TextureAtlas test ----------------------------
 
@@ -92,6 +96,8 @@ int main()
 	main_contr.setObject(main_contr_obj);
 	//set the window for the main controller
 	main_contr.setWindow(&window);
+	//set menu for the main controller
+	main_contr.setMenu(&main_menu);
 	//add controllers 
 	main_contr.addController(&contr_player_1);
 	main_contr.addController(&contr_player_2);
@@ -102,6 +108,9 @@ int main()
 	main_contr.bindActionToKey(main_contr_obj->getActions()[3], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Space });		//SWITCH PLAYERS TEST
 	main_contr.bindActionToKey(main_contr_obj->getActions()[4], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::P });			//PAUSE
 	main_contr.bindActionToKey(main_contr_obj->getActions()[5], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::L });			//PLAY
+	main_contr.bindActionToKey(main_contr_obj->getActions()[6], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Down });		//MENU_MOVE_DOWN
+	main_contr.bindActionToKey(main_contr_obj->getActions()[7], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Up });		//MENU_MOVE_UP
+	main_contr.bindActionToKey(main_contr_obj->getActions()[8], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Enter });		//MENU_CHOOSE_ALTERNATIVE
 	//last, add the main_controller_object to the scene
 	test_scene->addSceneObject(main_contr_obj);
 
@@ -110,7 +119,7 @@ int main()
 	while (window.isOpen())
 	{
 		//Start debugging
-		sf::Time Framerate = clock.getElapsedTime();
+		sf::Time framerate = clock.getElapsedTime();
 		clock.restart();
 		//End debugging
 
@@ -132,50 +141,26 @@ int main()
 				window.close();
 			}
 		}
-		
-		
+
 		main_contr.processUserInput();
-		/*
-		std::cout << "\n{{ ";
-		for (auto& active_action : main_contr.getActiveActions())
-			std::cout << active_action->getActionName() << ", ";
-		std::cout << "}}\n";
-		*/
-		/////////////////////////////////////////////
-		//------------DATA CONTR_PLAYER_1-------------
-		//std::system("cls");		//clears the terminal
-    
+
+		if (main_menu.getActiveMenuAlternative() == MENU_ALTERNATIVES::MAIN_MENU)
+		{
+			window.clear();
+			main_menu.draw(window);
+			window.display();
+		}
+		else if (main_menu.getActiveMenuAlternative() == MENU_ALTERNATIVES::PLAY_GAME)
+		{
+			contr_player_1.processUserInput();
+			contr_player_2.processUserInput();
+			window.drawActiveScene();
+		}
 		
-		//std::cout << "\n-----CONTR 1----\n";
-
-		contr_player_1.processUserInput();
-		/*
-		std::cout << "\n{ ";
-		for (auto& active_action : contr_player_1.getActiveActions())
-			std::cout << active_action->getActionName() << ", ";
-		std::cout << "}\n";
-
-		std::cout << contr_player_1.getObject()->getVelocity().x << 
-			" , " << contr_player_1.getObject()->getVelocity().y << std::endl;
-
-		std::cout << "-----------------\n\n";
-		*/
-		//-------------------------------------------
-		//////////////////////////////////////////////
-
-		contr_player_2.processUserInput();
-		
-		//ADDED WINDOW.CLEAR AND WINDOW.DISPLAY IN drawActiveScene()!!!!!!!!!!!!!!!!!!!!
-
-		// draw everything here...
-		//time = clock.getElapsedTime();
-		//test_scene->getSceneObjects()[8]->setWorldPosition(sf::Vector2f(300.0f + 50 * std::cos(time.asSeconds()), 300.0f + 50 * std::sin(time.asSeconds())));
-		
-		window.drawActiveScene();
-		
+	
 		//Start debugging
 		//prints out the framerate
-		std::cout << 1.0f / Framerate.asSeconds() << std::endl;
+		//std::cout << 1.0f / framerate.asSeconds() << std::endl;
 		//End debugging
 		
 	}

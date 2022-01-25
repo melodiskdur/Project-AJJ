@@ -57,9 +57,14 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\boss.PNG" />
+    <Image Include="assets\menu_buttons_mouse%403x.png" />
     <Image Include="assets\platformertiles.png" />
     <Image Include="assets\rogue_atlas.png" />
     <Image Include="assets\texture_atlas_test.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="assets\ayar_takhu.ttf" />
+    <Font Include="assets\MomCakeFont.otf" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

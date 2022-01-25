@@ -67,7 +67,7 @@ void ExtendedRenderWindow::drawActiveScene()
 	{
 		sf::Text text;
 		sf::Font font;
-		font.loadFromFile("C:/Users/karla/source/repos/Project-AJJ/Project_AJJ/assets/MomCakeFont.otf");
+		font.loadFromFile("../Project_AJJ/assets/ayar_takhu.ttf");
 		text.setString("PAUSED");
 		text.setFont(font);
 		text.setCharacterSize(34); // in pixels, not points!

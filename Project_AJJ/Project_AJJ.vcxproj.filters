@@ -130,5 +130,16 @@
     <Image Include="assets\boss.PNG">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="assets\menu_buttons_mouse%403x.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="assets\ayar_takhu.ttf">
+      <Filter>Resource Files</Filter>
+    </Font>
+    <Font Include="assets\MomCakeFont.otf">
+      <Filter>Resource Files</Filter>
+    </Font>
   </ItemGroup>
 </Project>
