@@ -42,10 +42,10 @@ void MainController::triggerAction(int index)
 
 
 	//in-game main-controller actions 
-	if (this->menu->getActiveMenuAlternative() == MENU_ALTERNATIVES::PLAY_GAME && window_active)
+	if (this->menu->getActiveMenuAlternative() == MENU_ALTERNATIVES::PLAY_GAME)
 	{
 		//PAUSE
-		if (type == ACTIONTYPE::PAUSE)
+		if (type == ACTIONTYPE::PAUSE && window_active)
 		{
 			for (auto& contr : this->controllers)
 			{
@@ -54,7 +54,7 @@ void MainController::triggerAction(int index)
 			this->window->deactivateWindow();
 		}
 		//PLAY
-		if (type == ACTIONTYPE::PLAY)
+		if (type == ACTIONTYPE::PLAY && !window_active)
 		{
 			for (auto& contr : this->controllers)
 			{
@@ -63,7 +63,7 @@ void MainController::triggerAction(int index)
 			this->window->activateWindow();
 		}
 		//ZOOM IN/OUT
-		if (type == ACTIONTYPE::ZOOM_IN || type == ACTIONTYPE::ZOOM_OUT)
+		if ((type == ACTIONTYPE::ZOOM_IN || type == ACTIONTYPE::ZOOM_OUT) && window_active)
 		{
 			//get the current zoom_factor
 			float cur_zoom = camera->getCameraZoom();
@@ -73,7 +73,7 @@ void MainController::triggerAction(int index)
 			camera->setCameraZoom(cur_zoom + this->active_actions[index]->getParameterManipulation());
 		}
 		//SWITCH CAMERA OBJECT
-		if (type == ACTIONTYPE::SWITCH_CAMERA_LOCKED_OBJECT)
+		if (type == ACTIONTYPE::SWITCH_CAMERA_LOCKED_OBJECT && window_active)
 		{
 			//get the id of the object that the camera is currently locked on
 			int locked_obj_id = camera->getTargetObject()->getId();

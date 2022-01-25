@@ -16,7 +16,7 @@ int main()
 	float window_width = 800 * sc_f;
 	float window_height = 600 * sc_f;
 	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ");
-	window.setFramerateLimit(30);
+	window.setFramerateLimit(25);
 
 	Menu main_menu(window_width, window_height);
 
