@@ -5,8 +5,9 @@
 #include "Hitbox.h"
 #include "CollisionDetection.h"
 #include <math.h>
+#include "Gravity.h"
+#include "AirFriction.h"
 
-//#include "Gravity.h"
 // "etc"
 
 /* Datatype to store all the changes to an object's parameters that's
@@ -21,6 +22,9 @@ typedef struct _CollisionData
 	std::vector<Object*> m_colliding_objects;		// All the colliding objects.
 	// Note that all the vectors above should have the same size.
 	std::vector<sf::FloatRect> m_hitboxes;			// Hitboxes of m_colliding_objects.
+
+	// Indices of best resolves.
+	std::vector<int> indices;
 
 	sf::Vector2f m_final_repos;
 	sf::Vector2f m_final_revel;

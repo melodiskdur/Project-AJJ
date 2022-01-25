@@ -16,7 +16,7 @@ int main()
 	float window_width = 800 * sc_f;
 	float window_height = 600 * sc_f;
 	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ");
-	window.setFramerateLimit(150);
+	window.setFramerateLimit(30);
 
 	Menu main_menu(window_width, window_height);
 
@@ -30,14 +30,18 @@ int main()
 	robot->assignTextureId(TEXTURE_ID::ATTACK, sf::Vector2u(0, 3), sf::Vector2u(9, 3));
 	window.setTextureManager(tex_mag);
 
-	//------------------- Scene , Camera, PhysicsManager, CollisionDetection, Hitbox --------------------
+	//------------------- Scene , Camera, PhysicsManager, CollisionDetection, Hitbox, Gravity, AirFriction --------------------
 
 	Scene* test_scene = FirstScene::createScene();
 	Camera scene_camera;
+	AirFriction* airfric = new AirFriction(test_scene->getSceneObjects());
+	Gravity* gravity = new Gravity(test_scene->getSceneObjects());
 	CollisionDetection* col_det = new CollisionDetection(test_scene->getSceneObjects());
 	PhysicsManager* phys_mag = new PhysicsManager(test_scene->getSceneObjects());
 	//Hitbox* hitbox = new Hitbox();
 	phys_mag->addAttribute(col_det);
+	phys_mag->addAttribute(gravity);
+	phys_mag->addAttribute(airfric);
 	test_scene->setCollisionDetection(col_det);
 	test_scene->setPhysicsManager(phys_mag);
 	test_scene->setCamera(&scene_camera);

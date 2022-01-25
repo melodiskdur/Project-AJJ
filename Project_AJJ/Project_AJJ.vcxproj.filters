@@ -63,6 +63,12 @@
     <ClInclude Include="includes\PhysicsManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="includes\Gravity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\AirFriction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="includes\Menu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -113,7 +119,10 @@
     <ClCompile Include="src\PhysicsManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Menu.cpp">
+    <ClCompile Include="src\Gravity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\AirFriction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
