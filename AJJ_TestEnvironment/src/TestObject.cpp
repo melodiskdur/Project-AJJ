@@ -104,6 +104,13 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size)
     object_actions.push_back(speedRight);
     */
 
+    // ---------------PhysicsAttribute test---------------
+
+    this->attributes.push_back("Gravity");
+    this->attributes.push_back("Air Friction");
+
+    //--------------------------------------------
+
 	std::cout << "TestObject called\n";
 }
 

@@ -37,10 +37,13 @@ void Controller::breakMovement(int hori_move, int vert_move, float break_value)
 	//the set_velocity is the velocity that will be set
 	sf::Vector2f set_vel = this->obj->getVelocity();
 
+
 	//if the object is moving horizontally and no horizontal movementaction is triggered
 	//we want to slow down!!
 	if (set_vel.x != 0 && !hori_move)
 	{
+		set_vel.x = 0;
+		/*
 		if (set_vel.x < 0 && set_vel.x + break_value <= 0)
 		{
 			set_vel.x += break_value;
@@ -57,11 +60,14 @@ void Controller::breakMovement(int hori_move, int vert_move, float break_value)
 		{
 			set_vel.x = 0;
 		}
+		*/
 	}
 	//if the object is moving vertically and no vertical movementaction is triggered
 	//we want to slow down!!
 	if (set_vel.y != 0 && !vert_move)
 	{
+		set_vel.y = 0;
+		/*
 		if (set_vel.y < 0 && set_vel.y + break_value <= 0)
 		{
 			set_vel.y += break_value;
@@ -78,6 +84,7 @@ void Controller::breakMovement(int hori_move, int vert_move, float break_value)
 		{
 			set_vel.y = 0;
 		}
+		*/
 	}
 
 	//set the velocity
@@ -206,7 +213,7 @@ void Controller::triggerActiveActions()
 
 	//break object movement in vert/hori direction if no actions were triggered in those directions
 	//!!!!!!!!!!FIX THIS-only a fast solution. Should be implemented as a physics attribute ( friction or airresistance )!!!!!!!!!!!!!!!!
-	breakMovement(hori_move, vert_move, 2);
+	//breakMovement(hori_move, vert_move, 2);
 
 	//correct horizontal movement to not overstep velocity-ellipsiod
 	correctMovement();

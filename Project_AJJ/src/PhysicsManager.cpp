@@ -21,7 +21,15 @@ void PhysicsManager::basicCollisionHandler(sf::FloatRect view_rect)
 
 	if (this->scene_objects == nullptr)
 		return;
-	
+
+	// Find Gravity attribute.
+	Gravity* grav = (Gravity*)this->searchAttribute("Gravity");
+	grav->applyGravity(view_rect);
+
+	// Find Air Friction attribute.
+	AirFriction* fric = (AirFriction*)this->searchAttribute("Air Friction");
+	fric->applyAirFriction(view_rect);
+
 	// Find Collision Detection attribute.
 	CollisionDetection* col_det = (CollisionDetection*) this->searchAttribute("Collision Detection");
 	if (col_det == nullptr)
@@ -48,13 +56,14 @@ void PhysicsManager::basicCollisionHandler(sf::FloatRect view_rect)
 		this->setAverageHitboxRes(this->data[i]);
 	}
 
-	// Gravity, Friction, Momentum can be added here!
-
 	// Set all new positions.
 	for (int i = 0; i < this->data.size(); i++)
 	{
 		this->data[i].m_object->setWorldPosition(this->data[i].m_final_repos);
+		this->data[i].m_object->setVelocity(this->data[i].m_revelocities[data[i].indices[0]]);
 	}
+
+	// Gravity, Friction, Momentum can be added here!
 }
 
 PhysicsAttribute* PhysicsManager::searchAttribute(std::string attribute_name)
@@ -64,6 +73,7 @@ PhysicsAttribute* PhysicsManager::searchAttribute(std::string attribute_name)
 		if (pa->getId().compare(attribute_name) == 0)
 			return pa;
 	}
+	return nullptr;
 }
 
 void PhysicsManager::storeObjectData(ObjectData odata)
@@ -125,11 +135,20 @@ void PhysicsManager::setAverageHitboxRes(CollisionData& data)
 	int best_index;
 	int current_index;
 	int iterations = 0;
+	int blabla = num_of_unresolved;
+
 	// While there are still unresolved collisions.
 	while (num_of_unresolved > 0)
 	{
-		// To avoid infinite loops.
-		if (iterations++ > num_of_unresolved) return;
+		// To avoid infinite loops. If the function can't find a decent resolve,
+		// we'll return the current world position of the object as a last resort.
+		if (iterations++ > blabla)
+		{
+			repos_vector.push_back(opos);
+			data.indices.push_back(0);
+			break;
+		}
+
 		best_index = 0;
 		best_resolved = 0;
 		for (int i = 0; i < unresolved.size(); i++)
@@ -166,12 +185,14 @@ void PhysicsManager::setAverageHitboxRes(CollisionData& data)
 			}
 		}
 		// Resolve the collisions.
+		if (best_resolved == 0) continue;
 		for (int i = 0; i < best_resolved_indices.size(); i++)
 		{
 			unresolved[best_resolved_indices[i]] = 1;
 		}
 		num_of_unresolved -= best_resolved;
 		repos_vector.push_back(sf::Vector2f(best_hitbox.left, best_hitbox.top));
+		data.indices.push_back(best_index);
 	}
 	// Finally, update the position of the object.
 	final_repos = repos_vector[0];

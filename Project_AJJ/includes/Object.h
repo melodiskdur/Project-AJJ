@@ -30,6 +30,7 @@ public:
 	TEXTURE_ID getTextureId() { return this->active_texture; };
 	Frame getFrame() { return this->current_frame; };
 	float getVelocityIncrement() { return this->velocity_inc; };
+	std::vector<std::string> getPhysicsAttributes() { return this->attributes; };
 
 	//Setters
 	void setId(int id);
@@ -76,6 +77,7 @@ protected:
 	Frame current_frame;
 
 	//PhysicsAttributes
+	std::vector<std::string> attributes;				   // The Physics Attribute types that the Object should be affected by.
 
 private:
 };

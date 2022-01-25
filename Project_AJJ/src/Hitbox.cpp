@@ -87,7 +87,6 @@ std::vector<ObjectData> Hitbox::separateHitboxes(Object* i, Object* j)
 	// Return the collected data.
 	return wp_and_vel_re;
 }
-
 ObjectData Hitbox::singleObjectSeparation(Object* moving, Object* other)
 {
 	// Return value.
