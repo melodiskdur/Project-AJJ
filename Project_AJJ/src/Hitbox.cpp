@@ -1,5 +1,7 @@
 #include "Hitbox.h"
 
+#define HITBOX_INFINITY 20000000.0f
+
 Hitbox::Hitbox():
 	PhysicsAttribute("Hitbox")
 {
@@ -93,6 +95,7 @@ ObjectData Hitbox::singleObjectSeparation(Object* moving, Object* other)
 	ObjectData data;
 	data.m_object = moving;
 	data.m_colliding_object = other;
+	INTERSECTED_SIDE intersect = INTERSECTED_SIDE::ODATA_NONE;
 
 	sf::Vector2f vel = moving->getVelocity();
 	sf::Vector2f prev_pos = moving->getWorldPosition() - vel;
@@ -169,6 +172,8 @@ ObjectData Hitbox::singleObjectSeparation(Object* moving, Object* other)
 			new_pos.x = vel.x < 0 ? other->getWorldPosition().x + other->getSize().x
 				: other->getWorldPosition().x - moving->getSize().x;
 			new_vel.x = 0;
+			// Set intersected side.
+			intersect = vel.x < 0 ? INTERSECTED_SIDE::ODATA_RIGHT : INTERSECTED_SIDE::ODATA_LEFT;
 		}
 		// Horizontal check + adjustment.
 		else if ((moving_hori[0].x + t_hori * vel.x > insec_hori[0].x && moving_hori[0].x + t_hori * vel.x < insec_hori[1].x) ||
@@ -177,13 +182,35 @@ ObjectData Hitbox::singleObjectSeparation(Object* moving, Object* other)
 			new_pos.y = vel.y < 0 ? other->getWorldPosition().y + other->getSize().y
 				: other->getWorldPosition().y - moving->getSize().y;
 			new_vel.y = 0;
+			// Set intersected side.
+			intersect = vel.y < 0 ? INTERSECTED_SIDE::ODATA_TOP : INTERSECTED_SIDE::ODATA_BOTTOM;
+			
+		}
+		// If something goes wrong. Do a simple unstuck-check.
+		else
+		{
+			sf::FloatRect moving_hitbox = sf::FloatRect(moving->getWorldPosition(), moving->getSize());
+			sf::FloatRect other_hitbox = sf::FloatRect(other->getWorldPosition(), other->getSize());
+			std::vector<sf::Vector2f> unstuck_resolves = Hitbox::unstuck(moving_hitbox, other_hitbox, vel);
+			new_vel = unstuck_resolves[1];
+			new_pos = unstuck_resolves[0];
+			// Set intersected side.
+			if (new_pos.x - moving->getWorldPosition().x > 0)
+				intersect = INTERSECTED_SIDE::ODATA_RIGHT;
+			else if (new_pos.x - moving->getWorldPosition().x < 0)
+				intersect = INTERSECTED_SIDE::ODATA_LEFT;
+			else if (new_pos.y - moving->getWorldPosition().y > 0)
+				intersect = INTERSECTED_SIDE::ODATA_TOP;
+			else if (new_pos.y - moving->getWorldPosition().y < 0)
+				intersect = INTERSECTED_SIDE::ODATA_BOTTOM;
 		}
 	}
 
-	// Add update velocities and return ObjectData.
+	// Add updated velocities and return ObjectData.
 	data.m_colliding_hitbox = sf::FloatRect(other->getWorldPosition(), other->getSize());
 	data.m_vel = new_vel;
 	data.m_wp = new_pos;
+	data.m_intersect = intersect;
 	return data;
 }
 
@@ -261,11 +288,17 @@ std::vector<ObjectData> Hitbox::dualObjectSeparation(Object* i, Object* j)
 		{
 			ipos.x -= i_c * overlaps.x;
 			jpos.x += j_c * overlaps.x;
+			// Intersected sides.
+			i_data.m_intersect = INTERSECTED_SIDE::ODATA_RIGHT;
+			j_data.m_intersect = INTERSECTED_SIDE::ODATA_LEFT;
 		}
 		else
 		{
 			ipos.x += i_c * overlaps.x;
 			jpos.x -= j_c * overlaps.x;
+			// Intersected sides.
+			i_data.m_intersect = INTERSECTED_SIDE::ODATA_LEFT;
+			j_data.m_intersect = INTERSECTED_SIDE::ODATA_RIGHT;
 		}
 		ivel.x = 0;
 		jvel.x = 0;
@@ -277,11 +310,17 @@ std::vector<ObjectData> Hitbox::dualObjectSeparation(Object* i, Object* j)
 		{
 			ipos.y -= i_c * overlaps.y;
 			jpos.y += j_c * overlaps.y;
+			// Intersected sides.
+			i_data.m_intersect = INTERSECTED_SIDE::ODATA_TOP;
+			j_data.m_intersect = INTERSECTED_SIDE::ODATA_BOTTOM;
 		}
 		else
 		{
 			ipos.y += i_c * overlaps.y;
 			jpos.y -= j_c * overlaps.y;
+			// Intersected sides.
+			i_data.m_intersect = INTERSECTED_SIDE::ODATA_BOTTOM;
+			j_data.m_intersect = INTERSECTED_SIDE::ODATA_TOP;
 		}
 		ivel.y = 0;
 		jvel.y = 0;
@@ -354,4 +393,45 @@ sf::Vector2f Hitbox::getT(Object* i, Object* j, sf::Vector2f overlaps)
 	float t_x = denom_x < 1 ? overlaps.x : overlaps.x / denom_x;
 	float t_y = denom_y < 1 ? overlaps.y : overlaps.y / denom_y;
 	return { t_x, t_y };
+}
+
+/* In case the axis-aligned repositioning in Hitbox::singeObjectSeparation() fails, this function is called
+* to do a kind of "last resort" resolve of the moving object's position. It tests the distance (no attention
+* paid to velocity) from the moving object's current position to each of the sides of the other object's hitbox.
+  the side that produces to shortest distane will be the position to which the moving object will be resolved. */
+std::vector<sf::Vector2f> Hitbox::unstuck(sf::FloatRect moving, sf::FloatRect other, sf::Vector2f moving_vel)
+{
+	std::vector<sf::Vector2f> resolves =
+	{
+		{ moving.left, other.top - moving.height },			// Top.
+		{ other.left + other.width, moving.top },			// Right.
+		{ moving.left, other.top + other.height},			// Bottom.
+		{ other.left - moving.width, moving.top }			// Left.
+	};
+	
+	std::vector<sf::Vector2f> new_velocities =
+	{
+		{ moving_vel.x, 0.f },								// Top.
+		{ 0.f, moving_vel.y },								// Right.
+		{ moving_vel.y, 0.f },								// Bottom.
+		{ 0.f, moving_vel.y }								// Left.
+	};
+
+	float current_shortest = HITBOX_INFINITY;
+	int current_best_index = -1;
+
+	for (int i = 0; i < 4; i++)
+	{
+		if ((i % 2 == 1) && std::abs(resolves[i].x - moving.left) < current_shortest)
+		{
+			current_shortest = std::abs(resolves[i].x - moving.left);
+			current_best_index = i;
+		}
+		if ((i % 2 == 0) && std::abs(resolves[i].y - moving.top) < current_shortest)
+		{
+			current_shortest = std::abs(resolves[i].y - moving.top);
+			current_best_index = i;
+		}
+	}
+	return { resolves[current_best_index], new_velocities[current_best_index] };
 }

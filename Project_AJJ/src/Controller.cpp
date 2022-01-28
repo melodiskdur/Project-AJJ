@@ -196,7 +196,7 @@ void Controller::triggerActiveActions()
 			//if we have moved vertically already
 			if (vert_move != 0)
 			{
-				//do not perform the action
+				//do not perform the action.
 				perform_action = 0;
 			}
 			//regardless, set vertical movement to true

@@ -22,6 +22,8 @@ void PhysicsManager::basicCollisionHandler(sf::FloatRect view_rect)
 	if (this->scene_objects == nullptr)
 		return;
 
+	// Gravity, Air Friction here.
+
 	// Find Gravity attribute.
 	Gravity* grav = (Gravity*)this->searchAttribute("Gravity");
 	grav->applyGravity(view_rect);
@@ -37,7 +39,7 @@ void PhysicsManager::basicCollisionHandler(sf::FloatRect view_rect)
 
 	// Run Collision check and retreive the tuples of colliding objects.
 	// NOTE: CollisionDetection should maybe be moved to a higher instance (collisions could be used for more
-	// just physics).
+	// than just physics).
 	std::vector<ObjectTuple> collision_tuples = col_det->getCollisions(view_rect);
 
 	// Collect Hitbox-resolutions and add all the data to the CollisionData-vector.
@@ -63,7 +65,9 @@ void PhysicsManager::basicCollisionHandler(sf::FloatRect view_rect)
 		this->data[i].m_object->setVelocity(this->data[i].m_revelocities[data[i].indices[0]]);
 	}
 
-	// Gravity, Friction, Momentum can be added here!
+	// Momentum here.
+
+
 }
 
 PhysicsAttribute* PhysicsManager::searchAttribute(std::string attribute_name)
@@ -202,4 +206,23 @@ void PhysicsManager::setAverageHitboxRes(CollisionData& data)
 		final_repos += dpos;
 	}
 	data.m_final_repos = final_repos;
+}
+
+void PhysicsManager::sortData()
+{
+	if (this->data.size() == 0) return;
+	CollisionData current;
+	for (int i = 0; i < this->data.size() - 1; i++)
+	{
+		current = data[i];
+		for (int j = i + 1; j < this->data.size(); j++)
+		{
+			if (current.m_colliding_objects.size() < data[j].m_colliding_objects.size())
+			{
+				data[i] = data[j];
+				data[j] = current;
+				break;
+			}
+		}
+	}
 }

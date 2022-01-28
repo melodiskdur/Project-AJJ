@@ -35,5 +35,9 @@ private:
     // x- and y-velocities must be multiplied by to undo the x- and y-
     // overlaps. (Used in dualObjectSeparation).
     static sf::Vector2f getT(Object* i, Object* j, sf::Vector2f overlaps);
+    // "Last resort" function that unstucks (separates) the hitboxes of
+    // two objects (one moving, one still). Moves the moving.hitbox
+    // the shortest distance (along x or y) that resolves the collision.
+    static std::vector<sf::Vector2f> unstuck(sf::FloatRect moving, sf::FloatRect other, sf::Vector2f moving_vel);
 };
 
