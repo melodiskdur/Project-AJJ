@@ -32,6 +32,16 @@ typedef struct _CollisionData
 	sf::Vector2f m_final_reacc;
 } CollisionData;
 
+enum COL_STACKTYPE {COL_HORIZONTAL, COL_VERTICAL};
+
+typedef struct _StackedCollision
+{
+	Object* m_object;
+	Object* m_collider1;
+	Object* m_collider2;
+	COL_STACKTYPE m_stacktype;
+} StackedCollision;
+
 /* PhysicsManager
 * Handles all physics-related things.
 */
@@ -48,6 +58,7 @@ private:
 	std::vector<PhysicsAttribute*> attributes;
 	std::vector<Object*>* scene_objects = nullptr;
 	std::vector<CollisionData> data;
+	std::vector<StackedCollision> stacked_collisions;
 
 	void storeObjectData(ObjectData odata);
 	int indexOf(Object* o);
@@ -56,8 +67,13 @@ private:
 	void setAverageHitboxRes(CollisionData& data);
 	// Returns all the (sf::FloatRect) hitboxes for all the colliding objects of a given object.
 	std::vector<sf::FloatRect> getHitboxes(CollisionData& data);
-
 	// Function to sort the collision data in descending order of number of concurrent collisions.
 	// Contains an implementation of Insertion sort.
 	void sortData();
+
+	// TEMPORARY
+	// Temporary functionality to handle stacked collisions.
+	int findStack(CollisionData& data, INTERSECTED_SIDE side);
+	void postResCleanUp();
+	// END TEMPORARY
 };
