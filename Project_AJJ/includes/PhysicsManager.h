@@ -8,7 +8,7 @@
 #include "Gravity.h"
 #include "AirFriction.h"
 
-// "etc"
+// "etc" ...
 
 /* Datatype to store all the changes to an object's parameters that's
 * been calculated in the different PhysicsAttributes. 
