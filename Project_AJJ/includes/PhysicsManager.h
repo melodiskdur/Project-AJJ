@@ -10,6 +10,16 @@
 
 // "etc"
 
+typedef struct _Collision_Node
+{
+
+} Collision_Node;
+
+typedef struct _Collision_Edge
+{
+
+} Collision_Edge;
+
 /* Datatype to store all the changes to an object's parameters that's
 * been calculated in the different PhysicsAttributes. 
 */
