@@ -72,6 +72,9 @@
     <ClInclude Include="includes\Menu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="includes\CollisionGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -123,6 +126,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\AirFriction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CollisionGraph.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
