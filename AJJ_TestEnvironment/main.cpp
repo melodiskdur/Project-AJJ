@@ -4,7 +4,7 @@
 #include "includes/ResourceLoader.h"
 #include "includes/TestMainControllerObject.h"
 #include "includes/MainController.h"
-#include "includes/Menu.h"
+#include "includes/Layout.h"
 
 int main()
 {
@@ -18,8 +18,25 @@ int main()
 	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ");
 	window.setFramerateLimit(25);
 
-	Menu main_menu(window_width, window_height);
+	//DEBUGGING
+	Layout* test_layout = new Layout(sf::FloatRect(300, -100, 400, 400), sf::Vector2f(0, 0), sf::Vector2f(0, 0), LAYOUT_PLACEMENT::LP_NONE);
+	test_layout->addLayout(sf::FloatRect(0, 0, 20, 100), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_TOP_LEFT);
+	test_layout->addLayout(sf::FloatRect(0, 0, 80, 80), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_TOP_LEFT);
+	test_layout->addLayout(sf::FloatRect(0, 0, 100, 100), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_TOP_RIGHT);
+	test_layout->addLayout(sf::FloatRect(0, 0, 20, 20), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
+	test_layout->addLayout(sf::FloatRect(0, 0, 100, 20), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_BOTTOM_RIGHT);
+	test_layout->addLayout(sf::FloatRect(0, 0, 60, 60), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_TOP_LEFT);
+	test_layout->addLayout(sf::FloatRect(0, 0, 60, 60), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_CENTERED);
+	test_layout->addLayout(sf::FloatRect(0, 0, 60, 60), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
 
+	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 60, 10), sf::Vector2f(0, 0), sf::Vector2f(2, 7), LAYOUT_PLACEMENT::LP_TOP_CENTERED);
+	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 60, 10), sf::Vector2f(0, 0), sf::Vector2f(2, 7), LAYOUT_PLACEMENT::LP_TOP_CENTERED);
+	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 60, 10), sf::Vector2f(0, 0), sf::Vector2f(2, 7), LAYOUT_PLACEMENT::LP_TOP_CENTERED);
+
+	test_layout->placeLayouts();
+	window.addLayout(test_layout);
+	//END DEBUGGING
+	
 	//------------------------- TextureAtlas test ----------------------------
 
 	TextureManager* tex_mag = ResourceLoader::loadResources();
@@ -100,8 +117,6 @@ int main()
 	main_contr.setObject(main_contr_obj);
 	//set the window for the main controller
 	main_contr.setWindow(&window);
-	//set menu for the main controller
-	main_contr.setMenu(&main_menu);
 	//add controllers 
 	main_contr.addController(&contr_player_1);
 	main_contr.addController(&contr_player_2);
@@ -115,13 +130,15 @@ int main()
 	main_contr.bindActionToKey(main_contr_obj->getActions()[6], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Down });		//MENU_MOVE_DOWN
 	main_contr.bindActionToKey(main_contr_obj->getActions()[7], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Up });		//MENU_MOVE_UP
 	main_contr.bindActionToKey(main_contr_obj->getActions()[8], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Enter });		//MENU_CHOOSE_ALTERNATIVE
+	main_contr.bindActionToKey(main_contr_obj->getActions()[9], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Delete });	//EXIT_TO_MENU
 	//last, add the main_controller_object to the scene
 	test_scene->addSceneObject(main_contr_obj);
 
 	//---------------------------------- Game Loop -----------------------------------------
-
+	
 	while (window.isOpen())
 	{
+		
 		//Start debugging
 		sf::Time framerate = clock.getElapsedTime();
 		clock.restart();
@@ -148,20 +165,19 @@ int main()
 
 		main_contr.processUserInput();
 
-		if (main_menu.getActiveMenuAlternative() == MENU_ALTERNATIVES::MAIN_MENU)
-		{
-			window.clear();
-			main_menu.draw(window);
-			window.display();
-		}
-		else if (main_menu.getActiveMenuAlternative() == MENU_ALTERNATIVES::PLAY_GAME)
-		{
-			contr_player_1.processUserInput();
-			contr_player_2.processUserInput();
-			window.drawActiveScene();
-		}
 		
-	
+		contr_player_1.processUserInput();
+		contr_player_2.processUserInput();
+		
+		
+		window.drawActiveScene();
+
+		//DEBUGGING
+		//window.getLayouts()[0]->setPosition({ window.getLayouts()[0]->getPosition().x + 1 , window.getLayouts()[0]->getPosition().y + 1});
+		
+		//END DEBUGGING
+
+
 		//Start debugging
 		//prints out the framerate
 		//std::cout << 1.0f / framerate.asSeconds() << std::endl;
@@ -173,5 +189,6 @@ int main()
 	delete main_contr_obj;
 	delete col_det;
 	delete tex_mag;
+	delete test_layout;
 	return 0;
 }

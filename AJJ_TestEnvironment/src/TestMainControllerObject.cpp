@@ -21,6 +21,7 @@ TestMainControllerObject::TestMainControllerObject()
 	Action* menu_move_up = new Action;
 	Action* menu_move_down = new Action;
 	Action* menu_choose_alternative = new Action;
+	Action* exit_to_menu = new Action;
 
 	idle->setActionName("Idle");
 	idle->setParentObject(this);
@@ -62,6 +63,10 @@ TestMainControllerObject::TestMainControllerObject()
 	menu_choose_alternative->setParentObject(this);
 	menu_choose_alternative->setActionType(ACTIONTYPE::MENU_CHOOSE_ALTERNATIVE);
 
+	exit_to_menu->setActionName("ExitToMenu");
+	exit_to_menu->setParentObject(this);
+	exit_to_menu->setActionType(ACTIONTYPE::EXIT_TO_MENU);
+
 	object_actions.push_back(idle);
 	object_actions.push_back(zoom_in);
 	object_actions.push_back(zoom_out);
@@ -71,6 +76,7 @@ TestMainControllerObject::TestMainControllerObject()
 	object_actions.push_back(menu_move_down);
 	object_actions.push_back(menu_move_up);
 	object_actions.push_back(menu_choose_alternative);
+	object_actions.push_back(exit_to_menu);
 
 }
 

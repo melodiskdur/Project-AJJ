@@ -1,4 +1,4 @@
-#include "../includes/MainController.h"
+#include "MainController.h"
 
 MainController::MainController()
 	: Controller()
@@ -21,9 +21,9 @@ void MainController::deactivateController(Controller* controller)
 	controller->Controller::deactivateController();
 }
 
-void MainController::addController(Controller * new_controller)
-{ 
-	this->controllers.push_back(new_controller); 
+void MainController::addController(Controller* new_controller)
+{
+	this->controllers.push_back(new_controller);
 	this->num_of_controllers++;
 }
 
@@ -39,10 +39,11 @@ void MainController::triggerAction(int index)
 	ACTIONTYPE type = this->active_actions[index]->getActionType();		//the current actions type
 	Camera* camera = this->window->getActiveScene()->getCamera();		//the window camera
 	bool window_active = this->window->getWindowState();				//if the window is active or not
+	Scene* active_scene = this->window->getActiveScene();				//the windows active scene
 
 
 	//in-game main-controller actions 
-	if (this->menu->getActiveMenuAlternative() == MENU_ALTERNATIVES::PLAY_GAME)
+	if (active_scene->getSceneDenotation() == SCENE_DENOTATION::TEST_GAME)
 	{
 		//PAUSE
 		if (type == ACTIONTYPE::PAUSE && window_active)
@@ -104,38 +105,29 @@ void MainController::triggerAction(int index)
 				}
 			}
 		}
+		//EXIT TO MAIN MENU
+		if (type == ACTIONTYPE::EXIT_TO_MENU)
+		{
+
+		}
 	}
-	
+
 	//menu main-controller actions
-	if (this->menu->getActiveMenuAlternative() == MENU_ALTERNATIVES::MAIN_MENU && window_active)
+	if (active_scene->getSceneDenotation() == SCENE_DENOTATION::TEST_GAME && window_active)
 	{
 		//MOVE UP/DOWN IN THE MENU
 		if (type == ACTIONTYPE::MENU_MOVE_DOWN || type == ACTIONTYPE::MENU_MOVE_UP)
 		{
-			//get focused/highlighted menu alternative
-			MENU_ALTERNATIVES foc_a = this->menu->getFocusedMenuAlternative();
-			//std::cout << foc_a << std::endl;
 
-			//get parameter manipulation value for action (1 = down, -1 = up)
-			int par_m = this->active_actions[index]->getParameterManipulation();
-
-			//check if bounds with the maximum number of alternatives
-			//i.e. if we can move up/down
-			if (foc_a + par_m <= MAXIMUM_NUM_ALTERNATIVES - 1 && foc_a + par_m >= 0)
-			{
-				//if so, apply parameter manipulation value and change focused alternative
-				this->menu->setFocusedMenuAlternative(static_cast<MENU_ALTERNATIVES>(foc_a + par_m));
-			}
 		}
 		//CHOOSE MENU ALTERNATIVE
 		if (type == ACTIONTYPE::MENU_CHOOSE_ALTERNATIVE)
 		{
-			//chamge active menu alternative to the one in focus
-			this->menu->setActiveMenuAlternative(this->menu->getFocusedMenuAlternative());
-			//std::cout << this->menu->getActiveMenuAlternative() << std::endl;
+
 		}
+		
 	}
-	
+
 
 
 	//TO BE CONTINUED.....

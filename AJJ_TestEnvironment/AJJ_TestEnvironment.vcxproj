@@ -148,9 +148,7 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="src\FirstScene.cpp" />
-    <ClCompile Include="src\MainController.cpp" />
     <ClCompile Include="src\ResourceLoader.cpp" />
-    <ClCompile Include="src\TestButton.cpp" />
     <ClCompile Include="src\TestMainControllerObject.cpp" />
     <ClCompile Include="src\TestObject.cpp" />
   </ItemGroup>
@@ -161,9 +159,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\FirstScene.h" />
-    <ClInclude Include="includes\MainController.h" />
     <ClInclude Include="includes\ResourceLoader.h" />
-    <ClInclude Include="includes\TestButton.h" />
     <ClInclude Include="includes\TestMainControllerObject.h" />
     <ClInclude Include="includes\TestObject.h" />
   </ItemGroup>

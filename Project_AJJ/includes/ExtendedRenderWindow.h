@@ -5,6 +5,8 @@
 #include "TextureIds.h"
 #include "TextureManager.h"
 #include "Scene.h"
+#include "Layout.h"
+#include "Button.h"
 
 /* ExtendedRenderWindow
 	Inherits from sf::RenderWindow. Contains additional functionality
@@ -20,8 +22,11 @@ public:
 	//Getters
 	Scene* getActiveScene();
 	TextureManager* getTextureManager();
-	bool getWindowState() { return this->window_state; };
-	
+	bool getWindowState() { return this->window_state; }
+	std::vector<Layout*> getLayouts() { return this->layouts; }
+	std::vector<Scene*> getScenes() { return this->scenes; }
+	Scene* getSceneFromDenotation(SCENE_DENOTATION scene_denotation);
+
 	//Setters
 	//Sets active scene and creates RenderTexture-pointers for each SceneLayer in active_scene.
 	void setActiveScene(Scene* scene);
@@ -30,14 +35,20 @@ public:
 	//Etc
 	//Draws a frame of the active Scene-object.
 	void drawActiveScene();
-	void deactivateWindow() { this->window_state = false; };
-	void activateWindow() { this->window_state = true; };
-
+	void deactivateWindow() { this->window_state = false; }
+	void activateWindow() { this->window_state = true; }
+	void drawButton(Button * button);
+	void drawLayouts(Layout* layout);
+	void drawLayout(int index);
+	void addLayout(Layout* new_layout) { this->layouts.push_back(new_layout); }
+	
 private:
-	Scene* active_scene = nullptr;			    //Active Scene-object.
-	TextureManager* texture_manager = nullptr;	//TextureManager-object.
-	std::vector<sf::RenderTexture*> scene_layer_textures;
-	bool window_state = true;					//activated/deactivated
+	Scene* active_scene = nullptr;							//Active Scene-object.
+	std::vector<Scene*> scenes;								//All of the available scenes
+	TextureManager* texture_manager = nullptr;				//TextureManager-object.
+	std::vector<sf::RenderTexture*> scene_layer_textures;	//all of the spritesheets
+	bool window_state = true;								//Activated/deactivated
+	std::vector<Layout*> layouts;							//Windows layouts(main_menu,side_menus,messages,etc.)
 
 	//Used internally to clear all RenderTextures in preparation for the next frame draw.
 	void clearSceneLayerTextures();
@@ -45,7 +56,7 @@ private:
 	void drawLayers();
 
 	// Debugging.
-	bool debugger_mode = true;
+	bool debugger_mode = false;
 	// Debugging.
 	void debugDraw();
 	// End debugging.
