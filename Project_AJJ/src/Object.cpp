@@ -8,13 +8,13 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
     this->geo_shape = sf::VertexArray(sf::Quads, 4);
     this->size = size;
 
-    //add vertices to the quad shape
+    //add vertices to the quad shape.
     geo_shape[0].position = sf::Vector2f(pos.x, pos.y);
     geo_shape[1].position = sf::Vector2f(pos.x + size.x, pos.y);
     geo_shape[2].position = sf::Vector2f(pos.x + size.x, pos.y + size.y);
     geo_shape[3].position = sf::Vector2f(pos.x, pos.y + size.y);
 
-    //hardcoded example colors
+    //hardcoded example colors.
     sf::Color gc = sf::Color::Black;
     geo_shape[0].color = gc;
     geo_shape[1].color = gc;
@@ -24,7 +24,7 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
 
 Object::Object()
 {
-    //empty constructor
+    //empty constructor.
 }
 
 Object::~Object()

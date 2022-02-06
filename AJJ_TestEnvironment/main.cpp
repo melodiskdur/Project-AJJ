@@ -16,7 +16,7 @@ int main()
 	float window_width = 800 * sc_f;
 	float window_height = 600 * sc_f;
 	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ");
-	window.setFramerateLimit(25);
+	window.setFramerateLimit(30);
 
 	//DEBUGGING
 	Layout* test_layout = new Layout(sf::FloatRect(300, -100, 400, 400), sf::Vector2f(0, 0), sf::Vector2f(0, 0), LAYOUT_PLACEMENT::LP_NONE);
