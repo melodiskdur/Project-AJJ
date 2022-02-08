@@ -106,6 +106,7 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size)
 
     // ---------------PhysicsAttribute test---------------
 
+    this->behavior_type = OBJECT_BEHAVIOR::DYNAMIC;
     this->attributes.push_back("Gravity");
     this->attributes.push_back("Air Friction");
 

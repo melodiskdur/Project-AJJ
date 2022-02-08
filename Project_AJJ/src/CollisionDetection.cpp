@@ -22,6 +22,7 @@ std::vector<ObjectTuple> CollisionDetection::getCollisions(sf::FloatRect view_re
 {
 	std::vector<Object*> collision_candidates;
 	std::vector<Object*> rendered_objects;
+	this->holders.clear();
 	this->collisions.clear();
 	this->collisions.resize(0);
 	root->clearTree();
@@ -38,6 +39,13 @@ std::vector<ObjectTuple> CollisionDetection::getCollisions(sf::FloatRect view_re
 
 	for (int i = 0; i < rendered_objects.size(); i++)
 	{
+		//Collision detection only needs to be done for objects within the camera's view.
+		if (rendered_objects[i]->getBehaviorType() == OBJECT_BEHAVIOR::STATIC) continue;
+
+		// Create a CloseCallsHolder storage for close call objects to object i.
+		CloseCallHolder i_holder;
+		i_holder.m_object = rendered_objects[i];
+
 		collision_candidates.clear();
 		collision_candidates = root->getCollisionCandidates(rendered_objects.at(i));
 		sf::FloatRect object_i = sf::FloatRect(rendered_objects.at(i)->getWorldPosition(), rendered_objects.at(i)->getSize());		//Object i's collision box.
@@ -46,14 +54,20 @@ std::vector<ObjectTuple> CollisionDetection::getCollisions(sf::FloatRect view_re
 			sf::FloatRect object_j = sf::FloatRect(rendered_objects.at(j)->getWorldPosition(), rendered_objects.at(j)->getSize());  //Object j's collision box.
 			if ( this->areIntersecting(object_i, object_j) &&																		//Intersection.
 				rendered_objects.at(i) != rendered_objects.at(j) &&																	//Not the same object.
-				!this->tupleExists(rendered_objects.at(i), rendered_objects.at(j)) &&												//Collision is not already registered in vector.
-				this->atLeastOneMoving(rendered_objects.at(i), rendered_objects.at(j)) )											//At least one object is moving.
+				!this->tupleExists(rendered_objects.at(i), rendered_objects.at(j)) )  												//Collision is not already registered in vector.
 			{
 				ObjectTuple new_collision;
 				new_collision.obj_i = rendered_objects.at(i);
 				new_collision.obj_j = rendered_objects.at(j);
 				this->collisions.push_back(new_collision);
 			}
+			// If no collision is done, we store the object in object i:s candidate holder.
+			else if (rendered_objects.at(i) != rendered_objects.at(j))
+			{
+				i_holder.m_close_calls.push_back(rendered_objects.at(j));
+			}
+			// Add object i:s close calls to vector.
+			this->holders.push_back(i_holder);
 		}
 	}
 	return this->collisions;

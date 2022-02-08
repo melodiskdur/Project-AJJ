@@ -8,6 +8,19 @@
 
 class QuadTree;
 
+/* Datatype to store all the close calls to a given object.
+* Close calls are deemed to be the objects close to m_object,
+* within the QuadTree, that are not intersecting with m_object.
+* See CollisionDetetcion:getCollisions() where this datatype is
+* used. */
+typedef struct _CloseCallHolder
+{
+	Object* m_object = nullptr;
+	std::vector<Object*> m_close_calls;
+} CloseCallHolder;
+
+/* Datatype to represent two objects in collision with each other.
+*/
 typedef struct _ObjectTuple
 {
 	Object* obj_i = nullptr;
@@ -27,7 +40,8 @@ public:
 	//Constructor that takes a pointer to a Scene's object vector as parameter.
 	CollisionDetection(std::vector<Object*>& objects);
 	~CollisionDetection();
-	//Runs collisition detection for all objects within the view_rect boundaries.
+	std::vector<CloseCallHolder> getCloseCallHolders() { return this->holders; };
+	//Runs collision detection for all objects within the view_rect boundaries.
 	//The view_rect should be the Scene::camera_view_rect. Different versions below.
 	std::vector<ObjectTuple> getCollisions(sf::FloatRect view_rect);
 	void checkForCollisions(sf::FloatRect view_rect);
@@ -45,6 +59,7 @@ public:
 private:
 	std::vector<Object*>* scene_objects = nullptr;
 	std::vector<ObjectTuple> collisions;
+	std::vector<CloseCallHolder> holders;					// Close calls to each rendered object.
 	QuadTree* root = nullptr;								//The base of the QuadTree.
 
 	// Debugging.

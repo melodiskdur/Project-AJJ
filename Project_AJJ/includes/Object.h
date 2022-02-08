@@ -5,6 +5,8 @@
 #include "Animation.h"
 #include "TextureIds.h"
 
+enum class OBJECT_BEHAVIOR { STATIC, DYNAMIC, HOLLOW };
+
 class Action;
 
 /* Object 
@@ -31,6 +33,7 @@ public:
 	Frame getFrame() { return this->current_frame; };
 	float getVelocityIncrement() { return this->velocity_inc; };
 	std::vector<std::string> getPhysicsAttributes() { return this->attributes; };
+	OBJECT_BEHAVIOR getBehaviorType() { return this->behavior_type; };
 
 	//Setters
 	void setId(int id);
@@ -45,6 +48,7 @@ public:
 	void setColor(sf::Color color);
 	void setVelocityIncrement(float vel_inc) { this->velocity_inc = vel_inc; };
 	//void setActions(std::vector<int> actions);
+	void setBehaviorType(OBJECT_BEHAVIOR behavior) { this->behavior_type = behavior; };
 
 	//Others
 	//Called when the object is queried for an action. Looks through its vector for the action 
@@ -77,6 +81,7 @@ protected:
 	Frame current_frame;
 
 	//PhysicsAttributes
+	OBJECT_BEHAVIOR behavior_type = OBJECT_BEHAVIOR::STATIC; // Physical behavior of object. Default is static.
 	std::vector<std::string> attributes;				   // The Physics Attribute types that the Object should be affected by.
 
 private:
