@@ -37,11 +37,13 @@ int main()
 	AirFriction* airfric = new AirFriction(test_scene->getSceneObjects());
 	Gravity* gravity = new Gravity(test_scene->getSceneObjects());
 	CollisionDetection* col_det = new CollisionDetection(test_scene->getSceneObjects());
+	CollisionGraph* col_graph = new CollisionGraph();
 	PhysicsManager* phys_mag = new PhysicsManager(test_scene->getSceneObjects());
 	//Hitbox* hitbox = new Hitbox();
 	phys_mag->addAttribute(col_det);
 	phys_mag->addAttribute(gravity);
 	phys_mag->addAttribute(airfric);
+	phys_mag->col_graph = col_graph;
 	test_scene->setCollisionDetection(col_det);
 	test_scene->setPhysicsManager(phys_mag);
 	test_scene->setCamera(&scene_camera);

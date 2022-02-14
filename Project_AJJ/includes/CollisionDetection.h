@@ -52,10 +52,14 @@ public:
 	bool atLeastOneMoving(Object* i, Object* j);
 	// Returns true if two objects have intersecting boundaries.
 	static bool areIntersecting(sf::FloatRect ibox, sf::FloatRect jbox);
+	// Checks if an object j is within a proximity of i->getSize() of object i.
+	static bool isCloseCall(Object* i, Object* j);
 	// Checks and removes collisions that have been resolved.
 	void removeResolved();
-	// Debugging.
+
+	// DEBUGGING.
 	std::vector<sf::VertexArray> getGrid();
+	// END DEBUGGING.
 private:
 	std::vector<Object*>* scene_objects = nullptr;
 	std::vector<ObjectTuple> collisions;

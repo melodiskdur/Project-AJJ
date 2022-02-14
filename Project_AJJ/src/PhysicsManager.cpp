@@ -29,7 +29,7 @@ void PhysicsManager::basicCollisionHandler(sf::FloatRect view_rect)
 	grav->applyGravity(view_rect);
 
 	// Find Air Friction attribute.
-	AirFriction* fric = (AirFriction*)this->searchAttribute("Air Friction");
+    AirFriction* fric = (AirFriction*)this->searchAttribute("Air Friction");
 	fric->applyAirFriction(view_rect);
 
 	// Find Collision Detection attribute.
@@ -38,10 +38,20 @@ void PhysicsManager::basicCollisionHandler(sf::FloatRect view_rect)
 		return;
 
 	// Run Collision check and retreive the tuples of colliding objects.
+
 	// NOTE: CollisionDetection should maybe be moved to a higher instance (collisions could be used for more
 	// than just physics).
 	std::vector<ObjectTuple> collision_tuples = col_det->getCollisions(view_rect);
 
+	// DEBUGGING.
+	std::vector<CloseCallHolder> close_calls = col_det->getCloseCallHolders();
+	this->col_graph->storeCollisions(collision_tuples);
+	this->col_graph->storeCloseCalls(close_calls);
+	this->col_graph->resolveTree();
+	this->col_graph->applyTreeResolution();
+	// END DEBUGGING.
+
+	/*
 	// Collect Hitbox-resolutions and add all the data to the CollisionData-vector.
 	for (int i = 0; i < collision_tuples.size(); i++)
 	{
@@ -64,6 +74,7 @@ void PhysicsManager::basicCollisionHandler(sf::FloatRect view_rect)
 		this->data[i].m_object->setWorldPosition(this->data[i].m_final_repos);
 		this->data[i].m_object->setVelocity(this->data[i].m_revelocities[data[i].indices[0]]);
 	}
+	*/
 
 	// Momentum here.
 

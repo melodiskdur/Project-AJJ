@@ -112,12 +112,14 @@ ObjectData Hitbox::singleObjectSeparation(Object* moving, Object* other)
 		new_pos.y = vel.y < 0 ? other->getWorldPosition().y + other->getSize().y
 			:                   other->getWorldPosition().y - moving->getSize().y;
 		new_vel.y = 0;
+		intersect = vel.y < 0 ? INTERSECTED_SIDE::ODATA_TOP : INTERSECTED_SIDE::ODATA_BOTTOM;
 	}
 	else if (vel.y == 0)
 	{
 		new_pos.x = vel.x < 0 ? other->getWorldPosition().x + other->getSize().x
 			:					other->getWorldPosition().x - moving->getSize().x;
 		new_vel.x = 0;
+		intersect = vel.x < 0 ? INTERSECTED_SIDE::ODATA_RIGHT : INTERSECTED_SIDE::ODATA_LEFT;
 	}
 	// Non-axis-aligned velocity.
 	else
@@ -370,14 +372,45 @@ sf::Vector2f Hitbox::getOverlaps(Object* i, Object* j)
 	return overlaps;
 }
 
+sf::Vector2f Hitbox::getOverlaps(sf::FloatRect i_rect, sf::FloatRect j_rect)
+{
+	float overlap_x, overlap_y, total_x, total_y, diff_x, diff_y;
+	total_x = i_rect.width + j_rect.width;
+	total_y = i_rect.height + j_rect.height;
+	diff_x = i_rect.left < j_rect.left ?
+		std::abs(j_rect.left + j_rect.width - i_rect.left) :
+		std::abs(i_rect.left + i_rect.width - j_rect.left);
+	diff_y = i_rect.top < j_rect.top ?
+		std::abs(j_rect.top + j_rect.height - i_rect.top) :
+		std::abs(i_rect.top + i_rect.height - j_rect.top);
+
+	overlap_x = total_x - diff_x < 0 ? 0.0f : total_x - diff_x;
+	overlap_y = total_y - diff_y < 0 ? 0.0f : total_y - diff_y;
+	return { overlap_x, overlap_y };
+}
+
 bool Hitbox::sameXDirection(Object* i, Object* j)
 {
-	return (i->getVelocity().x * j->getVelocity().x > 0);
+	sf::Vector2f i_prev = i->getWorldPosition() - i->getVelocity();
+	sf::Vector2f j_prev = j->getWorldPosition() - j->getVelocity();
+	// Make sure that one of the object is behind the other.
+	if ( (i_prev.x + i->getSize().x < j_prev.x) || (j_prev.x + j->getSize().x < i_prev.x) )
+	{
+		return (i->getVelocity().x * j->getVelocity().x > 0);
+	}
+	return false;
 }
 
 bool Hitbox::sameYDirection(Object* i, Object* j)
 {
-	return (i->getVelocity().y * j->getVelocity().y > 0);
+	sf::Vector2f i_prev = i->getWorldPosition() - i->getVelocity();
+	sf::Vector2f j_prev = j->getWorldPosition() - j->getVelocity();
+	// Make sure that one of the object is behind the other.
+	if ((i_prev.y + i->getSize().y < j_prev.y) || (j_prev.y + j->getSize().y < i_prev.y))
+	{
+		return (i->getVelocity().y * j->getVelocity().y > 0);
+	}
+	return false;
 }
 
 sf::Vector2f Hitbox::getT(Object* i, Object* j, sf::Vector2f overlaps)
@@ -434,4 +467,80 @@ std::vector<sf::Vector2f> Hitbox::unstuck(sf::FloatRect moving, sf::FloatRect ot
 		}
 	}
 	return { resolves[current_best_index], new_velocities[current_best_index] };
+}
+
+/* Second version of unstuck without the parameter moving_vel. Compared to the previous
+*  version, this one only returns the new position.
+*/
+sf::Vector2f Hitbox::unstuck(sf::FloatRect moving, sf::FloatRect other)
+{
+	std::vector<sf::Vector2f> resolves =
+	{
+		{ moving.left, other.top - moving.height },			// Top.
+		{ other.left + other.width, moving.top },			// Right.
+		{ moving.left, other.top + other.height},			// Bottom.
+		{ other.left - moving.width, moving.top }			// Left.
+	};
+
+	float current_shortest = HITBOX_INFINITY;
+	int current_best_index = -1;
+
+	for (int i = 0; i < 4; i++)
+	{
+		if ((i % 2 == 1) && std::abs(resolves[i].x - moving.left) < current_shortest)
+		{
+			current_shortest = std::abs(resolves[i].x - moving.left);
+			current_best_index = i;
+		}
+		if ((i % 2 == 0) && std::abs(resolves[i].y - moving.top) < current_shortest)
+		{
+			current_shortest = std::abs(resolves[i].y - moving.top);
+			current_best_index = i;
+		}
+	}
+	return resolves[current_best_index];
+}
+
+std::vector<sf::Vector2f> Hitbox::recalibrate(const ObjectData& odata, const sf::Vector2f& i_pos, const INTERSECTED_SIDE& adj_intersect, const sf::Vector2f& j_pos)
+{
+	// Quick check to see if the collision is double-sided.
+	bool is_double = (adj_intersect != INTERSECTED_SIDE::ODATA_NONE);
+
+	sf::Vector2f i_updated = i_pos;
+	sf::Vector2f j_updated = j_pos;
+	sf::Vector2f i_size = odata.m_object->getSize();
+	sf::Vector2f j_size = odata.m_colliding_object->getSize();
+
+	float i_c = is_double ? 0.5f : 1.f;
+	float j_c = 1.f - i_c;
+	sf::Vector2f overlaps = Hitbox::getOverlaps({ i_pos, i_size }, { j_pos, j_size });
+	
+	switch (odata.m_intersect)
+	{
+		case INTERSECTED_SIDE::ODATA_TOP:
+		{
+			i_updated.y += i_c * overlaps.y;
+			if (is_double) j_updated.y -= j_c * overlaps.y;
+			break;
+		}
+		case INTERSECTED_SIDE::ODATA_RIGHT:
+		{
+			i_updated.x -= i_c * overlaps.x;
+			if (is_double) j_updated.x += j_c * overlaps.x;
+			break;
+		}
+		case INTERSECTED_SIDE::ODATA_BOTTOM:
+		{
+			i_updated.y -= i_c * overlaps.y;
+			if (is_double) j_updated.y += j_c * overlaps.y;
+			break;
+		}
+		case INTERSECTED_SIDE::ODATA_LEFT:
+		{
+			i_updated.x += i_c * overlaps.x;
+			if (is_double) j_updated.x -= j_c * overlaps.x;
+		}
+	}
+
+	return { i_updated, j_updated };
 }

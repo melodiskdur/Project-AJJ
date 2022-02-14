@@ -4,11 +4,14 @@
 #include "PhysicsAttribute.h"
 #include "Hitbox.h"
 #include "CollisionDetection.h"
+#include "CollisionGraph.h"
 #include <math.h>
 #include "Gravity.h"
 #include "AirFriction.h"
 
 // "etc"
+
+class CollisionGraph;
 
 /* Datatype to store all the changes to an object's parameters that's
 * been calculated in the different PhysicsAttributes. 
@@ -44,6 +47,10 @@ public:
 	void addAttribute(PhysicsAttribute* attribute);
 	void basicCollisionHandler(sf::FloatRect view_rect);
 	PhysicsAttribute* searchAttribute(std::string attribute_name);
+
+	// DEBUGGING.
+	CollisionGraph* col_graph;
+	// END DEBUGGING.
 private:
 	std::vector<PhysicsAttribute*> attributes;
 	std::vector<Object*>* scene_objects = nullptr;
@@ -60,4 +67,5 @@ private:
 	// Function to sort the collision data in descending order of number of concurrent collisions.
 	// Contains an implementation of Insertion sort.
 	void sortData();
+
 };

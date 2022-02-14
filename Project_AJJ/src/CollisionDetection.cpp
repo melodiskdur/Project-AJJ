@@ -45,6 +45,7 @@ std::vector<ObjectTuple> CollisionDetection::getCollisions(sf::FloatRect view_re
 		// Create a CloseCallsHolder storage for close call objects to object i.
 		CloseCallHolder i_holder;
 		i_holder.m_object = rendered_objects[i];
+		i_holder.m_close_calls.clear();
 
 		collision_candidates.clear();
 		collision_candidates = root->getCollisionCandidates(rendered_objects.at(i));
@@ -62,13 +63,13 @@ std::vector<ObjectTuple> CollisionDetection::getCollisions(sf::FloatRect view_re
 				this->collisions.push_back(new_collision);
 			}
 			// If no collision is done, we store the object in object i:s candidate holder.
-			else if (rendered_objects.at(i) != rendered_objects.at(j))
+			else if (rendered_objects.at(i) != rendered_objects.at(j) && this->isCloseCall(rendered_objects.at(i), rendered_objects.at(j)))
 			{
 				i_holder.m_close_calls.push_back(rendered_objects.at(j));
 			}
-			// Add object i:s close calls to vector.
-			this->holders.push_back(i_holder);
 		}
+		// Add object i:s close calls to vector.
+		this->holders.push_back(i_holder);
 	}
 	return this->collisions;
 }
@@ -146,6 +147,19 @@ bool CollisionDetection::atLeastOneMoving(Object* i, Object* j)
 bool CollisionDetection::areIntersecting(sf::FloatRect ibox, sf::FloatRect jbox)
 {
 	return (ibox.intersects(jbox) || jbox.intersects(ibox));
+}
+
+bool CollisionDetection::isCloseCall(Object* i, Object* j)
+{
+	// Define a FloatRect representing the proximity of i.
+	sf::Vector2f i_prox_topleft = i->getWorldPosition() - i->getSize();
+	sf::Vector2f i_prox_size = i->getSize() * 2.0f;
+	sf::FloatRect i_prox_rect = {i_prox_topleft, i_prox_size};
+
+	// Close object hitbox.
+	sf::FloatRect j_box = { j->getWorldPosition(), j->getSize() };
+	// Call to ColDet::areIntersecting.
+	return (CollisionDetection::areIntersecting(i_prox_rect, j_box));
 }
 
 void CollisionDetection::removeResolved()
