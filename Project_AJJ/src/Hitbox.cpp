@@ -28,9 +28,19 @@ std::vector<ObjectData> Hitbox::separateHitboxes(Object* i, Object* j)
 	// Return values.
 	std::vector<ObjectData> wp_and_vel_re;
 
-	// Exit if no objects are moving.
+	// Special case: If no objects are moving.
 	if (vel_i.x == 0 && vel_i.y == 0 && vel_j.x == 0 && vel_j.y == 0)
+	{
+		if (i->getBehaviorType() == OBJECT_BEHAVIOR::STATIC && j->getBehaviorType() == OBJECT_BEHAVIOR::STATIC)
+			return wp_and_vel_re;
+		else if (i->getBehaviorType() == OBJECT_BEHAVIOR::STATIC && j->getBehaviorType() == OBJECT_BEHAVIOR::DYNAMIC)
+			wp_and_vel_re.push_back(Hitbox::singleObjectSeparation(j, i));
+		else if (i->getBehaviorType() == OBJECT_BEHAVIOR::DYNAMIC && j->getBehaviorType() == OBJECT_BEHAVIOR::STATIC)
+			wp_and_vel_re.push_back(Hitbox::singleObjectSeparation(i, j));
+		else if (i->getBehaviorType() == OBJECT_BEHAVIOR::DYNAMIC && j->getBehaviorType() == OBJECT_BEHAVIOR::DYNAMIC)
+			wp_and_vel_re = Hitbox::dualObjectSeparation(i, j);
 		return wp_and_vel_re;
+	}
 
 	sf::Vector2f abs_vel_i = sf::Vector2f(std::abs(i->getVelocity().x), std::abs(i->getVelocity().y));
 	sf::Vector2f abs_vel_j = sf::Vector2f(std::abs(j->getVelocity().x), std::abs(j->getVelocity().y));

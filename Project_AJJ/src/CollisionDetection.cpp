@@ -63,13 +63,14 @@ std::vector<ObjectTuple> CollisionDetection::getCollisions(sf::FloatRect view_re
 				this->collisions.push_back(new_collision);
 			}
 			// If no collision is done, we store the object in object i:s candidate holder.
-			else if (rendered_objects.at(i) != rendered_objects.at(j) && this->isCloseCall(rendered_objects.at(i), rendered_objects.at(j)))
+			else if (rendered_objects.at(i) != rendered_objects.at(j) && this->isCloseCall(rendered_objects.at(i), rendered_objects.at(j)) &&
+				    !this->tupleExists(rendered_objects.at(i), rendered_objects.at(j)))
 			{
 				i_holder.m_close_calls.push_back(rendered_objects.at(j));
 			}
 		}
 		// Add object i:s close calls to vector.
-		this->holders.push_back(i_holder);
+		if (i_holder.m_close_calls.size() > 0) this->holders.push_back(i_holder);
 	}
 	return this->collisions;
 }
@@ -152,8 +153,8 @@ bool CollisionDetection::areIntersecting(sf::FloatRect ibox, sf::FloatRect jbox)
 bool CollisionDetection::isCloseCall(Object* i, Object* j)
 {
 	// Define a FloatRect representing the proximity of i.
-	sf::Vector2f i_prox_topleft = i->getWorldPosition() - i->getSize();
-	sf::Vector2f i_prox_size = i->getSize() * 2.0f;
+	sf::Vector2f i_prox_topleft = i->getWorldPosition() - 0.5f * i->getSize();
+	sf::Vector2f i_prox_size = i->getSize() * 2.5f;
 	sf::FloatRect i_prox_rect = {i_prox_topleft, i_prox_size};
 
 	// Close object hitbox.

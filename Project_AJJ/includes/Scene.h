@@ -47,6 +47,7 @@ public:
 	std::vector<SceneLayer*>& getSceneLayers();
 	Object* getObjectWithId(int id);
 	CollisionDetection* getCollisionDetection();
+	PhysicsManager* getPhysicsManager() { return this->phys_mag; };
 
 	//Setters
 	void setCamera(Camera* camera);

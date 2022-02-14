@@ -8,6 +8,8 @@
 
 #define REPOS_INFINITY 200000000.f
 
+enum class EDGE_STATUS { EDGE_ACTIVE, EDGE_RELAXED, EDGE_TRIGGERED, EDGE_UNRESOLVED };
+
 typedef struct _ObjectTuple ObjectTuple;
 typedef struct _CloseCallHolder CloseCallHolder;
 
@@ -46,14 +48,12 @@ typedef struct _CollisionNode
 	Object* m_node_object;
 	sf::Vector2f m_frame_pos;
 	sf::Vector2f m_updated_pos;
+	std::vector<int> i_m_all;
 	std::vector<int> i_m_primary;
 	std::vector<int> i_m_relaxed;
 	std::vector<int> i_m_triggered;
 	std::vector<int> i_m_unresolved;
 	int m_storage_index;
-	// DEBUGGING.
-	int m_num_static = 0;
-	// END DEBUGGING.
 	bool m_horizontal_collision = false;
 	bool m_vertical_collision = false;
 } CollisionNode;
@@ -67,6 +67,10 @@ class CollisionGraph :
 public:
 	CollisionGraph();
 	~CollisionGraph();
+
+	// DEBUGGING.
+	void printVectors();
+	// END DEBUGGING.
 
 	// Main function of the graph. Attempts to relax all the edges
 	// of the graph and then store the resulting resolves for each CollisionNode.
@@ -95,18 +99,24 @@ public:
 	// Adds a collision close call to 'node' by creating a CollisionEdge and setting it as relaxed. 
 	void createCloseCallEdge(CollisionNode* node, CollisionNode* adjacent);
 
+	// Debugging, treedrawer.
+	std::vector<sf::VertexArray> getTree();
 private:
 	// Node storage vector + index vectors.
 	std::vector<CollisionNode> node_storage;
-	std::vector<int> i_primary_collisions;
-	std::vector<int> i_triggered_collisions;
-	std::vector<int> i_relaxed_collisions;
-	std::vector<int> i_unresolved_collisions;
+	std::vector<int> i_active_nodes;
 
 	// Edge storage vector + index vectors.
 	std::vector<CollisionEdge> edge_storage;
-	std::vector<int> i_active_edges;
 	std::vector<int> i_primary_edges;
+	std::vector<int> i_active_edges;
+	std::vector<int> i_triggered_edges;
+	std::vector<int> i_relaxed_edges;
+	std::vector<int> i_unresolved_edges;
+
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	*       Updating / manipulating Nodes & Edges            *
+	* * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
 	// Applies e.proposed_resolve to e. Also marks the e.bonus_resolves-Edges as relaxed.
 	void updatePosition(CollisionNode* c, CollisionEdge* e);
@@ -125,18 +135,51 @@ private:
 	// Executes whenever a proposed resolve triggers a collision with a static object.
 	void markAsUnresolved(CollisionEdge* unres);
 
-	// Checks a given parameter vector for an index of an Edge. That has node_storage[i_c] as Node
-	// and node_storage[i_adj] as adjacent.
-	int findEdgeIndex(int i_c, int i_adj, std::vector<int>& edge_vector);
-
-	CollisionEdge* invertedEdge(CollisionEdge* e);
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	*                   Comparisons                          *
+	* * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
 
 	// Checks if two objects are colliding into each other.
 	bool collisionTwoSided(CollisionEdge* e);
 
-	// Used internally to check if an object already has a CollisonNode.
-	// Returns -1 if the node doesn't exist.
-	int indexOf(Object* o);
+	// Checks if e->proposed_resolve also resolves the edge e_tocheck.
+	bool resolves(CollisionEdge* e, CollisionEdge* e_tocheck);
+	// Checks for intersection between an active and a relaxed Edge.
+	bool intersects(CollisionEdge* e, CollisionEdge* r);
+
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	*                Finding Nodes and Edges.                *
+	* * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+
+	// Checks a given parameter vector for an index of an Edge. That has node_storage[i_c] as Node
+	// and node_storage[i_adj] as adjacent.
+	int findEdgeIndex(int i_c, int i_adj, std::vector<int>& edge_vector);
+	int findNodeIndexIn(const int node_index, std::vector<int>& i_node_vector);
+
+	CollisionEdge* invertedEdge(CollisionEdge* e);
+
+	// Pointer (to node/edge_storage instances) returners, for cleaner code.
+	CollisionNode* findNode(Object* o);
+	CollisionNode* findNode(int node_index);
+	CollisionEdge* findEdge(int edge_index);
+	std::vector<CollisionNode*> findOutgoingAdjacents(int node_index);
+	std::vector<CollisionNode*> findOutgoingAdjacents(CollisionNode* c);
+	std::vector<CollisionNode*> findIncomingAdjacents(int node_index);
+	std::vector<CollisionNode*> findIncomingAdjacents(CollisionNode* c);
+	std::vector<CollisionEdge*> findIncomingEdges(int node_index);
+	std::vector<CollisionEdge*> findIncomingEdges(CollisionNode* c);
+	std::vector<CollisionEdge*> findOutgoingEdges(int node_index);
+	std::vector<CollisionEdge*> findOutgoingEdges(CollisionNode* c);
+	std::vector<CollisionEdge*> findOutgoingEdgesByStatus(CollisionNode* c, EDGE_STATUS status);
+	
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	*                Sorting-methods.                        *
+	* * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
+
+	// Methods to switch index-integers between vectors.
+	void moveEdgeIndex(CollisionEdge* e, std::vector<int>& from, std::vector<int>& to);
+	void moveNodeIndex(CollisionNode* c, std::vector<int>& from, std::vector<int>& to);
+
 	// Sorts the primary edges in number
 	// of resolves that are created (one edge.proposed
 	// could for example solve 2 other collisions).
@@ -147,14 +190,8 @@ private:
 	// Sorts the primary CollisionNode in
 	// descending order of collisions it's involved in.
 	void sortPrimaryCollisions();
-	// Same as above but in order of STATIC collisions it's involved in.
-	void sortPrimaryByStatic();
 	// Resets all the vectors.
 	void clearVectors();
-	// Checks if e->proposed_resolve also resolves the edge e_tocheck.
-	bool resolves(CollisionEdge* e, CollisionEdge* e_tocheck);
-	// Checks for intersection between an active and a relaxed Edge.
-	bool intersects(CollisionEdge* e, CollisionEdge* r);
 
 };
 

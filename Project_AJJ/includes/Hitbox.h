@@ -20,7 +20,6 @@ public:
     static std::vector<ObjectData> separateHitboxes(Object* i, Object* j);
     // Resolves collisions with only one moving object.
     static ObjectData singleObjectSeparation(Object* moving, Object* other);
-    static ObjectData singleObjectSeparation2(Object* moving, Object* other);
     // Resolves collisions where both objects are moving.
     static std::vector<ObjectData> dualObjectSeparation(Object*i, Object* j);
 
