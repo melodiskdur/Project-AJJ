@@ -65,6 +65,8 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\boss.PNG" />
+    <Image Include="assets\Inkedlayout_test_LI.jpg" />
+    <Image Include="assets\layout_test.png" />
     <Image Include="assets\menu_buttons.png" />
     <Image Include="assets\platformertiles.png" />
     <Image Include="assets\rogue_atlas.png" />

@@ -17,6 +17,15 @@ Layout::Layout(sf::FloatRect rect, sf::Vector2f padding, sf::Vector2f margin, LA
 
 	//create 4 margin_spaces(top,right,left,bottom)
 	this->margin_spaces = std::vector<sf::FloatRect>(4, sf::FloatRect({ this->rect.left, this->rect.top }, { this->rect.width, this->rect.height }) );
+
+	Frame new_frame;
+	new_frame.region_name = "Layouts";
+	new_frame.texture_id = TEXTURE_ID::HOVER;
+	new_frame.frame_index = 0;
+	new_frame.duration = 0;
+
+	this->current_frame = new_frame;
+	this->texture_name = "Layouts";
 }
 
 /*Destructor*/
@@ -119,7 +128,7 @@ void Layout::placeLayouts()
 		//the parent_layout is in this case "this"
 		l->updateParentMarginSpaces();
 
-		//use recursion to place the layouts inside of layout l
+		         //use recursion to place the layouts inside of layout l
 		//this way, we place every layout available inside of the whole "base"-layout
 		l->placeLayouts();
 	}
@@ -212,6 +221,7 @@ void Layout::setBestLayoutPlacement()
 				adjusted_placement = new_pos;
 			}
 		}
+
 	}
 
 	this->setPosition(correctPosition(adjusted_placement));
@@ -383,21 +393,16 @@ void Layout::updateParentMarginSpaces()
 				}
 			}
 		
-			//update the margin_rect's floatrect. The ms is in this case not updated by the operations above. This step is necessary
+			// Update the margin_rect's floatrect. 
+			// The ms is in this case not updated by the operations above. This step is necessary
 			this->parent_layout->setMarginSpaceRect(ms,index);
-
-			if (no_adjustment)
-			{
-				std::cout << "ERROR:updateParentMarginSpaces(), no adjustment was made. Should not be possible" << std::endl;
-				return;
-			}
 		}
 
 		index++;
 	}
 }
 
-
+/*Help-mehthods*/
 float Layout::distance(sf::Vector2f s, sf::Vector2f d)
 {
 	/*This function calculates the distnace from source-point to
@@ -509,6 +514,8 @@ sf::Vector2f Layout::correctPosition(sf::Vector2f total_rect_pos)
 
 void Layout::setPosition(sf::Vector2f new_pos)
 {
+	sf::Vector2f move_dist = sf::Vector2f(new_pos.x - this->rect.left, new_pos.y - this->rect.top);		//the distance this layout will be moved
+
 	//update layouts position
 	this->rect.left = new_pos.x;
 	this->rect.top = new_pos.y;
@@ -519,7 +526,14 @@ void Layout::setPosition(sf::Vector2f new_pos)
 	{
 		ms.left = new_pos.x;
 		ms.top = new_pos.y;
-		this->setMarginSpaceRect(ms,index);
+		this->setMarginSpaceRect(ms, index);
 		index++;
 	}
+
+	//finally, use recursion to move all of the layouts inside of this one
+	for (auto& child_layout : this->layouts)
+	{
+		child_layout->setPosition({ child_layout->getRect().left + move_dist.x, child_layout->getRect().top + move_dist.y });
+	}
+	
 }

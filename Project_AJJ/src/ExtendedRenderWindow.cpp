@@ -209,6 +209,38 @@ void ExtendedRenderWindow::drawButton(Button * button)
 
 void ExtendedRenderWindow::drawLayouts(Layout* parent_layout)
 {
+	sf::Sprite layout_sprite;
+
+	//only print the base-layout. Prevents double-draw
+	if (parent_layout->getParentLayout() == nullptr)
+	{
+		layout_sprite = this->texture_manager->getAtlas(parent_layout->getTextureName())->
+						getSprite(parent_layout->getFrame().texture_id, parent_layout->getFrame().region_name, parent_layout->getFrame().frame_index);
+		//Set position and correct its scaling
+		layout_sprite.setPosition(parent_layout->getPosition());
+		layout_sprite.setScale(parent_layout->getSize().x / layout_sprite.getLocalBounds().width, parent_layout->getSize().y / layout_sprite.getLocalBounds().height);
+
+		this->draw(layout_sprite);
+	}
+	
+	//loop all child-layouts
+	for (auto& l : parent_layout->getLayouts())
+	{
+		layout_sprite = this->texture_manager->getAtlas(l->getTextureName())->
+						getSprite(l->getFrame().texture_id, l->getFrame().region_name, l->getFrame().frame_index);		
+		//Set position and correct its scaling
+		layout_sprite.setPosition(l->getPosition());
+		layout_sprite.setScale(l->getSize().x / layout_sprite.getLocalBounds().width, l->getSize().y / layout_sprite.getLocalBounds().height);
+
+		this->draw(layout_sprite);
+
+		//recursion
+		this->drawLayouts(l);
+	}
+}
+
+void ExtendedRenderWindow::drawLayoutsDEBUG(Layout* parent_layout)
+{
 	//DEBUGGING simple test-rect
 	sf::RectangleShape layout_rect_shape;
 	layout_rect_shape.setSize(parent_layout->getSize());

@@ -30,6 +30,9 @@
     <ClCompile Include="src\TestMainControllerObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\TestLayout.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\TestObject.h">
@@ -42,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="includes\TestMainControllerObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\TestLayout.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

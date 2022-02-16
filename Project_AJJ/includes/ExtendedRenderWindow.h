@@ -39,7 +39,7 @@ public:
 	void activateWindow() { this->window_state = true; }
 	void drawButton(Button * button);
 	void drawLayouts(Layout* layout);
-	void drawLayout(int index);
+	void drawLayoutsDEBUG(Layout* layout);
 	void addLayout(Layout* new_layout) { this->layouts.push_back(new_layout); }
 	
 private:

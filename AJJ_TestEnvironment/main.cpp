@@ -4,7 +4,7 @@
 #include "includes/ResourceLoader.h"
 #include "includes/TestMainControllerObject.h"
 #include "includes/MainController.h"
-#include "includes/Layout.h"
+#include "includes/TestLayout.h"
 
 int main()
 {
@@ -18,24 +18,10 @@ int main()
 	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ");
 	window.setFramerateLimit(30);
 
-	//DEBUGGING
-	Layout* test_layout = new Layout(sf::FloatRect(300, -100, 400, 400), sf::Vector2f(0, 0), sf::Vector2f(0, 0), LAYOUT_PLACEMENT::LP_NONE);
-	test_layout->addLayout(sf::FloatRect(0, 0, 20, 100), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_TOP_LEFT);
-	test_layout->addLayout(sf::FloatRect(0, 0, 80, 80), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_TOP_LEFT);
-	test_layout->addLayout(sf::FloatRect(0, 0, 100, 100), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_TOP_RIGHT);
-	test_layout->addLayout(sf::FloatRect(0, 0, 20, 20), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->addLayout(sf::FloatRect(0, 0, 100, 20), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_BOTTOM_RIGHT);
-	test_layout->addLayout(sf::FloatRect(0, 0, 60, 60), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_TOP_LEFT);
-	test_layout->addLayout(sf::FloatRect(0, 0, 60, 60), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_CENTERED);
-	test_layout->addLayout(sf::FloatRect(0, 0, 60, 60), sf::Vector2f(0, 0), sf::Vector2f(2, 2), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
+	//---------------------------- Layout test -------------------------------
 
-	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 60, 10), sf::Vector2f(0, 0), sf::Vector2f(2, 7), LAYOUT_PLACEMENT::LP_TOP_CENTERED);
-	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 60, 10), sf::Vector2f(0, 0), sf::Vector2f(2, 7), LAYOUT_PLACEMENT::LP_TOP_CENTERED);
-	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 60, 10), sf::Vector2f(0, 0), sf::Vector2f(2, 7), LAYOUT_PLACEMENT::LP_TOP_CENTERED);
-
-	test_layout->placeLayouts();
+	Layout* test_layout = TestLayout::createTestLayout();
 	window.addLayout(test_layout);
-	//END DEBUGGING
 	
 	//------------------------- TextureAtlas test ----------------------------
 
@@ -174,7 +160,6 @@ int main()
 
 		//DEBUGGING
 		//window.getLayouts()[0]->setPosition({ window.getLayouts()[0]->getPosition().x + 1 , window.getLayouts()[0]->getPosition().y + 1});
-		
 		//END DEBUGGING
 
 

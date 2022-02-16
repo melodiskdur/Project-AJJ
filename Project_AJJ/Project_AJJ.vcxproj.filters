@@ -157,6 +157,12 @@
     <Image Include="assets\menu_buttons.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="assets\layout_test.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\Inkedlayout_test_LI.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\ayar_takhu.ttf">

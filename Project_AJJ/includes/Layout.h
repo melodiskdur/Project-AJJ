@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include "Animation.h"
+#include "TextureIds.h"
 #include "Button.h"
 
 /*Class for layouts(menus,textbubbles,screen-messages,popups,etc)
@@ -67,6 +69,12 @@ public:
 	//so that it doesnt include the layouts padding and margin. This function does that.
 	sf::Vector2f correctPosition(sf::Vector2f total_rect_pos);
 
+	sf::String getTextureName() { return this->texture_name; };
+	TEXTURE_ID getTextureId() { return this->active_texture; };
+	Frame getFrame() { return this->current_frame; };
+
+	Layout* getParentLayout() { return this->parent_layout; }
+
 
 	/*Setters*/
 	void setText(sf::Text new_text) { this->text = new_text; }
@@ -76,6 +84,12 @@ public:
 	void setPadding(sf::Vector2f padding) { this->padding = padding; }
 	void setMargin(sf::Vector2f margin) { this->margin = margin; }
 	void setMarginSpaceRect(sf::FloatRect new_margin_space, int index) { this->margin_spaces[index] = new_margin_space; }
+
+	void setTextureName(sf::String name) { this->texture_name = name; };
+	void setTextureId(TEXTURE_ID texture_id) { this->active_texture = texture_id; };
+	void setFrame(Frame frame) { this->current_frame = frame; };
+
+	void setParentLayout(Layout* parent_layout) { this->parent_layout = parent_layout; }
 	
 	
 
@@ -103,9 +117,6 @@ public:
 	//calculates the distance between two xy-points
 	float distance(sf::Vector2f s, sf::Vector2f d);
 	
-
-	
-
 protected:
 	sf::Text text;									//text inside of the layout
 
@@ -122,6 +133,11 @@ protected:
 	sf::Vector2f margin = { 0,0 };					//space between other layouts or window-bordes, left/right and top/bottom
 
 	std::vector<sf::FloatRect> margin_spaces;		//used to check the remaining space of the layout (top,bottom,left,right margin space)
+
+	//Textures
+	sf::String texture_name = "";					//Name of the texture atlas that we want to draw frames of this object from.
+	TEXTURE_ID active_texture = TEXTURE_ID::NONE;
+	Frame current_frame;
 
 	LAYOUT_PLACEMENT layout_placement = LAYOUT_PLACEMENT::LP_NONE;	//placement of the layout in relation to the window or parent-layout
 };
