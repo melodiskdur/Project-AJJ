@@ -301,6 +301,8 @@ void ExtendedRenderWindow::drawLayoutsDEBUG(Layout* parent_layout)
 // Debugging.
 void ExtendedRenderWindow::debugDraw()
 {
+	
+	// COLLISIONDETECTION GRID LINES
 	if (this->active_scene != nullptr)
 	{
 		std::vector<sf::VertexArray> grid = this->active_scene->getCollisionDetection()->getGrid();
@@ -309,4 +311,17 @@ void ExtendedRenderWindow::debugDraw()
 			this->draw(grid[i]);
 		}
 	}
+	
+	
+	/*
+	// COLLISIONGRAPH EDGES.
+	if (this->active_scene != nullptr)
+	{
+		std::vector<sf::VertexArray> edges = this->active_scene->getPhysicsManager()->col_graph->getTree();
+		for (int i = 0; i < edges.size(); i++)
+		{
+			this->draw(edges[i]);
+		}
+	}
+	*/
 }

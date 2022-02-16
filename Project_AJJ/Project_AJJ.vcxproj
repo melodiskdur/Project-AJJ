@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="includes\AirFriction.h" />
+    <ClInclude Include="includes\CollisionGraph.h" />
     <ClInclude Include="includes\Button.h" />
     <ClInclude Include="includes\Gravity.h" />
     <ClInclude Include="includes\Hitbox.h" />
@@ -48,6 +49,7 @@
     <ClCompile Include="src\Button.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\CollisionDetection.cpp" />
+    <ClCompile Include="src\CollisionGraph.cpp" />
     <ClCompile Include="src\Controller.cpp" />
     <ClCompile Include="src\ExtendedRenderWindow.cpp" />
     <ClCompile Include="src\Gravity.cpp" />

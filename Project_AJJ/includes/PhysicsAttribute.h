@@ -31,8 +31,16 @@ public:
 	PhysicsAttribute(std::string attrib_name);
 	virtual ~PhysicsAttribute();
 	
+	// Getters
 	std::string getId();
 
+	// Setters
+	
+	//Others
+	
+	// Returns the opposite INTERSECTED_SIDE
+	static INTERSECTED_SIDE oppositeSide(INTERSECTED_SIDE& side);
+	sf::String intersectString(INTERSECTED_SIDE& side);
 protected:
 	std::string attribute_name;
 };

@@ -9,6 +9,7 @@
 #include "Scene.h"
 #include "Camera.h"
 #include "CollisionDetection.h"
+#include "CollisionGraph.h"
 #include "Gravity.h"
 #include "AirFriction.h"
 #include "PhysicsManager.h"

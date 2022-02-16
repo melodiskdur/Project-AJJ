@@ -40,11 +40,13 @@ int main()
 	AirFriction* airfric = new AirFriction(test_scene->getSceneObjects());
 	Gravity* gravity = new Gravity(test_scene->getSceneObjects());
 	CollisionDetection* col_det = new CollisionDetection(test_scene->getSceneObjects());
+	CollisionGraph* col_graph = new CollisionGraph();
 	PhysicsManager* phys_mag = new PhysicsManager(test_scene->getSceneObjects());
 	//Hitbox* hitbox = new Hitbox();
 	phys_mag->addAttribute(col_det);
 	phys_mag->addAttribute(gravity);
 	phys_mag->addAttribute(airfric);
+	phys_mag->col_graph = col_graph;
 	test_scene->setCollisionDetection(col_det);
 	test_scene->setPhysicsManager(phys_mag);
 	test_scene->setCamera(&scene_camera);
@@ -63,6 +65,38 @@ int main()
 	test_scene->addSceneObject(player_1);
 	test_scene->addSceneObject(player_2);
 	test_scene->getCamera()->lockOnObject(player_1);
+
+	// ---------------------- Some NPC Objects --------------------------
+	TestObject* npc_1 = new TestObject(sf::Vector2f(700.f, 110.f), sf::Vector2f(100.f, 100.f), true);
+	TestObject* npc_2 = new TestObject(sf::Vector2f(700.f, 10.f), sf::Vector2f(100.f, 100.f), true);
+	TestObject* npc_3 = new TestObject(sf::Vector2f(1000.f, 110.f), sf::Vector2f(100.f, 100.f), true);
+	TestObject* npc_4 = new TestObject(sf::Vector2f(1050.f, 10.f), sf::Vector2f(100.f, 100.f), true);
+	TestObject* npc_5 = new TestObject(sf::Vector2f(1100.f, -90.f), sf::Vector2f(100.f, 100.f), true);
+	TestObject* npc_6 = new TestObject(sf::Vector2f(1150.f, -190.f), sf::Vector2f(100.f, 100.f), true);
+
+	TestObject* npc_7 = new TestObject(sf::Vector2f(1400.f, -320.f), sf::Vector2f(50.f, 430.f), true);
+	TestObject* npc_8 = new TestObject(sf::Vector2f(1400.f, -370.f), sf::Vector2f(500.f, 50.f), true);
+
+	TestObject* npc_9 = new TestObject(sf::Vector2f(1800.f, -470.f), sf::Vector2f(100.f, 100.f), true);
+
+	npc_1->setId(1001);
+	npc_2->setId(1002);
+	npc_3->setId(1003);
+	npc_4->setId(1004);
+	npc_5->setId(1005);
+	npc_6->setId(1006);
+	npc_7->setId(1007);
+	npc_8->setId(1008);
+	npc_9->setId(1009);
+	test_scene->addSceneObject(npc_1);
+	test_scene->addSceneObject(npc_2);
+	test_scene->addSceneObject(npc_3);
+	test_scene->addSceneObject(npc_4);
+	test_scene->addSceneObject(npc_5);
+	test_scene->addSceneObject(npc_6);
+	test_scene->addSceneObject(npc_7);
+	test_scene->addSceneObject(npc_8);
+	test_scene->addSceneObject(npc_9);
 
 	//------------------------ Add Controls To Players --------------------
 

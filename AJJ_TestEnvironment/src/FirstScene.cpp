@@ -120,7 +120,7 @@ void FirstScene::createWorldLayer(Scene* scene, sf::String texture_name, std::ve
 {
 	float current_x;
 	float current_y;
-
+	int counter = 0;
 	for (int i = 0; i < rows; i++)
 	{
 		for (int j = 0; j < cols; j++)
@@ -132,6 +132,7 @@ void FirstScene::createWorldLayer(Scene* scene, sf::String texture_name, std::ve
 			current_y = start_pos.y + i * object_size.y;
 			Object* tile = new Object(sf::Vector2f(current_x, current_y), object_size);
 			tile->setTextureName(texture_name);
+			tile->setId(counter);
 			Frame tile_frame;
 			tile_frame.duration = 200;
 			tile_frame.frame_index = map[i * cols + j];
@@ -139,7 +140,7 @@ void FirstScene::createWorldLayer(Scene* scene, sf::String texture_name, std::ve
 			tile_frame.region_name = "Tile";
 			tile->setFrame(tile_frame);
 			scene->addSceneObject(tile);
-			
+			counter++;
 		}
 	}
 }
