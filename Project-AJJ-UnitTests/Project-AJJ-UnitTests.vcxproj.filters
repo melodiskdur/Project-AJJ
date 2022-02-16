@@ -15,39 +15,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="Project-AJJ-UnitTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\TestObject.cpp">
+    <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\ResourceLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\FirstScene.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TestMainControllerObject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TestLayout.cpp">
+    <ClCompile Include="Object_UnitTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="includes\TestObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="includes\ResourceLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="includes\FirstScene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="includes\TestMainControllerObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="includes\TestLayout.h">
+    <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

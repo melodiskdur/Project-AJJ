@@ -26,7 +26,8 @@ enum ACTIONTYPE
 	SWITCH_CAMERA_LOCKED_OBJECT,
 	MENU_MOVE_UP,
 	MENU_MOVE_DOWN,
-	MENU_CHOOSE_ALTERNATIVE
+	MENU_CHOOSE_ALTERNATIVE,
+	EXIT_TO_MENU
 };
 
 /* Action
@@ -61,6 +62,7 @@ private:
 	ACTIONTYPE action_type = ACTIONTYPE::IDLE;
 	Object* parent_object = nullptr;
 	float parameter_manipulation = 0;	    //The value of which the parameter shall be manipulated by.
+	float action_duration = 0;				//Amount of time the action is run. -1 is default, meaing 
 
 	//Animation
 	Animation* animation = nullptr;		//An animation, sequence of sprites

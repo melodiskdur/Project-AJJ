@@ -21,6 +21,7 @@ public:
 
 	//Getters
 	int getId();
+	sf::String getClassId() { return this->class_id; }
 	sf::Vector2f getWorldPosition();
 	sf::Vector2f getVelocity();
 	sf::Vector2f getMaxVelocity() { return this->max_velocity; };
@@ -35,8 +36,10 @@ public:
 	std::vector<std::string> getPhysicsAttributes() { return this->attributes; };
 	OBJECT_BEHAVIOR getBehaviorType() { return this->behavior_type; };
 
+
 	//Setters
 	void setId(int id);
+	void setClassId(sf::String new_class_id);
 	void setWorldPosition(sf::Vector2f pos);
 	void setVelocity(sf::Vector2f vel);
 	void setMaxVelocity(sf::Vector2f max_vel) { this->max_velocity = max_vel; };
@@ -49,6 +52,7 @@ public:
 	void setVelocityIncrement(float vel_inc) { this->velocity_inc = vel_inc; };
 	//void setActions(std::vector<int> actions);
 	void setBehaviorType(OBJECT_BEHAVIOR behavior) { this->behavior_type = behavior; };
+
 
 	//Others
 	//Called when the object is queried for an action. Looks through its vector for the action 
@@ -64,6 +68,7 @@ protected:
 
 	//Parameters
 	int obj_id;													//object id
+	sf::String class_id = "default";							//object class
 	sf::Vector2f world_position = sf::Vector2f(0.0f, 0.0f);		//Position on-screen
 	sf::Vector2f velocity = sf::Vector2f(0.0f, 0.0f);			//Current velocity
 	float velocity_inc = 0.0f;									//Velocity increment

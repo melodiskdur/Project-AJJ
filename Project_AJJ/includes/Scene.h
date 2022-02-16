@@ -27,6 +27,17 @@ typedef struct _SceneLayer
 	sf::Vector2f last_cam_pos;
 } SceneLayer;
 
+//denotation of the scene i.e. name/class/defintion
+enum SCENE_DENOTATION
+{
+	TEST_GAME,
+	MAIN_MENU,
+	ABOUT_US,
+	OPTIONS,
+	MAP_EDITOR,
+	CUSTOM
+};
+
 /* Scene
 	Creates an environment in which many Objects, as well as a Camera object, can be placed.
 	The Scene can then be rendered onto a surface (ExtendedRenderWindow is recommended for this
@@ -48,11 +59,13 @@ public:
 	Object* getObjectWithId(int id);
 	CollisionDetection* getCollisionDetection();
 	PhysicsManager* getPhysicsManager() { return this->phys_mag; };
+	SCENE_DENOTATION getSceneDenotation() { return this->scene_denotation; }
 
 	//Setters
 	void setCamera(Camera* camera);
 	void setCollisionDetection(CollisionDetection* col);
 	void setPhysicsManager(PhysicsManager* phys);
+	SCENE_DENOTATION setSceneDenotation( SCENE_DENOTATION new_denotation ) { this->scene_denotation = new_denotation; }
 	
 	//Others
 	// Instantiates a new SceneLayer given that the layer_num has not already been occupied.
@@ -67,16 +80,20 @@ public:
 	void updateSceneFrame();
 	//Updates scene layers.
 	void updateSceneLayers();
+
+
 private:
-	Camera* scene_camera = nullptr;
-	std::vector<Object*> scene_objects;
-	CollisionDetection* col_det = nullptr;
-	PhysicsManager* phys_mag = nullptr;
-	std::vector<SceneLayer*> scene_layers;
+	Camera* scene_camera = nullptr;											//the scenes camera
+	std::vector<Object*> scene_objects;										//the objects currently in the scene
+	SCENE_DENOTATION scene_denotation = SCENE_DENOTATION::TEST_GAME;		//denotation of the scene i.e. name/class/defintion
+	CollisionDetection* col_det = nullptr;									//the scenes collisiondetection-handler
+	PhysicsManager* phys_mag = nullptr;										//the scenes physics-manager
+	std::vector<SceneLayer*> scene_layers;									//all of the layers present in the scene
 
 	//Adds a layer into vector scene_layers and sorts it in descending order (layer.layer_num). Returns
 	//false if there already is a layer with the same layer_num.
 	bool addLayer(SceneLayer* layer);
+
 	//Sets the SceneLayer offset with respect to the Scene camera's movement and position. Called in Scene::updateSceneLayers.
 	sf::Vector2f calculateLayerOffset(SceneLayer* layer);
 };

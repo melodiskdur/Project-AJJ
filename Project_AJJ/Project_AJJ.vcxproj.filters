@@ -69,7 +69,13 @@
     <ClInclude Include="includes\AirFriction.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="includes\Menu.h">
+    <ClInclude Include="includes\Layout.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\MainController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\Button.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="includes\CollisionGraph.h">
@@ -128,10 +134,16 @@
     <ClCompile Include="src\AirFriction.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Menu.cpp">
+    <ClCompile Include="src\CollisionGraph.cpp">
+      <Filter>Source Files</Filter>
+     </ClCompile>
+    <ClCompile Include="src\Layout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\CollisionGraph.cpp">
+    <ClCompile Include="src\MainController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Button.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -148,7 +160,13 @@
     <Image Include="assets\boss.PNG">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="assets\menu_buttons_mouse%403x.png">
+    <Image Include="assets\menu_buttons.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\layout_test.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\Inkedlayout_test_LI.jpg">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

@@ -21,9 +21,11 @@
   <ItemGroup>
     <ClInclude Include="includes\AirFriction.h" />
     <ClInclude Include="includes\CollisionGraph.h" />
+    <ClInclude Include="includes\Button.h" />
     <ClInclude Include="includes\Gravity.h" />
     <ClInclude Include="includes\Hitbox.h" />
-    <ClInclude Include="includes\Menu.h" />
+    <ClInclude Include="includes\MainController.h" />
+    <ClInclude Include="includes\Layout.h" />
     <ClInclude Include="includes\PhysicsManager.h" />
     <ClInclude Include="Project_AJJ.h" />
     <ClInclude Include="includes\Action.h" />
@@ -44,6 +46,7 @@
     <ClCompile Include="src\Action.cpp" />
     <ClCompile Include="src\AirFriction.cpp" />
     <ClCompile Include="src\Animation.cpp" />
+    <ClCompile Include="src\Button.cpp" />
     <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\CollisionDetection.cpp" />
     <ClCompile Include="src\CollisionGraph.cpp" />
@@ -52,7 +55,8 @@
     <ClCompile Include="src\Gravity.cpp" />
     <ClCompile Include="src\Hitbox.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\Menu.cpp" />
+    <ClCompile Include="src\MainController.cpp" />
+    <ClCompile Include="src\Layout.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\PhysicsAttribute.cpp" />
     <ClCompile Include="src\PhysicsManager.cpp" />
@@ -63,7 +67,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\boss.PNG" />
-    <Image Include="assets\menu_buttons_mouse%403x.png" />
+    <Image Include="assets\Inkedlayout_test_LI.jpg" />
+    <Image Include="assets\layout_test.png" />
+    <Image Include="assets\menu_buttons.png" />
     <Image Include="assets\platformertiles.png" />
     <Image Include="assets\rogue_atlas.png" />
     <Image Include="assets\texture_atlas_test.png" />

@@ -27,7 +27,7 @@ std::vector<ObjectData> Hitbox::separateHitboxes(Object* i, Object* j)
 
 	// Return values.
 	std::vector<ObjectData> wp_and_vel_re;
-
+  
 	// Special case: If no objects are moving.
 	if (vel_i.x == 0 && vel_i.y == 0 && vel_j.x == 0 && vel_j.y == 0)
 	{
@@ -129,7 +129,7 @@ ObjectData Hitbox::singleObjectSeparation(Object* moving, Object* other)
 		new_pos.x = vel.x < 0 ? other->getWorldPosition().x + other->getSize().x
 			:					other->getWorldPosition().x - moving->getSize().x;
 		new_vel.x = 0;
-		intersect = vel.x < 0 ? INTERSECTED_SIDE::ODATA_RIGHT : INTERSECTED_SIDE::ODATA_LEFT;
+		intersect = vel.x < 0 ? INTERSECTED_SIDE::ODATA_LEFT : INTERSECTED_SIDE::ODATA_RIGHT;
 	}
 	// Non-axis-aligned velocity.
 	else
@@ -301,16 +301,16 @@ std::vector<ObjectData> Hitbox::dualObjectSeparation(Object* i, Object* j)
 			ipos.x -= i_c * overlaps.x;
 			jpos.x += j_c * overlaps.x;
 			// Intersected sides.
-			i_data.m_intersect = INTERSECTED_SIDE::ODATA_RIGHT;
-			j_data.m_intersect = INTERSECTED_SIDE::ODATA_LEFT;
+			i_data.m_intersect = INTERSECTED_SIDE::ODATA_LEFT;
+			j_data.m_intersect = INTERSECTED_SIDE::ODATA_RIGHT;
 		}
 		else
 		{
 			ipos.x += i_c * overlaps.x;
 			jpos.x -= j_c * overlaps.x;
 			// Intersected sides.
-			i_data.m_intersect = INTERSECTED_SIDE::ODATA_LEFT;
-			j_data.m_intersect = INTERSECTED_SIDE::ODATA_RIGHT;
+			i_data.m_intersect = INTERSECTED_SIDE::ODATA_RIGHT;
+			j_data.m_intersect = INTERSECTED_SIDE::ODATA_LEFT;
 		}
 		ivel.x = 0;
 		jvel.x = 0;
@@ -323,16 +323,16 @@ std::vector<ObjectData> Hitbox::dualObjectSeparation(Object* i, Object* j)
 			ipos.y += i_c * overlaps.y;
 			jpos.y -= j_c * overlaps.y;
 			// Intersected sides.
-			i_data.m_intersect = INTERSECTED_SIDE::ODATA_TOP;
-			j_data.m_intersect = INTERSECTED_SIDE::ODATA_BOTTOM;
+			i_data.m_intersect = INTERSECTED_SIDE::ODATA_BOTTOM;
+			j_data.m_intersect = INTERSECTED_SIDE::ODATA_TOP;
 		}
 		else
 		{
 			ipos.y -= i_c * overlaps.y;
 			jpos.y += j_c * overlaps.y;
 			// Intersected sides.
-			i_data.m_intersect = INTERSECTED_SIDE::ODATA_BOTTOM;
-			j_data.m_intersect = INTERSECTED_SIDE::ODATA_TOP;
+			i_data.m_intersect = INTERSECTED_SIDE::ODATA_TOP;
+			j_data.m_intersect = INTERSECTED_SIDE::ODATA_BOTTOM;
 		}
 		ivel.y = 0;
 		jvel.y = 0;

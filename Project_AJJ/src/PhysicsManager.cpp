@@ -19,6 +19,10 @@ void PhysicsManager::basicCollisionHandler(sf::FloatRect view_rect)
 {
 	this->data.clear();
 
+	// TEMPORARY
+	this->stacked_collisions.clear();
+	// END TEMPORARY
+
 	if (this->scene_objects == nullptr)
 		return;
 
@@ -66,6 +70,8 @@ void PhysicsManager::basicCollisionHandler(sf::FloatRect view_rect)
 		}
 	}
 
+	this->sortData();
+
 	// Calculate the average Hitbox-resolutions for each Object.
 	for (int i = 0; i < this->data.size(); i++)
 	{
@@ -80,9 +86,13 @@ void PhysicsManager::basicCollisionHandler(sf::FloatRect view_rect)
 	}
 	*/
 
+	// TEMPORARY
+	this->postResCleanUp();
+	// END TEMPORARY
+
+	
+
 	// Momentum here.
-
-
 }
 
 PhysicsAttribute* PhysicsManager::searchAttribute(std::string attribute_name)
@@ -113,6 +123,20 @@ void PhysicsManager::storeObjectData(ObjectData odata)
 	this->data[index].m_reacc.push_back(odata.m_acc);
 	this->data[index].m_colliding_objects.push_back(odata.m_colliding_object);
 	this->data[index].m_hitboxes.push_back(odata.m_colliding_hitbox);
+	this->data[index].m_intersects.push_back(odata.m_intersect);
+
+	// TEMPORARY
+	// Temporary functionality to handle stacked collisions.
+	int i = this->findStack(this->data[index], odata.m_intersect);
+	if (i != -1)
+	{
+		StackedCollision new_stack;
+		new_stack.m_object = this->data[index].m_object;
+		new_stack.m_collider1 = odata.m_colliding_object;
+		new_stack.m_collider2 = this->data[index].m_colliding_objects[i];
+		this->stacked_collisions.push_back(new_stack);
+	}
+	// END TEMPORARY
 }
 
 int PhysicsManager::indexOf(Object* o)
@@ -238,6 +262,47 @@ void PhysicsManager::sortData()
 				data[j] = current;
 				break;
 			}
+		}
+	}
+}
+
+int PhysicsManager::findStack(CollisionData& data, INTERSECTED_SIDE side)
+{
+	for (int i = 0; i < data.m_intersects.size(); i++)
+	{
+		INTERSECTED_SIDE current = data.m_intersects[i];
+		if ((int) side % 2 == (int) current % 2 && side != current) return i;
+	}
+	return -1;
+}
+
+void PhysicsManager::postResCleanUp()
+{
+	Object* current,* stacked1,* stacked2;
+	sf::FloatRect cur_hitbox, stack1_hitbox, stack2_hitbox;
+	std::vector<sf::Vector2f> resolves;
+
+	for (int i = 0; i < this->stacked_collisions.size(); i++)
+	{
+		current = this->stacked_collisions[i].m_object;
+		stacked1 = this->stacked_collisions[i].m_collider1;
+		stacked2 = this->stacked_collisions[i].m_collider2;
+
+		cur_hitbox = { current->getWorldPosition(), current->getSize() };
+		stack1_hitbox = { stacked1->getWorldPosition(), stacked1->getSize() };
+		stack2_hitbox = { stacked2->getWorldPosition(), stacked2->getSize() };
+		// Check if current is still intersecting with any of the objects.
+		if (CollisionDetection::areIntersecting(cur_hitbox, stack1_hitbox))
+		{
+			resolves = Hitbox::unstuck(stack1_hitbox, cur_hitbox, stacked1->getVelocity());
+			stacked1->setWorldPosition(resolves[0]);
+			stacked1->setVelocity(resolves[1]);
+		}
+		else if (CollisionDetection::areIntersecting(cur_hitbox, stack2_hitbox))
+		{
+			resolves = Hitbox::unstuck(stack2_hitbox, cur_hitbox, stacked2->getVelocity());
+			stacked2->setWorldPosition(resolves[0]);
+			stacked2->setVelocity(resolves[1]);
 		}
 	}
 }

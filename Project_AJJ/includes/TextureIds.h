@@ -13,5 +13,6 @@ enum class TEXTURE_ID
 	RUN,
 	JUMP,
 	FALL,
-	ATTACK
+	ATTACK,
+	HOVER
 };

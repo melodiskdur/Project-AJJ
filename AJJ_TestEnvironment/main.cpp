@@ -4,7 +4,7 @@
 #include "includes/ResourceLoader.h"
 #include "includes/TestMainControllerObject.h"
 #include "includes/MainController.h"
-#include "includes/Menu.h"
+#include "includes/TestLayout.h"
 
 int main()
 {
@@ -18,8 +18,11 @@ int main()
 	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ");
 	window.setFramerateLimit(30);
 
-	Menu main_menu(window_width, window_height);
+	//---------------------------- Layout test -------------------------------
 
+	Layout* test_layout = TestLayout::createTestLayout();
+	window.addLayout(test_layout);
+	
 	//------------------------- TextureAtlas test ----------------------------
 
 	TextureManager* tex_mag = ResourceLoader::loadResources();
@@ -134,8 +137,6 @@ int main()
 	main_contr.setObject(main_contr_obj);
 	//set the window for the main controller
 	main_contr.setWindow(&window);
-	//set menu for the main controller
-	main_contr.setMenu(&main_menu);
 	//add controllers 
 	main_contr.addController(&contr_player_1);
 	main_contr.addController(&contr_player_2);
@@ -149,13 +150,15 @@ int main()
 	main_contr.bindActionToKey(main_contr_obj->getActions()[6], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Down });		//MENU_MOVE_DOWN
 	main_contr.bindActionToKey(main_contr_obj->getActions()[7], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Up });		//MENU_MOVE_UP
 	main_contr.bindActionToKey(main_contr_obj->getActions()[8], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Enter });		//MENU_CHOOSE_ALTERNATIVE
+	main_contr.bindActionToKey(main_contr_obj->getActions()[9], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Delete });	//EXIT_TO_MENU
 	//last, add the main_controller_object to the scene
 	test_scene->addSceneObject(main_contr_obj);
 
 	//---------------------------------- Game Loop -----------------------------------------
-
+	
 	while (window.isOpen())
 	{
+		
 		//Start debugging
 		sf::Time framerate = clock.getElapsedTime();
 		clock.restart();
@@ -182,20 +185,18 @@ int main()
 
 		main_contr.processUserInput();
 
-		if (main_menu.getActiveMenuAlternative() == MENU_ALTERNATIVES::MAIN_MENU)
-		{
-			window.clear();
-			main_menu.draw(window);
-			window.display();
-		}
-		else if (main_menu.getActiveMenuAlternative() == MENU_ALTERNATIVES::PLAY_GAME)
-		{
-			contr_player_1.processUserInput();
-			contr_player_2.processUserInput();
-			window.drawActiveScene();
-		}
 		
-	
+		contr_player_1.processUserInput();
+		contr_player_2.processUserInput();
+		
+		
+		window.drawActiveScene();
+
+		//DEBUGGING
+		//window.getLayouts()[0]->setPosition({ window.getLayouts()[0]->getPosition().x + 1 , window.getLayouts()[0]->getPosition().y + 1});
+		//END DEBUGGING
+
+
 		//Start debugging
 		//prints out the framerate
 		//std::cout << 1.0f / framerate.asSeconds() << std::endl;
@@ -207,5 +208,6 @@ int main()
 	delete main_contr_obj;
 	delete col_det;
 	delete tex_mag;
+	delete test_layout;
 	return 0;
 }
