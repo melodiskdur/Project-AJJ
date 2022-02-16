@@ -68,10 +68,6 @@ public:
 	CollisionGraph();
 	~CollisionGraph();
 
-	// DEBUGGING.
-	void printVectors();
-	// END DEBUGGING.
-
 	// Main function of the graph. Attempts to relax all the edges
 	// of the graph and then store the resulting resolves for each CollisionNode.
 	void resolveTree();
@@ -96,6 +92,8 @@ public:
 
 	// Creates and stores a CollisionEdge for odata.m_object.
 	void createEdge(ObjectData& odata);
+	void createInvertedEdge(CollisionEdge* e);
+
 	// Adds a collision close call to 'node' by creating a CollisionEdge and setting it as relaxed. 
 	void createCloseCallEdge(CollisionNode* node, CollisionNode* adjacent);
 
@@ -108,8 +106,8 @@ private:
 
 	// Edge storage vector + index vectors.
 	std::vector<CollisionEdge> edge_storage;
-	std::vector<int> i_primary_edges;
 	std::vector<int> i_active_edges;
+	std::vector<int> i_primary_edges;
 	std::vector<int> i_triggered_edges;
 	std::vector<int> i_relaxed_edges;
 	std::vector<int> i_unresolved_edges;
@@ -141,11 +139,14 @@ private:
 
 	// Checks if two objects are colliding into each other.
 	bool collisionTwoSided(CollisionEdge* e);
-
+	// Check if an Edge e with a STATIC adjacent object triggers an Edge r with a STATIC object.
+	bool staticTriggersStatic(CollisionEdge* e, CollisionEdge* r);
 	// Checks if e->proposed_resolve also resolves the edge e_tocheck.
 	bool resolves(CollisionEdge* e, CollisionEdge* e_tocheck);
 	// Checks for intersection between an active and a relaxed Edge.
 	bool intersects(CollisionEdge* e, CollisionEdge* r);
+	// Checks for intersection between two Collision Nodes.
+	bool intersects(CollisionNode* c, CollisionNode* c_adj);
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	*                Finding Nodes and Edges.                *
@@ -171,6 +172,7 @@ private:
 	std::vector<CollisionEdge*> findOutgoingEdges(int node_index);
 	std::vector<CollisionEdge*> findOutgoingEdges(CollisionNode* c);
 	std::vector<CollisionEdge*> findOutgoingEdgesByStatus(CollisionNode* c, EDGE_STATUS status);
+	std::vector<CollisionEdge*> findEdgesByVector(const std::vector<int>& edge_indices);
 	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	*                Sorting-methods.                        *
@@ -190,8 +192,14 @@ private:
 	// Sorts the primary CollisionNode in
 	// descending order of collisions it's involved in.
 	void sortPrimaryCollisions();
+	// Sorts g.primary_edges by collision type. Double collisions are prioritized.
+	void sortPrimaryEdgesByType();
 	// Resets all the vectors.
 	void clearVectors();
+
+	// DEBUGGING.
+	CollisionNode* node1337 = nullptr;
+	// END DEBUGGING.
 
 };
 

@@ -171,6 +171,7 @@ void ExtendedRenderWindow::debugDraw()
 		}
 	}
 	
+	
 	/*
 	// COLLISIONGRAPH EDGES.
 	if (this->active_scene != nullptr)

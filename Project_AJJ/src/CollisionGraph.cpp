@@ -11,19 +11,74 @@ CollisionGraph::~CollisionGraph()
 
 }
 
-void CollisionGraph::printVectors()
-{
-	
-}
-
 void CollisionGraph::resolveTree()
 {
-	this->printVectors();
+	//std::cout << "========================================\n";
+	this->sortPrimaryEdgesByType();
+	for (CollisionEdge* e : this->findEdgesByVector(this->i_primary_edges))
+	{
+		CollisionNode* c = this->findNode(e->m_i_node);
+		this->resolveCollision(e, c);
+	}
+	while (this->i_triggered_edges.size() > 0)
+	{
+		std::swap(this->i_primary_edges, this->i_triggered_edges);
+		for (CollisionEdge* e : this->findEdgesByVector(this->i_primary_edges))
+		{
+			CollisionNode* c = this->findNode(e->m_i_node);
+			std::swap(c->i_m_primary, c->i_m_triggered);
+			this->resolveCollision(e, c);
+		}
+	}
+	/*
+	// Check for intersects.
+	for (CollisionEdge* e : findEdgesByVector(this->i_active_edges))
+	{
+		CollisionNode* c = this->findNode(e->m_i_node);
+		CollisionNode* c_adj = this->findNode(e->m_i_adjacent);
+		if (this->intersects(c, c_adj))
+		{
+			std::cout << "REMAINING INTERSECT (" << c->m_node_object->getId() << ", "
+				<< c_adj->m_node_object->getId() << ") [ " << std::string(this->intersectString(e->m_side))
+				<< " ] [ " << e->m_is_visited << " ]\n";
+		}
+	}
+	*/
 }
 
 void CollisionGraph::resolveCollision(CollisionEdge* e, CollisionNode* c)
 {
-	
+	std::vector<int> i_triggered;
+	// Check for triggered collisions.
+	for (CollisionEdge* r : this->findOutgoingEdgesByStatus(c, EDGE_STATUS::EDGE_RELAXED))
+	{
+		// If the resolve for Edge e triggers Edge r, we store r.index in i_triggeed.
+		if (this->intersects(e, r))
+		{
+			if (this->staticTriggersStatic(e, r))
+			{
+			//	// PRINT
+			//	std::cout << "STATIC TO STATIC-TRIGGER\n";
+			//	// /PRINT
+				this->moveEdgeIndex(e, this->i_primary_edges, this->i_unresolved_edges);
+				this->moveEdgeIndex(e, c->i_m_primary, c->i_m_unresolved);
+				return;
+			}
+			i_triggered.push_back(r->m_storage_index);
+		}
+	}
+	// Check for bonus resolves.
+	for (CollisionEdge* e_bonus : this->findOutgoingEdgesByStatus(c, EDGE_STATUS::EDGE_ACTIVE))
+	{
+		// Skip if we're looking at the same Edge.
+		if (e_bonus->m_storage_index == e->m_storage_index) continue;
+		// If we find a bonus resolve, store it's storage index in e.bonus_resolves.
+		if (this->resolves(e, e_bonus)) e->i_m_bonus_resolves.push_back(e_bonus->m_storage_index);
+	}
+
+	this->updatePosition(c, e);
+	this->handleTriggeredCollisions(c, e, i_triggered);
+	this->recalibrateResolves(c);
 }
 
 void CollisionGraph::applyTreeResolution()
@@ -31,7 +86,6 @@ void CollisionGraph::applyTreeResolution()
 	for (CollisionNode& node : this->node_storage)
 	{
 		node.m_node_object->setWorldPosition(node.m_updated_pos);
-
 		// DEBUGGING
 		// THIS SHOULD PERHAPS NOT BE HERE.
 		sf::Vector2f o_velocity = node.m_node_object->getVelocity();
@@ -113,6 +167,13 @@ void CollisionGraph::createEdge(ObjectData& odata)
 	c_i->i_m_primary.push_back(new_edge.m_storage_index);
 }
 
+void CollisionGraph::createInvertedEdge(CollisionEdge* e)
+{
+	CollisionNode* i = this->findNode(e->m_i_adjacent);
+	CollisionNode* j = this->findNode(e->m_i_node);
+	this->createCloseCallEdge(i, j);
+}
+
 void CollisionGraph::createCloseCallEdge(CollisionNode* node, CollisionNode* adjacent)
 {
 	if (node == nullptr || adjacent == nullptr) return;
@@ -129,28 +190,161 @@ void CollisionGraph::createCloseCallEdge(CollisionNode* node, CollisionNode* adj
 	// Store Edge and add index to the storage to object's Node.relaxed.
 	this->edge_storage.push_back(new_edge);
 	this->i_active_edges.push_back(new_edge.m_storage_index);
+	this->i_relaxed_edges.push_back(new_edge.m_storage_index);
 	node->i_m_all.push_back(new_edge.m_storage_index);
 	node->i_m_relaxed.push_back(new_edge.m_storage_index);
 }
 
 void CollisionGraph::updatePosition(CollisionNode* c, CollisionEdge* e)
 {
-	
+	if (e->m_proposed_resolve.x == REPOS_INFINITY ||e->m_proposed_resolve.y == REPOS_INFINITY) return;
+	// Update phase. Set Edge to relaxed and move it to c.relaxed AND graph.relaxed.
+	c->m_updated_pos += (e->m_proposed_resolve - c->m_updated_pos);
+	e->m_is_relaxed = true;
+	// PRINT
+	//std::cout << "RESOLVED (" << c->m_node_object->getId() << ", " << this->findNode(e->m_i_adjacent)->m_node_object->getId() << ") [ "
+	//
+	//	<< std::string(this->intersectString(e->m_side)) << " ]\n";
+	// /PRINT
+	if (this->findNode(e->m_i_adjacent)->m_node_object->getBehaviorType() == OBJECT_BEHAVIOR::STATIC)
+		e->m_is_visited = true;
+	this->moveEdgeIndex(e, c->i_m_primary, c->i_m_relaxed);
+	this->moveEdgeIndex(e, this->i_primary_edges, this->i_relaxed_edges);
+	// Bonus phase. Do the same thing.
+	for (CollisionEdge* e_bonus : this->findEdgesByVector(e->i_m_bonus_resolves))
+	{
+		e_bonus->m_is_relaxed = true;
+		this->moveEdgeIndex(e_bonus, c->i_m_primary, c->i_m_relaxed);
+		this->moveEdgeIndex(e_bonus, this->i_primary_edges, this->i_relaxed_edges);
+	//	// PRINT
+	//	std::cout << "BONUS RESOLVE (" << c->m_node_object->getId() << ", " << this->findNode(e_bonus->m_i_adjacent)->m_node_object->getId() << ") [ "
+	//		<< std::string(this->intersectString(e_bonus->m_side)) << " ]\n";
+		// /PRINT
+	}
+	e->i_m_bonus_resolves.clear();
+	// (NOTE: THIS MIGHT BE TEMPORARY) Set collided axis.
+	switch (e->m_side)
+	{
+	case INTERSECTED_SIDE::ODATA_TOP: c->m_vertical_collision = true; break;
+	case INTERSECTED_SIDE::ODATA_BOTTOM: c->m_vertical_collision = true; break;
+	case INTERSECTED_SIDE::ODATA_LEFT: c->m_horizontal_collision = true; break;
+	case INTERSECTED_SIDE::ODATA_RIGHT: c->m_horizontal_collision = true; break;
+	}
 }
 
 void CollisionGraph::recalibrateResolves(CollisionNode* c)
 {
+	for (CollisionEdge* e : this->findOutgoingEdges(c))
+	{
+		// No recalibration needed if if an Edge is relaxed.
+		if (e->m_is_relaxed) continue;
+		ObjectData temp_data;
+		temp_data.m_object = c->m_node_object;
+		temp_data.m_colliding_object = this->findNode(e->m_i_adjacent)->m_node_object;
+		temp_data.m_intersect = e->m_side;
+		// Recalibrations. Look for the inverted Edge to determine if there's a double collision at hand. If
+		// there is a double collision but the inverted Edge is visited (it's been triggered in a collision
+		// chain originating from a STATIC object), we proceed as if this is a single collision (only moving c.object.)
+		CollisionEdge* e_inv = this->invertedEdge(e);
+		INTERSECTED_SIDE adj_intersect;
+		if (e_inv != nullptr)
+			adj_intersect = e_inv->m_is_visited ? INTERSECTED_SIDE::ODATA_NONE : e_inv->m_side;
+		else
+			adj_intersect = INTERSECTED_SIDE::ODATA_NONE;
+		std::vector<sf::Vector2f> recab_repos = Hitbox::recalibrate(temp_data, c->m_updated_pos, adj_intersect, this->findNode(e->m_i_adjacent)->m_updated_pos);
+		// Update Edges' proposed resolves.
 
+		//std::cout << "RECALIBRATE (" << c->m_node_object->getId() << ", " << this->findNode(e->m_i_adjacent)->m_node_object->getId()
+		//	<< ")  :  " << "[ " << e->m_proposed_resolve.x << " " << e->m_proposed_resolve.y << " ] -> [ "
+		//	<< recab_repos[0].x << " " << recab_repos[0].y << " ]\n";
+
+		e->m_proposed_resolve = recab_repos[0];
+		if (e_inv != nullptr) e_inv->m_proposed_resolve = recab_repos[1];
+	}
 }
 
 void CollisionGraph::handleTriggeredCollisions(CollisionNode* c, CollisionEdge* e, const std::vector<int>& i_triggered)
 {
-	
+	for (CollisionEdge* e_trig : this->findEdgesByVector(i_triggered))
+	{
+		this->collisionTriggered(e_trig, e);
+	}
 }
 
 void CollisionGraph::collisionTriggered(CollisionEdge* r, CollisionEdge* e)
 {
-	
+	// Setup part.
+	CollisionNode* r_adj = this->findNode(r->m_i_adjacent);
+	CollisionNode* r_c = this->findNode(r->m_i_node);
+	CollisionEdge* r_inv = this->invertedEdge(r);
+	bool chain_case = false;
+	if (r_inv == nullptr)
+	{
+		int i_e = e->m_storage_index;
+		this->createInvertedEdge(r);
+		r_inv = this->findEdge(this->edge_storage.size() - 1);
+		r = this->invertedEdge(r_inv);
+		e = this->findEdge(i_e);
+	}
+	if (r->m_side == INTERSECTED_SIDE::ODATA_NONE)
+		r->m_side = this->oppositeSide(e->m_side);
+
+	if (r_adj->m_node_object->getBehaviorType() == OBJECT_BEHAVIOR::STATIC)
+		chain_case = true;
+	else
+	{
+		for (CollisionEdge* r_adj_e : this->findOutgoingEdges(r_adj))
+		{
+			// If we find an edge from r.adjacent in the same direction as
+			// r that is visited, this means we've found a chain leading to a
+			// a STATIC collision. This is not permitted.
+			if ((r_adj_e->m_side == r->m_side) && r_adj_e->m_is_visited)
+			{
+				chain_case = true;
+				break;
+			}
+		}
+	}
+	// Case 2 (Chain case).
+	if (chain_case)
+	{
+		// Set r.isvisited to true, as a marker that that this
+			// Edge is part of a chain to a STATIC collision.
+		r->m_is_visited = true;
+		r->m_is_relaxed = false;
+		// We set the inverted_r.side to NONE, indicating that
+		// only r.m_node will be moved when we recalibrate the resolve.
+		r_inv->m_side = INTERSECTED_SIDE::ODATA_NONE;
+		// Move r to the 'triggered'-index vectors.
+		// PRINT
+		//std::cout << "TRIGGERED (" << r_c->m_node_object->getId()
+		//	<< ", " << r_adj->m_node_object->getId() << ") [ "
+		//	<< std::string(this->intersectString(r->m_side)) << " ]\n";
+		// /PRINT
+		this->moveEdgeIndex(r, r_c->i_m_relaxed, r_c->i_m_triggered);
+		this->moveEdgeIndex(r, this->i_relaxed_edges, this->i_triggered_edges);
+		this->recalibrateResolves(r_c);
+	}
+	// Case 1 (Normal case).
+	// If e resolved a collison with a STATIC Node, mark r_inv (it has
+	// the same direction as e) as visited to indicate it's connected to a 
+	// chain to a STATIC collision.
+	else if (this->findEdgeIndex(r_inv->m_i_node, r_inv->m_i_adjacent, r_adj->i_m_relaxed) != -1)
+	{
+		r_inv->m_is_visited = e->m_is_visited;
+		r_inv->m_is_relaxed = false;
+		r_inv->m_side = this->oppositeSide(r->m_side);
+		r->m_side = INTERSECTED_SIDE::ODATA_NONE;
+		// PRINT
+		//std::cout << "INV TRIGGERED (" << r_adj->m_node_object->getId()
+		//	<< ", " << r_c->m_node_object->getId() << ") [ "
+		//	<< std::string(this->intersectString(r_inv->m_side)) << " ]\n";
+		// /PRINT
+		// Move r_inv to the 'triggered'-index vectors.
+		this->moveEdgeIndex(r_inv, r_adj->i_m_relaxed, r_adj->i_m_triggered);
+		this->moveEdgeIndex(r_inv, this->i_relaxed_edges, this->i_triggered_edges);
+		this->recalibrateResolves(r_adj);
+	}
 }
 
 void CollisionGraph::markAsUnresolved(CollisionEdge* unres)
@@ -160,12 +354,30 @@ void CollisionGraph::markAsUnresolved(CollisionEdge* unres)
 
 bool CollisionGraph::collisionTwoSided(CollisionEdge* e)
 {
+	CollisionEdge* e_inv = this->invertedEdge(e);
+	if (e_inv != nullptr && e_inv->m_side != INTERSECTED_SIDE::ODATA_NONE)
+		return true;
 	return false;
+}
+
+bool CollisionGraph::staticTriggersStatic(CollisionEdge* e, CollisionEdge* r)
+{
+	CollisionNode* e_adj = this->findNode(e->m_i_adjacent);
+	CollisionNode* r_adj = this->findNode(r->m_i_adjacent);
+	return (e_adj->m_node_object->getBehaviorType() == OBJECT_BEHAVIOR::STATIC &&
+		    r_adj->m_node_object->getBehaviorType() == OBJECT_BEHAVIOR::STATIC);
 }
 
 bool CollisionGraph::resolves(CollisionEdge* e, CollisionEdge* e_tocheck)
 {
-	return !(this->intersects(e, e_tocheck));
+	// First, check that they're intersecting before moving.
+	CollisionNode* c = this->findNode(e->m_i_node);
+	CollisionNode* adj = this->findNode(e_tocheck->m_i_adjacent);
+	if (CollisionDetection::areIntersecting({c->m_updated_pos, c->m_node_object->getSize()}, {adj->m_updated_pos, adj->m_node_object->getSize()}))
+	{
+		return !(this->intersects(e, e_tocheck));
+	}
+	return false;
 }
 
 bool CollisionGraph::intersects(CollisionEdge* e, CollisionEdge* r)
@@ -179,6 +391,9 @@ bool CollisionGraph::intersects(CollisionEdge* e, CollisionEdge* r)
 		return true;
 	return false;
 }
+
+bool CollisionGraph::intersects(CollisionNode* c, CollisionNode* c_adj)
+{ return CollisionDetection::areIntersecting({ c->m_updated_pos, c->m_node_object->getSize() }, { c_adj->m_updated_pos, c_adj->m_node_object->getSize() }); }
 
 int CollisionGraph::findEdgeIndex(int i_c, int i_adj, std::vector<int>& edge_vector)
 {
@@ -313,28 +528,34 @@ std::vector<CollisionEdge*> CollisionGraph::findOutgoingEdgesByStatus(CollisionN
 {
 	std::vector<CollisionEdge*> edges;
 	CollisionEdge* edge = nullptr;
-	std::vector<int>* edge_vector = nullptr;
+	std::vector<int> edge_vector;
 	switch (status)
 	{
-	case EDGE_STATUS::EDGE_ACTIVE: edge_vector = &(c->i_m_primary); break;
-	case EDGE_STATUS::EDGE_RELAXED: edge_vector = &(c->i_m_relaxed); break;
-	case EDGE_STATUS::EDGE_TRIGGERED: edge_vector = &(c->i_m_triggered); break;
-	case EDGE_STATUS::EDGE_UNRESOLVED: edge_vector = &(c->i_m_unresolved); break;
+	case EDGE_STATUS::EDGE_ACTIVE: edge_vector = (c->i_m_primary); break;
+	case EDGE_STATUS::EDGE_RELAXED: edge_vector = (c->i_m_relaxed); break;
+	case EDGE_STATUS::EDGE_TRIGGERED: edge_vector = (c->i_m_triggered); break;
+	case EDGE_STATUS::EDGE_UNRESOLVED: edge_vector = (c->i_m_unresolved); break;
 	}
-	if (edge_vector != nullptr)
+	for (int edge_index : edge_vector)
 	{
-		for (int& edge_index : *edge_vector)
-		{
-			if ((edge = findEdge(edge_index)) != nullptr) edges.push_back(edge);
-		}
+		if ((edge = this->findEdge(edge_index)) != nullptr) edges.push_back(edge);
 	}
+	return edges;
+}
+
+std::vector<CollisionEdge*> CollisionGraph::findEdgesByVector(const std::vector<int>& edge_indices)
+{
+	std::vector<CollisionEdge*> edges;
+	CollisionEdge* edge;
+	for (int edge_index : edge_indices)
+		if ((edge = this->findEdge(edge_index)) != nullptr) edges.push_back(edge);
 	return edges;
 }
 
 void CollisionGraph::moveEdgeIndex(CollisionEdge* e, std::vector<int>& from, std::vector<int>& to)
 {
 	int index;
-	if (index = this->findEdgeIndex(e->m_i_node, e->m_i_adjacent, from) != -1)
+	if ((index = this->findEdgeIndex(e->m_i_node, e->m_i_adjacent, from)) != -1)
 	{
 		from.erase(from.begin() + index);
 		to.push_back(e->m_storage_index);
@@ -354,16 +575,17 @@ void CollisionGraph::moveNodeIndex(CollisionNode* c, std::vector<int>& from, std
 void CollisionGraph::sortEdges(CollisionNode* c)
 {
 	// Calculate and store the bonus resolves for each CollisionEdge.
-	for (int i = 0; i < c->i_m_primary.size(); i++)
+	for (CollisionEdge* e : this->findOutgoingEdges(c))
 	{
-		CollisionEdge* e = &this->edge_storage[c->i_m_primary[i]];
-		for (int j = 0; j < c->i_m_primary.size(); j++)
+		for (CollisionEdge* e_tocheck : this->findOutgoingEdges(c))
 		{
-			if (i == j) continue;
-			CollisionEdge* e_tocheck = &this->edge_storage[c->i_m_primary[j]];
+			// Skip if e == e_tocheck.
+			if (e->m_storage_index == e_tocheck->m_storage_index) continue;
 			// Check for resolvability of e for e_tocheck. Store e_tocheck in e.bonus if True.
 			if (this->resolves(e, e_tocheck))
+			{
 				e->i_m_bonus_resolves.push_back(e_tocheck->m_storage_index);
+			}
 		}
 	}
 	
@@ -426,6 +648,24 @@ void CollisionGraph::sortPrimaryCollisions()
 	}
 }
 
+void CollisionGraph::sortPrimaryEdgesByType()
+{
+	std::vector<int> temp;
+	// Pop each Edge. If both objects are DYNAMIC, push to front. Else, push to back.
+	for (int index : this->i_primary_edges)
+	{
+		CollisionEdge* e = this->findEdge(index);
+		CollisionNode* c = this->findNode(e->m_i_node);
+		CollisionNode* adj = this->findNode(e->m_i_adjacent);
+		if (c->m_node_object->getBehaviorType() == OBJECT_BEHAVIOR::DYNAMIC &&
+			adj->m_node_object->getBehaviorType() == OBJECT_BEHAVIOR::DYNAMIC)
+			temp.insert(temp.begin(), e->m_storage_index);
+		else temp.insert(temp.end(), e->m_storage_index);
+	}
+	// Swap the contents of temp and g.i_primary.
+	this->i_primary_edges = temp;
+}
+
 void CollisionGraph::clearVectors()
 {
 	this->node_storage.clear();
@@ -449,6 +689,7 @@ std::vector<sf::VertexArray> CollisionGraph::getTree()
 		edge[0].position = (c->m_updated_pos + 0.5f * (c->m_node_object->getSize()));
 		edge[1].position = (adj->m_updated_pos + 0.5f * (adj->m_node_object->getSize()));
 		sf::Color gc = e.m_is_relaxed ? sf::Color::Blue : sf::Color::Red;
+		
 		edge[0].color = gc;
 		edge[1].color = gc;
 		edges.push_back(edge);

@@ -115,6 +115,29 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size)
 	std::cout << "TestObject called\n";
 }
 
+TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size, bool npc)
+    : Object(pos, size)
+{
+    this->max_velocity = { 5.f,5.f };
+
+    //increase speed by:
+    this->velocity_inc = 2.0f;
+
+    this->behavior_type = OBJECT_BEHAVIOR::DYNAMIC;
+    this->attributes.push_back("Gravity");
+    this->attributes.push_back("Air Friction");
+    
+    this->setTextureName(sf::String("Boss"));
+    Frame npc_frame;
+    npc_frame.duration = 200;
+    npc_frame.frame_index = 0;
+    npc_frame.texture_id = TEXTURE_ID::NONE;
+    npc_frame.region_name = sf::String("Boss");
+    this->setFrame(npc_frame);
+
+    std::cout << "TestObject called\n";
+}
+
 TestObject::~TestObject()
 {
 }

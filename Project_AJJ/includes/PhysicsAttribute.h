@@ -40,7 +40,7 @@ public:
 	
 	// Returns the opposite INTERSECTED_SIDE
 	static INTERSECTED_SIDE oppositeSide(INTERSECTED_SIDE& side);
-
+	sf::String intersectString(INTERSECTED_SIDE& side);
 protected:
 	std::string attribute_name;
 };

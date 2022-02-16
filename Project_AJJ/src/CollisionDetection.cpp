@@ -331,10 +331,12 @@ void QuadTree::insertObject(Object* object)
 	
 	this->tree_objects.push_back(object);						//Adds object to this QuadTree.
 	if (this->tree_objects.size() > QuadTree::max_objects &&	
-		this->tree_level < QuadTree::max_level)
+		this->tree_level < QuadTree::max_level - 1)
 	{
 		if (!this->has_sub_trees)
+		{
 			this->splitTree();
+		}
 		for (int i = 0; i < this->tree_objects.size(); i++)
 		{
 			sub_index = this->objectIndex(this->tree_objects[i]);

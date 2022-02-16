@@ -185,7 +185,7 @@ ObjectData Hitbox::singleObjectSeparation(Object* moving, Object* other)
 				: other->getWorldPosition().x - moving->getSize().x;
 			new_vel.x = 0;
 			// Set intersected side.
-			intersect = vel.x < 0 ? INTERSECTED_SIDE::ODATA_RIGHT : INTERSECTED_SIDE::ODATA_LEFT;
+			intersect = vel.x < 0 ? INTERSECTED_SIDE::ODATA_LEFT : INTERSECTED_SIDE::ODATA_RIGHT;
 		}
 		// Horizontal check + adjustment.
 		else if ((moving_hori[0].x + t_hori * vel.x > insec_hori[0].x && moving_hori[0].x + t_hori * vel.x < insec_hori[1].x) ||
@@ -208,9 +208,9 @@ ObjectData Hitbox::singleObjectSeparation(Object* moving, Object* other)
 			new_pos = unstuck_resolves[0];
 			// Set intersected side.
 			if (new_pos.x - moving->getWorldPosition().x > 0)
-				intersect = INTERSECTED_SIDE::ODATA_RIGHT;
-			else if (new_pos.x - moving->getWorldPosition().x < 0)
 				intersect = INTERSECTED_SIDE::ODATA_LEFT;
+			else if (new_pos.x - moving->getWorldPosition().x < 0)
+				intersect = INTERSECTED_SIDE::ODATA_RIGHT;
 			else if (new_pos.y - moving->getWorldPosition().y > 0)
 				intersect = INTERSECTED_SIDE::ODATA_TOP;
 			else if (new_pos.y - moving->getWorldPosition().y < 0)
@@ -277,7 +277,7 @@ std::vector<ObjectData> Hitbox::dualObjectSeparation(Object* i, Object* j)
 	if (Hitbox::sameYDirection(i, j))
 	{
 		// Only reposition i.
-		if (std::abs(i->getVelocity().y) > std::abs(j->getVelocity().y))
+		if (i_prev.y < j_prev.y)
 		{
 			i_c = 1;
 			j_c = 0;
@@ -318,18 +318,18 @@ std::vector<ObjectData> Hitbox::dualObjectSeparation(Object* i, Object* j)
 	// If vertical spparation happens before horizontal separation.
 	else
 	{
-		if (i_prev.y < j_prev.y)
+		if (i_prev.y > j_prev.y)
 		{
-			ipos.y -= i_c * overlaps.y;
-			jpos.y += j_c * overlaps.y;
+			ipos.y += i_c * overlaps.y;
+			jpos.y -= j_c * overlaps.y;
 			// Intersected sides.
 			i_data.m_intersect = INTERSECTED_SIDE::ODATA_TOP;
 			j_data.m_intersect = INTERSECTED_SIDE::ODATA_BOTTOM;
 		}
 		else
 		{
-			ipos.y += i_c * overlaps.y;
-			jpos.y -= j_c * overlaps.y;
+			ipos.y -= i_c * overlaps.y;
+			jpos.y += j_c * overlaps.y;
 			// Intersected sides.
 			i_data.m_intersect = INTERSECTED_SIDE::ODATA_BOTTOM;
 			j_data.m_intersect = INTERSECTED_SIDE::ODATA_TOP;
@@ -415,8 +415,11 @@ bool Hitbox::sameYDirection(Object* i, Object* j)
 {
 	sf::Vector2f i_prev = i->getWorldPosition() - i->getVelocity();
 	sf::Vector2f j_prev = j->getWorldPosition() - j->getVelocity();
+	sf::FloatRect i_prev_rect = { i_prev, i->getSize() };
+	sf::FloatRect j_prev_rect = { j_prev, j->getSize() };
+	sf::Vector2f overlaps = Hitbox::getOverlaps(i_prev_rect, j_prev_rect);
 	// Make sure that one of the object is behind the other.
-	if ((i_prev.y + i->getSize().y < j_prev.y) || (j_prev.y + j->getSize().y < i_prev.y))
+	if (overlaps.x >= overlaps.y)
 	{
 		return (i->getVelocity().y * j->getVelocity().y > 0);
 	}
@@ -529,26 +532,48 @@ std::vector<sf::Vector2f> Hitbox::recalibrate(const ObjectData& odata, const sf:
 	{
 		case INTERSECTED_SIDE::ODATA_TOP:
 		{
-			i_updated.y += i_c * overlaps.y;
-			if (is_double) j_updated.y -= j_c * overlaps.y;
+			
+			if (is_double)
+			{
+				i_updated.y += i_c * overlaps.y;
+				j_updated.y -= j_c * overlaps.y;
+			}
+			else
+				i_updated.y = j_updated.y + j_size.y;
 			break;
 		}
 		case INTERSECTED_SIDE::ODATA_RIGHT:
 		{
-			i_updated.x -= i_c * overlaps.x;
-			if (is_double) j_updated.x += j_c * overlaps.x;
+			if (is_double)
+			{
+				i_updated.x -= i_c * overlaps.x;
+				j_updated.x += j_c * overlaps.x;
+			}
+			else
+				i_updated.x = j_updated.x - i_size.x;
 			break;
 		}
 		case INTERSECTED_SIDE::ODATA_BOTTOM:
 		{
-			i_updated.y -= i_c * overlaps.y;
-			if (is_double) j_updated.y += j_c * overlaps.y;
+			if (is_double)
+			{
+				i_updated.y -= i_c * overlaps.y;
+				j_updated.y += j_c * overlaps.y;
+			}
+			else
+				i_updated.y = j_updated.y - i_size.y;
 			break;
 		}
 		case INTERSECTED_SIDE::ODATA_LEFT:
 		{
-			i_updated.x += i_c * overlaps.x;
-			if (is_double) j_updated.x -= j_c * overlaps.x;
+			if (is_double)
+			{
+				i_updated.x += i_c * overlaps.x;
+				j_updated.x -= j_c * overlaps.x;
+			}
+			else
+				i_updated.x = j_updated.x + j_size.x;
+			break;
 		}
 	}
 
