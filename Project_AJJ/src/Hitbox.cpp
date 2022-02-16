@@ -301,16 +301,16 @@ std::vector<ObjectData> Hitbox::dualObjectSeparation(Object* i, Object* j)
 			ipos.x -= i_c * overlaps.x;
 			jpos.x += j_c * overlaps.x;
 			// Intersected sides.
-			i_data.m_intersect = INTERSECTED_SIDE::ODATA_LEFT;
-			j_data.m_intersect = INTERSECTED_SIDE::ODATA_RIGHT;
+			i_data.m_intersect = INTERSECTED_SIDE::ODATA_RIGHT;
+			j_data.m_intersect = INTERSECTED_SIDE::ODATA_LEFT;
 		}
 		else
 		{
 			ipos.x += i_c * overlaps.x;
 			jpos.x -= j_c * overlaps.x;
 			// Intersected sides.
-			i_data.m_intersect = INTERSECTED_SIDE::ODATA_RIGHT;
-			j_data.m_intersect = INTERSECTED_SIDE::ODATA_LEFT;
+			i_data.m_intersect = INTERSECTED_SIDE::ODATA_LEFT;
+			j_data.m_intersect = INTERSECTED_SIDE::ODATA_RIGHT;
 		}
 		ivel.x = 0;
 		jvel.x = 0;
@@ -323,16 +323,16 @@ std::vector<ObjectData> Hitbox::dualObjectSeparation(Object* i, Object* j)
 			ipos.y += i_c * overlaps.y;
 			jpos.y -= j_c * overlaps.y;
 			// Intersected sides.
-			i_data.m_intersect = INTERSECTED_SIDE::ODATA_BOTTOM;
-			j_data.m_intersect = INTERSECTED_SIDE::ODATA_TOP;
+			i_data.m_intersect = INTERSECTED_SIDE::ODATA_TOP;
+			j_data.m_intersect = INTERSECTED_SIDE::ODATA_BOTTOM;
 		}
 		else
 		{
 			ipos.y -= i_c * overlaps.y;
 			jpos.y += j_c * overlaps.y;
 			// Intersected sides.
-			i_data.m_intersect = INTERSECTED_SIDE::ODATA_TOP;
-			j_data.m_intersect = INTERSECTED_SIDE::ODATA_BOTTOM;
+			i_data.m_intersect = INTERSECTED_SIDE::ODATA_BOTTOM;
+			j_data.m_intersect = INTERSECTED_SIDE::ODATA_TOP;
 		}
 		ivel.y = 0;
 		jvel.y = 0;
