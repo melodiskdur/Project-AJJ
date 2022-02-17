@@ -9,7 +9,7 @@ TextureManager* ResourceLoader::loadResources()
 	tex_mag->loadAtlas("Dirt Tiles", "../Project_AJJ/assets/platformertiles.png");
 	tex_mag->loadAtlas("Boss", "../Project_AJJ/assets/boss.PNG");
 	tex_mag->loadAtlas("MenuButtons", "../Project_AJJ/assets/menu_buttons.PNG");
-	tex_mag->loadAtlas("Layouts", "../Project_AJJ/assets/Inkedlayout_test_LI.jpg");
+	tex_mag->loadAtlas("LayoutBlock", "../Project_AJJ/assets/test_layout_block.png");
 
 	//Set up Rogue.
 	TextureAtlas* rogue = tex_mag->getAtlas("Rogue");
@@ -34,12 +34,9 @@ TextureManager* ResourceLoader::loadResources()
 	menu_buttons->assignTextureId(TEXTURE_ID::HOVER, sf::Vector2u(1, 0), sf::Vector2u(1, 0));
 
 	//Set up layout test
-	TextureAtlas* layouts = tex_mag->getAtlas("Layouts");
-	layouts->createRegionGrid(4, 4);
-	layouts->assignRegionName("Layouts", sf::Vector2u(3, 2), 0);
-	layouts->assignRegionName("Layouts2", sf::Vector2u(3, 3), 1);
-	layouts->assignTextureId(TEXTURE_ID::RUN, sf::Vector2u(3, 3), sf::Vector2u(3, 3));
-	layouts->assignTextureId(TEXTURE_ID::HOVER, sf::Vector2u(3, 2), sf::Vector2u(3, 2));
+	TextureAtlas* layouts = tex_mag->getAtlas("LayoutBlock");
+	layouts->createRegionGrid(3, 3);
+	layouts->assignTextureId(TEXTURE_ID::IDLE, { 0,0 }, { 2,2 });
 
 	return tex_mag;
 }

@@ -1,9 +1,9 @@
 #include "ExtendedRenderWindow.h"
 
-ExtendedRenderWindow::ExtendedRenderWindow(sf::Vector2u resolution, std::string window_title)
-	: sf::RenderWindow(sf::VideoMode(resolution.x, resolution.y), window_title)
+ExtendedRenderWindow::ExtendedRenderWindow(sf::Vector2u resolution, std::string window_title, sf::ContextSettings settings)
+	: sf::RenderWindow(sf::VideoMode(resolution.x, resolution.y), window_title, sf::Style::Default, settings)
 {
-
+	
 }
 
 ExtendedRenderWindow::~ExtendedRenderWindow()
@@ -79,6 +79,7 @@ void ExtendedRenderWindow::drawActiveScene()
 
 		//DEBUGGING
 		this->drawLayouts(this->layouts[0]);
+		//this->drawButton((Button*)this->layouts[0]->getObjects()[0]);
 		//END DEBUGGING
 		
 		// end the current frame. Display all changes
@@ -87,6 +88,7 @@ void ExtendedRenderWindow::drawActiveScene()
 	//PAUSE
 	else
 	{
+		//DEBUGGING
 		//!!!!!!!FIX THIS--shouldnt load each time!!!!!!!!!!!!!
 		sf::Text text;
 		sf::Font font;
@@ -103,13 +105,12 @@ void ExtendedRenderWindow::drawActiveScene()
 
 		if (active_scene != nullptr)
 		{
-			//all layers are drawn.
-			this->drawLayers();
 			//pause-text
 			this->draw(text);
 		}
 		// end the current frame. Display all changes
 		this->display();
+		//END DEBUGGING
 	}
 }
 
@@ -209,33 +210,87 @@ void ExtendedRenderWindow::drawButton(Button * button)
 
 void ExtendedRenderWindow::drawLayouts(Layout* parent_layout)
 {
-	sf::Sprite layout_sprite;
-
+	
 	//only print the base-layout. Prevents double-draw
 	if (parent_layout->getParentLayout() == nullptr)
-	{
-		layout_sprite = this->texture_manager->getAtlas(parent_layout->getTextureName())->
-						getSprite(parent_layout->getFrame().texture_id, parent_layout->getFrame().region_name, parent_layout->getFrame().frame_index);
-		//Set position and correct its scaling
-		layout_sprite.setPosition(parent_layout->getPosition());
-		layout_sprite.setScale(parent_layout->getSize().x / layout_sprite.getLocalBounds().width, parent_layout->getSize().y / layout_sprite.getLocalBounds().height);
-
-		this->draw(layout_sprite);
+	{	
+		//draw the base-layout
+		//this will only occur for the layout without a parent
+		drawLayout(parent_layout);
 	}
 	
 	//loop all child-layouts
 	for (auto& l : parent_layout->getLayouts())
 	{
-		layout_sprite = this->texture_manager->getAtlas(l->getTextureName())->
-						getSprite(l->getFrame().texture_id, l->getFrame().region_name, l->getFrame().frame_index);		
-		//Set position and correct its scaling
-		layout_sprite.setPosition(l->getPosition());
-		layout_sprite.setScale(l->getSize().x / layout_sprite.getLocalBounds().width, l->getSize().y / layout_sprite.getLocalBounds().height);
+		//draw the child-layout
+		drawLayout(l);
 
-		this->draw(layout_sprite);
-
-		//recursion
+		//recursion(draw the child-layout's children, grandchildren etc.)
 		this->drawLayouts(l);
+	}
+}
+
+void ExtendedRenderWindow::drawLayout(Layout* layout)
+{
+	sf::Sprite layout_sprite;
+	float bsw = layout->getMinSize().x / 2;
+	float bsh = layout->getMinSize().y / 2;
+
+	sf::Vector2f l_pos = layout->getPosition();
+	sf::Vector2f l_size = layout->getSize();
+	int num_rows = this->texture_manager->getAtlas(layout->getTextureName())->getNumRows();
+	int num_columns = this->texture_manager->getAtlas(layout->getTextureName())->getNumColumns();
+
+	sf::Vector2f set_size;
+	sf::Vector2f set_pos;
+	
+
+	for (int i = 0; i < num_rows; i++)
+	{
+		for (int j = 0; j < num_columns; j++)
+		{
+			set_size = { bsw,bsh };
+			set_pos = l_pos;
+			if (set_size.x > l_size.x) set_size.x = l_size.x;
+			if (set_size.y > l_size.y) set_size.y = l_size.y;
+
+			// Get the sprite
+			layout_sprite = this->texture_manager->getAtlas(layout->getTextureName())->getSprite(TEXTURE_ID::IDLE, i * num_columns + j);
+			
+
+			//check if last row
+			if (i == num_rows - 1)
+			{
+				set_pos.y = l_pos.y + l_size.y - bsh;
+			}
+			else if (i > 0)
+			{
+				set_size.y = (l_size.y - (2 * bsh)) / (num_rows - 2);
+				set_pos.y = l_pos.y + bsh + (i - 1) * set_size.y;
+
+			}
+
+			//check if last column
+			if (j == num_columns - 1)
+			{
+				set_pos.x = l_pos.x + l_size.x - bsw;
+			}
+			else if (j > 0)
+			{
+				set_size.x = (l_size.x - (2 * bsw)) / (num_columns - 2);
+				set_pos.x = l_pos.x + bsw + (j - 1) * set_size.x;
+			}
+
+
+			//Set position
+			layout_sprite.setPosition(set_pos);
+
+			//Correct the layout_sprite's scaling
+			layout_sprite.setScale(set_size.x / layout_sprite.getLocalBounds().width, set_size.y / layout_sprite.getLocalBounds().height);
+
+			//Draw the sprite
+			this->draw(layout_sprite);
+		}
 	}
 }
 
@@ -325,3 +380,36 @@ void ExtendedRenderWindow::debugDraw()
 	}
 	*/
 }
+
+/*void ExtendedRenderWindow::drawLayouts(Layout* parent_layout)
+{
+	sf::Sprite layout_sprite;
+
+	//only print the base-layout. Prevents double-draw
+	if (parent_layout->getParentLayout() == nullptr)
+	{
+
+		layout_sprite = this->texture_manager->getAtlas(parent_layout->getTextureName())->
+						getSprite(parent_layout->getFrame().texture_id, parent_layout->getFrame().region_name, parent_layout->getFrame().frame_index);
+		//Set position and correct its scaling
+		layout_sprite.setPosition(parent_layout->getPosition());
+		layout_sprite.setScale(parent_layout->getSize().x / layout_sprite.getLocalBounds().width, parent_layout->getSize().y / layout_sprite.getLocalBounds().height);
+
+		this->draw(layout_sprite);
+	}
+	
+	//loop all child-layouts
+	for (auto& l : parent_layout->getLayouts())
+	{
+		layout_sprite = this->texture_manager->getAtlas(l->getTextureName())->
+						getSprite(l->getFrame().texture_id, l->getFrame().region_name, l->getFrame().frame_index);		
+		//Set position and correct its scaling
+		layout_sprite.setPosition(l->getPosition());
+		layout_sprite.setScale(l->getSize().x / layout_sprite.getLocalBounds().width, l->getSize().y / layout_sprite.getLocalBounds().height);
+
+		this->draw(layout_sprite);
+
+		//recursion
+		this->drawLayouts(l);
+	}
+}*/

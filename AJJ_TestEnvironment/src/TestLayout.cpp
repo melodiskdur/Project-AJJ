@@ -83,5 +83,9 @@ Layout* TestLayout::createTestLayout()
 	//place them all
 	test_layout->placeLayouts();
 
+	Button* btn = new Button(10, sf::Text::Style::Bold, sf::Color::Red, std::string("hello"), { 10,10 }, { 300,-100 });
+
+	test_layout->addObject(btn);
+
 	return test_layout;
 }

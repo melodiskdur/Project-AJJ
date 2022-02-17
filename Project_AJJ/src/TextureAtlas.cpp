@@ -221,8 +221,9 @@ void TextureAtlas::assignTextureId(TEXTURE_ID id, int row)
 void TextureAtlas::assignTextureId(TEXTURE_ID id, sf::Vector2u first_cell, sf::Vector2u last_cell)
 {
 	//Checks if the grid cell parameters are reasonable.
-	if (first_cell.x > this->columns || first_cell.y > this->rows ||
-		last_cell.x > this->columns || last_cell.y > this->rows ||
+	if (first_cell.x >= this->columns || first_cell.y >= this->rows ||
+		last_cell.x >= this->columns || last_cell.y >= this->rows ||
+		first_cell.x < 0 || first_cell.y < 0 || last_cell.x < 0 || last_cell.y < 0 ||
 		first_cell.y > last_cell.y || (first_cell.y == last_cell.y && first_cell.x > last_cell.x))
 		return;
 
@@ -231,7 +232,7 @@ void TextureAtlas::assignTextureId(TEXTURE_ID id, sf::Vector2u first_cell, sf::V
 	int first_index = first_cell.x + this->columns * first_cell.y;
 	int last_index = last_cell.x + this->columns * last_cell.y;
 	//Iterates over these indices and adds id to each Region in texture_regions.
-	for (int i = first_index; i < last_index; i++)
+	for (int i = first_index; i <= last_index; i++)
 	{
 		texture_regions[i]->texture_id = id;
 		texture_regions[i]->frame_index = frame_index;

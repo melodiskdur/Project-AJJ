@@ -75,6 +75,8 @@ public:
 
 	Layout* getParentLayout() { return this->parent_layout; }
 
+	sf::Vector2f getMinSize() { return this->min_size; }
+
 
 	/*Setters*/
 	void setText(sf::Text new_text) { this->text = new_text; }
@@ -110,12 +112,16 @@ public:
 	//correct/update the available margin_spaces after placing a layout
 	void updateParentMarginSpaces();
 
+	void resetMarginSpaces();
+
 	//calculate the position so that rect fits inside of margin_space
 	sf::Vector2f fitInside(sf::FloatRect margin_space, sf::FloatRect rect);
 	//if the rect could fit inside of margin_space (true/false)
 	bool possibleFit(sf::FloatRect margin_space, sf::FloatRect rect);
 	//calculates the distance between two xy-points
 	float distance(sf::Vector2f s, sf::Vector2f d);
+
+	bool validSize(sf::Vector2f size);
 	
 protected:
 	sf::Text text;									//text inside of the layout
@@ -131,6 +137,7 @@ protected:
 	sf::FloatRect rect = { 0,0,0,0 };				//position and size
 	sf::Vector2f padding = { 0,0 };					//padding around the layout, left/right and top/bottom
 	sf::Vector2f margin = { 0,0 };					//space between other layouts or window-bordes, left/right and top/bottom
+	sf::Vector2f min_size = { 4,4 };				//the minimum width and height for a layout
 
 	std::vector<sf::FloatRect> margin_spaces;		//used to check the remaining space of the layout (top,bottom,left,right margin space)
 

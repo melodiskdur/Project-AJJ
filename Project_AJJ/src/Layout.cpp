@@ -19,13 +19,13 @@ Layout::Layout(sf::FloatRect rect, sf::Vector2f padding, sf::Vector2f margin, LA
 	this->margin_spaces = std::vector<sf::FloatRect>(4, sf::FloatRect({ this->rect.left, this->rect.top }, { this->rect.width, this->rect.height }) );
 
 	Frame new_frame;
-	new_frame.region_name = "Layouts";
-	new_frame.texture_id = TEXTURE_ID::HOVER;
+	new_frame.region_name = "LayoutBlock";
+	new_frame.texture_id = TEXTURE_ID::IDLE;
 	new_frame.frame_index = 0;
 	new_frame.duration = 0;
 
 	this->current_frame = new_frame;
-	this->texture_name = "Layouts";
+	this->texture_name = "LayoutBlock";
 }
 
 /*Destructor*/
@@ -72,6 +72,8 @@ sf::FloatRect Layout::getTotalRect()
 /*Others*/
 void Layout::addLayout(Layout* new_layout)
 {
+	if (!validSize(new_layout->getSize())) return;
+
 	//add layout to child-layout-vector
 	this->layouts.push_back(new_layout);
 
@@ -81,6 +83,8 @@ void Layout::addLayout(Layout* new_layout)
 
 void Layout::addLayout(sf::FloatRect rect, sf::Vector2f padding, sf::Vector2f margin, LAYOUT_PLACEMENT layout_placement)
 {
+	if (!validSize({ rect.width,rect.height })) return;
+	
 	//create new layout
 	Layout* new_layout = new Layout(rect,padding,margin,layout_placement);
 
@@ -402,6 +406,20 @@ void Layout::updateParentMarginSpaces()
 	}
 }
 
+void Layout::resetMarginSpaces()
+{
+	for (auto& ms : this->margin_spaces)
+	{
+		if (this->num_layouts == 0) return;
+
+		ms = this->rect;
+	}
+	for (auto& l : this->layouts)
+	{
+		l->resetMarginSpaces();
+	}
+}
+
 /*Help-mehthods*/
 float Layout::distance(sf::Vector2f s, sf::Vector2f d)
 {
@@ -536,4 +554,13 @@ void Layout::setPosition(sf::Vector2f new_pos)
 		child_layout->setPosition({ child_layout->getRect().left + move_dist.x, child_layout->getRect().top + move_dist.y });
 	}
 	
+}
+
+bool Layout::validSize(sf::Vector2f size)
+{
+	if (size.x < this->min_size.x || size.y < this->min_size.y)
+	{
+		return false;
+	}
+	return true;
 }

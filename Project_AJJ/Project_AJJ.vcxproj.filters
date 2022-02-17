@@ -136,7 +136,7 @@
     </ClCompile>
     <ClCompile Include="src\CollisionGraph.cpp">
       <Filter>Source Files</Filter>
-     </ClCompile>
+    </ClCompile>
     <ClCompile Include="src\Layout.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -167,6 +167,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="assets\Inkedlayout_test_LI.jpg">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\test_layout_block.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

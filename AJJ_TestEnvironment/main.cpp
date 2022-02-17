@@ -15,7 +15,9 @@ int main()
 	float sc_f = 1; //scale_factor for window width/height
 	float window_width = 800 * sc_f;
 	float window_height = 600 * sc_f;
-	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ");
+	sf::ContextSettings settings;
+	settings.antialiasingLevel = 10;
+	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ", settings);
 	window.setFramerateLimit(30);
 
 	//---------------------------- Layout test -------------------------------
@@ -193,9 +195,14 @@ int main()
 		window.drawActiveScene();
 
 		//DEBUGGING
-		//window.getLayouts()[0]->setPosition({ window.getLayouts()[0]->getPosition().x + 1 , window.getLayouts()[0]->getPosition().y + 1});
+		/*
+		window.getLayouts()[0]->setPosition({ window.getLayouts()[0]->getPosition().x + 1 , window.getLayouts()[0]->getPosition().y + 1});
+		window.getLayouts()[0]->setSize({ window.getLayouts()[0]->getSize().x + 2, window.getLayouts()[0]->getSize().y + 2});
+		test_layout->resetMarginSpaces();
+		test_layout->placeLayouts();
+		*/
 		//END DEBUGGING
-
+		
 
 		//Start debugging
 		//prints out the framerate

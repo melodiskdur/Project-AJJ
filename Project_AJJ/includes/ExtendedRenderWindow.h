@@ -16,7 +16,7 @@
 class ExtendedRenderWindow : public sf::RenderWindow
 {
 public:
-	ExtendedRenderWindow(sf::Vector2u resolution, std::string window_title);
+	ExtendedRenderWindow(sf::Vector2u resolution, std::string window_title, sf::ContextSettings settings);
 	~ExtendedRenderWindow();
 
 	//Getters
@@ -38,7 +38,8 @@ public:
 	void deactivateWindow() { this->window_state = false; }
 	void activateWindow() { this->window_state = true; }
 	void drawButton(Button * button);
-	void drawLayouts(Layout* layout);
+	void drawLayouts(Layout* parent_layout);
+	void drawLayout(Layout* layout);
 	void drawLayoutsDEBUG(Layout* layout);
 	void addLayout(Layout* new_layout) { this->layouts.push_back(new_layout); }
 	
