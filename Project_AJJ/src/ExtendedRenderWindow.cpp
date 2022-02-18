@@ -61,8 +61,6 @@ void ExtendedRenderWindow::drawActiveScene()
 		// clear the window with transparent(black) color
 		this->clear(sf::Color::Transparent);
 
-		
-
 		if (active_scene != nullptr)
 		{
 			//Collision detection.
@@ -126,19 +124,18 @@ void ExtendedRenderWindow::clearSceneLayerTextures()
 
 void ExtendedRenderWindow::drawLayers()
 {
-	this->active_scene->updateSceneLayers();
-
 	std::vector<SceneLayer*>& layers = this->active_scene->getSceneLayers(); //For readability.
+	// Get the layer-manipulated views of Camera.view.
+	std::vector<sf::View> layer_views = this->active_scene->transformCameraViewToLayers();
 	for (int i = 0; i < this->scene_layer_textures.size(); i++)
 	{
-		//Clears each RenderTexture in preparation for rendering.
+		// Clears each RenderTexture in preparation for rendering.
 		this->scene_layer_textures[i]->clear(sf::Color::Transparent);
-
-		//Camera-view must be equal to the active_scene's camera-view.
-		this->scene_layer_textures[i]->setView(*(active_scene->getCamera()->getCameraView()));
-
-		//Calculates the Drawable and positioning of each object in each layer.
-		for (Object* o : layers[i]->layer_objects)
+		// Set RenderTexture view to that of the corresponding layer.
+		this->scene_layer_textures[i]->setView(layer_views[i]);
+		// Calculates the Drawable and positioning of each object WITHIN the view_rect corresponding
+		// to the manipulated Camera view.
+		for (Object* o : this->active_scene->getObjectsWithinCamera(layers[i]->layer_num))
 		{
 			TextureAtlas* obj_atlas = this->texture_manager->getAtlas(o->getTextureName());	//For readability.
 			if (obj_atlas == nullptr)

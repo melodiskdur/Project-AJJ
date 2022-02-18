@@ -43,6 +43,7 @@ public:
 	void setWorldPosition(sf::Vector2f pos);
 	void setVelocity(sf::Vector2f vel);
 	void setMaxVelocity(sf::Vector2f max_vel) { this->max_velocity = max_vel; };
+	void setSize(sf::Vector2f size) { this->size = size; };
 	void setGeoShape(sf::VertexArray shape);
 	void setRotation(int rot);
 	void setTextureName(sf::String name);

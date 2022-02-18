@@ -110,7 +110,7 @@ Scene* FirstScene::createScene()
 	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", bg_layer1, 10, 35, 1, 1.3f, 0.9f, sf::Vector2f(-50.0f, -350.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
 	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", bg_layer2, 13, 25, 2, 10.0f, 0.8f, sf::Vector2f(50.0f, -350.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
 	FirstScene::createBackgroundLayer(first_scene, "Boss", bg_layer_1_5, 10, 25, 3, 1.8f, 0.7f, sf::Vector2f(-50.0f, -350.0f), sf::Vector2f(200.0f, 200.0f), "Boss");
-	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", bg_layer3, 18, 34, 4, 100.0f, 0.7f, sf::Vector2f(-300.0f, -350.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
+	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", bg_layer3, 18, 34, 4, 100.0f, 0.7f, sf::Vector2f(-600.0f, -550.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
 	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", fg_layer1, 10, 35, -1, 0.5f, 1.7f, sf::Vector2f(200.0f, -400.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
 	return first_scene;
 }
@@ -151,7 +151,10 @@ void FirstScene::createBackgroundLayer(Scene* scene, sf::String texture_name, st
 	float current_x;
 	float current_y;
 
-	scene->createSceneLayer(layer_num, layer_depth, layer_scale);
+	if (layer_num == 4)
+		scene->createSceneLayer(layer_num, layer_depth, layer_scale, LAYER_TYPE::STATIC_FIXATED);
+	else
+		scene->createSceneLayer(layer_num, layer_depth, layer_scale, LAYER_TYPE::STATIC_FLEXIBLE);
 
 	for (int i = 0; i < rows; i++)
 	{

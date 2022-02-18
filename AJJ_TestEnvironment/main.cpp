@@ -17,7 +17,7 @@ int main()
 	float window_width = 800 * sc_f;
 	float window_height = 600 * sc_f;
 	sf::ContextSettings settings;
-	settings.antialiasingLevel = 10;
+	settings.antialiasingLevel = 8;
 	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ", settings);
 	window.setFramerateLimit(30);
 	window.setVerticalSyncEnabled(true);

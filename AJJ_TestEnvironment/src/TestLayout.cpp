@@ -84,7 +84,7 @@ Layout* TestLayout::createTestLayout()
 	test_layout->placeLayouts();
 
 	//this layout will be fixed and adjustment to be in the users view
-	test_layout->setFixedToView(true);
+	test_layout->setFixedToView(false);
 
 	//add a test-button
 	//Button* btn = new Button(10, sf::Text::Style::Bold, sf::Color::Red, std::string("hello"), { 10,10 }, { 300,-100 });
