@@ -92,8 +92,9 @@ public:
 	void setFrame(Frame frame) { this->current_frame = frame; };
 
 	void setParentLayout(Layout* parent_layout) { this->parent_layout = parent_layout; }
-	
-	
+
+	bool getfixedToView() { return this->fixed_to_view; }
+	void setFixedToView(bool state) { this->fixed_to_view = state; }
 
 	/*Others*/
 	//add a another layout inside of this one i.e. add it to the Layout*-vector
@@ -140,6 +141,8 @@ protected:
 	sf::Vector2f min_size = { 4,4 };				//the minimum width and height for a layout
 
 	std::vector<sf::FloatRect> margin_spaces;		//used to check the remaining space of the layout (top,bottom,left,right margin space)
+
+	bool fixed_to_view = false;						//if the layout is fixed to the users view. If false, no adjustment is needed (rect.x and rect.y specify its location)
 
 	//Textures
 	sf::String texture_name = "";					//Name of the texture atlas that we want to draw frames of this object from.

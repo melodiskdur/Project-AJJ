@@ -5,7 +5,7 @@
 Layout* TestLayout::createTestLayout()
 {
 	//baselayout (base)
-	Layout* test_layout = new Layout(sf::FloatRect(300, -100, 500, 400), sf::Vector2f(0, 0), sf::Vector2f(0, 0), LAYOUT_PLACEMENT::LP_NONE);
+	Layout* test_layout = new Layout(sf::FloatRect(300, -400, 500, 400), sf::Vector2f(0, 0), sf::Vector2f(0, 0), LAYOUT_PLACEMENT::LP_NONE);
 
 	//base->children
 	test_layout->addLayout(sf::FloatRect(0, 0, 460, 60), sf::Vector2f(0, 0), sf::Vector2f(20, 20), LAYOUT_PLACEMENT::LP_TOP_CENTERED);
@@ -83,9 +83,12 @@ Layout* TestLayout::createTestLayout()
 	//place them all
 	test_layout->placeLayouts();
 
-	Button* btn = new Button(10, sf::Text::Style::Bold, sf::Color::Red, std::string("hello"), { 10,10 }, { 300,-100 });
+	//this layout will be fixed and adjustment to be in the users view
+	//test_layout->setFixedToView(true);
 
-	test_layout->addObject(btn);
+	//add a test-button
+	//Button* btn = new Button(10, sf::Text::Style::Bold, sf::Color::Red, std::string("hello"), { 10,10 }, { 300,-100 });
+	//test_layout->addObject(btn);
 
 	return test_layout;
 }

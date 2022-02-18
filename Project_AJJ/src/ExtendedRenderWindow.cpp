@@ -65,10 +65,10 @@ void ExtendedRenderWindow::drawActiveScene()
 
 		if (active_scene != nullptr)
 		{
-			//Updates the sf::View position.
-			this->setView(*(active_scene->getCamera()->getCameraView()));	 
 			//Collision detection.
-			this->active_scene->updateSceneFrame();							 
+			this->active_scene->updateSceneFrame();
+			//Updates the sf::View position.
+			this->setView(*(active_scene->getCamera()->getCameraView()));
 			//All layers are drawn.
 			this->drawLayers();	
 		}
@@ -79,6 +79,7 @@ void ExtendedRenderWindow::drawActiveScene()
 
 		//DEBUGGING
 		this->drawLayouts(this->layouts[0]);
+		//this->drawLayoutsDEBUG(this->layouts[0]);
 		//this->drawButton((Button*)this->layouts[0]->getObjects()[0]);
 		//END DEBUGGING
 		
@@ -88,6 +89,10 @@ void ExtendedRenderWindow::drawActiveScene()
 	//PAUSE
 	else
 	{
+		
+
+		if (active_scene == nullptr) return;
+		
 		//DEBUGGING
 		//!!!!!!!FIX THIS--shouldnt load each time!!!!!!!!!!!!!
 		sf::Text text;
@@ -95,19 +100,16 @@ void ExtendedRenderWindow::drawActiveScene()
 		font.loadFromFile("../Project_AJJ/assets/ayar_takhu.ttf");
 		text.setString("PAUSED");
 		text.setFont(font);
-		text.setCharacterSize(this->getSize().x/16); // in pixels, not points!
+		text.setCharacterSize(this->getSize().x / 16); // in pixels, not points!
 		text.setFillColor(sf::Color::White);
 		//-----------------------------------------------------
 
 		sf::FloatRect cam_rect = this->getActiveScene()->getCamera()->getCameraViewRect();
 		text.setPosition({ cam_rect.left + (cam_rect.width / 2) - (text.getLocalBounds().width / 2),
 						   cam_rect.top + (cam_rect.height / 2) - (text.getLocalBounds().height / 2) });
+		//pause-text
+		this->draw(text);
 
-		if (active_scene != nullptr)
-		{
-			//pause-text
-			this->draw(text);
-		}
 		// end the current frame. Display all changes
 		this->display();
 		//END DEBUGGING
@@ -214,6 +216,14 @@ void ExtendedRenderWindow::drawLayouts(Layout* parent_layout)
 	//only print the base-layout. Prevents double-draw
 	if (parent_layout->getParentLayout() == nullptr)
 	{	
+		//check if we need to adjust its position depending on the camera view
+		if (parent_layout->getfixedToView() == true)
+		{
+			sf::FloatRect cam_rect = this->getActiveScene()->getCamera()->getCameraViewRect();
+			parent_layout->setPosition({ cam_rect.left + (cam_rect.width / 2) - (parent_layout->getRect().width / 2),
+							   cam_rect.top + (cam_rect.height / 2) - (parent_layout->getRect().height / 2) });
+		}
+
 		//draw the base-layout
 		//this will only occur for the layout without a parent
 		drawLayout(parent_layout);

@@ -1,4 +1,5 @@
 #include "Project_AJJ.h"
+#include <SFML/OpenGL.hpp>
 #include "includes/TestObject.h"
 #include "includes/FirstScene.h"
 #include "includes/ResourceLoader.h"
@@ -19,6 +20,7 @@ int main()
 	settings.antialiasingLevel = 10;
 	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ", settings);
 	window.setFramerateLimit(30);
+	window.setVerticalSyncEnabled(true);
 
 	//---------------------------- Layout test -------------------------------
 
@@ -183,6 +185,11 @@ int main()
 			{
 				window.close();
 			}
+			else if (event.type == sf::Event::Resized)
+			{ 
+				glViewport(0, 0, event.size.width, event.size.height);
+			}
+				
 		}
 
 		main_contr.processUserInput();
