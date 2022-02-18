@@ -219,9 +219,11 @@ void ExtendedRenderWindow::drawLayouts(Layout* parent_layout)
 		//check if we need to adjust its position depending on the camera view
 		if (parent_layout->getfixedToView() == true)
 		{
+			//DEBUGGING
 			sf::FloatRect cam_rect = this->getActiveScene()->getCamera()->getCameraViewRect();
 			parent_layout->setPosition({ cam_rect.left + (cam_rect.width / 2) - (parent_layout->getRect().width / 2),
 							   cam_rect.top + (cam_rect.height / 2) - (parent_layout->getRect().height / 2) });
+			//END DEBUGGING
 		}
 
 		//draw the base-layout

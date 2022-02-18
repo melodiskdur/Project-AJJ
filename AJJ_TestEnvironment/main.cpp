@@ -1,5 +1,5 @@
 #include "Project_AJJ.h"
-#include <SFML/OpenGL.hpp>
+//#include <SFML/OpenGL.hpp>
 #include "includes/TestObject.h"
 #include "includes/FirstScene.h"
 #include "includes/ResourceLoader.h"
@@ -187,7 +187,7 @@ int main()
 			}
 			else if (event.type == sf::Event::Resized)
 			{ 
-				glViewport(0, 0, event.size.width, event.size.height);
+				//glViewport(0, 0, event.size.width, event.size.height);
 			}
 				
 		}
