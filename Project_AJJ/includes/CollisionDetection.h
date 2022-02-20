@@ -1,5 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include <SFML/System.hpp>
 #include "Object.h"
 #include "Scene.h"
 #include "PhysicsAttribute.h"

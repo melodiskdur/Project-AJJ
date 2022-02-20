@@ -127,6 +127,17 @@ void Object::setVelocity(sf::Vector2f vel)
     */
 }
 
+void Object::setSize(sf::Vector2f size)
+{
+    this->size = size;
+
+    // Update geoshape-size.
+    geo_shape[0].position = sf::Vector2f(this->world_position.x, world_position.y);
+    geo_shape[1].position = sf::Vector2f(world_position.x + size.x, world_position.y);
+    geo_shape[2].position = sf::Vector2f(world_position.x + size.x, world_position.y + size.y);
+    geo_shape[3].position = sf::Vector2f(world_position.x, world_position.y + size.y);
+}
+
 void Object::setGeoShape(sf::VertexArray shape)
 {
 

@@ -2,7 +2,8 @@
 
 Scene::Scene()
 {
-	this->createSceneLayer(0, 1.0f, 1.0f, LAYER_TYPE::DYNAMIC_FLEXIBLE);
+	// Create the main Scene-layer.
+	this->addSceneLayer(new SceneLayer(0, 1.f, 1.f));
 }
 
 Scene::~Scene()
@@ -20,34 +21,9 @@ Camera* Scene::getCamera()
 
 std::vector<Object*> Scene::getObjectsWithinCamera(signed int layer_num)
 {
-	// Find the corresponding layer.
-	std::vector<Object*> temp_vector;
 	for (SceneLayer* layer : this->scene_layers)
-	{
-		if (layer->layer_num == layer_num)
-		{
-			// Collect the objects within the view_rect, scaled with respect
-			// to the layer.
-			sf::View view = *(scene_camera->getCameraView());
-			view.zoom(layer->depth);
-			sf::FloatRect view_rect = sf::FloatRect(view.getCenter() - 0.5f * view.getSize(), view.getSize());
-			for (Object* o : layer->layer_objects)
-			{
-				if (view_rect.intersects({ o->getWorldPosition(), o->getSize() }))
-					temp_vector.push_back(o);
-			}
-			break;
-		}
-	}
-	return temp_vector;
-}
-
-std::vector<SceneLayer*> Scene::getSceneLayersByType(LAYER_TYPE type)
-{
-	std::vector<SceneLayer*> layers;
-	for (SceneLayer* layer : this->scene_layers)
-		if (layer->layer_type == type) layers.push_back(layer);
-	return layers;
+		if (layer->getLayerNum() == layer_num)
+			return layer->getLayerObjectsWithinView(this->scene_camera->getCameraViewRect());
 }
 
 Object* Scene::getObjectWithId(int id)
@@ -87,16 +63,13 @@ void Scene::setPhysicsManager(PhysicsManager* phys)
 }
 
 //Etc
-void Scene::createSceneLayer(signed int layer_num, float depth, float scale, LAYER_TYPE type)
+
+void Scene::addSceneLayer(SceneLayer* L)
 {
-	SceneLayer* new_layer = new SceneLayer();
-	new_layer->layer_num = layer_num;
-	new_layer->depth = depth;
-	new_layer->scale = scale;
-	new_layer->layer_type = type;
-	if (!this->addLayer(new_layer))
-		delete new_layer;
+	if (!this->addLayer(L))
+		delete L;
 }
+
 
 void Scene::addSceneObject(Object* object)
 {
@@ -115,15 +88,9 @@ void Scene::addObjectToSceneLayer(Object* object, int layer_num)
 	//Finds the SceneLayer with the corresponding layer_num in vector and adds object to it.
 	for (SceneLayer* layer : this->scene_layers)
 	{
-		if (layer->layer_num == layer_num)
+		if (layer->getLayerNum() == layer_num)
 		{
-			// Scale and reposition the Object with regards to the Layer depth and scale.
-			if (layer_num != 0)
-			{
-				object->setSize(object->getSize() * layer->depth * layer->scale);
-				object->setWorldPosition(object->getWorldPosition() * layer->depth * layer->scale);
-			}
-			layer->layer_objects.push_back(object);
+			layer->addObject(object);
 			break;
 		}
 	}
@@ -134,18 +101,9 @@ void Scene::addObjectsToSceneLayer(std::vector<Object*> objects, int layer_num)
 	//Fins the SceneLayer with the corresponding layer_num in vector and inserts the object vector into it.
 	for (SceneLayer* layer : this->scene_layers)
 	{
-		if (layer->layer_num == layer_num)
+		if (layer->getLayerNum() == layer_num)
 		{
-			// Scale and reposition the Object with regards to the Layer depth and scale.
-			if (layer_num != 0)
-			{
-				for (Object* o : objects)
-				{
-					o->setSize(o->getSize() * layer->depth * layer->scale);
-					o->setWorldPosition(o->getWorldPosition() * layer->depth * layer->scale);
-				}
-			}
-			layer->layer_objects.insert(scene_objects.end(), objects.begin(), objects.end());
+			layer->addObjects(objects);
 			break;
 		}
 	}
@@ -156,42 +114,30 @@ void Scene::updateSceneFrame()
 	if(phys_mag != nullptr)
 		phys_mag->basicCollisionHandler(scene_camera->getCameraViewRect());
 }
-
-std::vector<sf::View> Scene::transformCameraViewToLayers()
+std::vector<sf::View> Scene::getLayerManipulatedViews()
 {
-	std::vector<sf::View> transformed_camera_views;
-	if (this->scene_camera == nullptr) return transformed_camera_views;
-	for (SceneLayer* layer: this->scene_layers)
-	{
-		// If the layer is of type STATIC, we retreive a view to with position back at (0, 0).
-		// This is useful in the sense that we can draw everything related to that layer simply
-		// at and around this coordinate and thus won't have to move the layer objects around
-		// to accommodate for the moving of the Camera.
-		if (layer->layer_type == LAYER_TYPE::STATIC_FIXATED || layer->layer_type == LAYER_TYPE::DYNAMIC_FIXATED)
-			transformed_camera_views.push_back(
-				this->scene_camera->getManipulatedCameraView(layer->depth, layer->scale, layer->rotation, sf::Vector2f(0.0f, 0.0f)));
-		// Else we retreview a view with the same center as the Camera non manipulated view, but with manipulated parameters.
-		else
-			transformed_camera_views.push_back(this->scene_camera->getManipulatedCameraView(layer->depth, layer->scale, layer->rotation));
-	}
-	return transformed_camera_views;
+	std::vector<sf::View> manip_v;
+	for (SceneLayer* L : this->scene_layers) 
+		manip_v.push_back(L->manipulateCameraView(*this->scene_camera->getCameraView()));
+	return manip_v;
 }
-
 bool Scene::addLayer(SceneLayer* layer)
 {
 	for (int i = 0; i < this->scene_layers.size(); i++)
 	{
 		//Vector can't contain layer_num duplicates.
-		if (this->scene_layers[i]->layer_num == layer->layer_num)
+		if (this->scene_layers[i]->getLayerNum() == layer->getLayerNum())
 			return false;
 		//If an element has a lower layer_num than layer (param), layer is inserted right before that element.
-		else if (this->scene_layers[i]->layer_num < layer->layer_num)
+		else if (this->scene_layers[i]->getLayerNum() < layer->getLayerNum())
 		{
 			this->scene_layers.insert(scene_layers.begin() + i, layer);
+			this->layer_nums.insert(this->layer_nums.begin() + i, layer->getLayerNum());
 			return true;
 		}
 	}
 	//Runs if scene_layers is empty or if layer has the smallest layer_num, thus adding it to the back of the vector.
 	this->scene_layers.push_back(layer);
+	this->layer_nums.push_back(layer->getLayerNum());
 	return true;
 }

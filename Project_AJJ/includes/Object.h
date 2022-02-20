@@ -43,7 +43,7 @@ public:
 	void setWorldPosition(sf::Vector2f pos);
 	void setVelocity(sf::Vector2f vel);
 	void setMaxVelocity(sf::Vector2f max_vel) { this->max_velocity = max_vel; };
-	void setSize(sf::Vector2f size) { this->size = size; };
+	void setSize(sf::Vector2f size);
 	void setGeoShape(sf::VertexArray shape);
 	void setRotation(int rot);
 	void setTextureName(sf::String name);
@@ -59,6 +59,9 @@ public:
 	//Called when the object is queried for an action. Looks through its vector for the action 
 	//with a name corresponding to std::string action_name.
 	void onActionRequest(std::string action_name);
+
+	// Adds an action to the Object's Action*-vector.
+	void addAction(Action* action) { this->object_actions.push_back(action); };
 
 	//DEBUGGING
 	sf::VertexArray vel_vec[4] = { sf::VertexArray(sf::Lines, 2), //UR
@@ -87,8 +90,8 @@ protected:
 	Frame current_frame;
 
 	//PhysicsAttributes
-	OBJECT_BEHAVIOR behavior_type = OBJECT_BEHAVIOR::STATIC; // Physical behavior of object. Default is static.
-	std::vector<std::string> attributes;				   // The Physics Attribute types that the Object should be affected by.
+	OBJECT_BEHAVIOR behavior_type = OBJECT_BEHAVIOR::STATIC;  // Physical behavior of object. Default is static.
+	std::vector<std::string> attributes;				      // The Physics Attribute types that the Object should be affected by.
 
 private:
 };

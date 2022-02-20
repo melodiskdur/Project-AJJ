@@ -7,6 +7,7 @@
 #include "Controller.h"
 #include "ExtendedRenderWindow.h"
 #include "Scene.h"
+#include "SceneLayer.h"
 #include "Camera.h"
 #include "CollisionDetection.h"
 #include "CollisionGraph.h"

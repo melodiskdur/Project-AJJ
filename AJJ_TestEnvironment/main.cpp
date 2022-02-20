@@ -198,7 +198,6 @@ int main()
 		contr_player_1.processUserInput();
 		contr_player_2.processUserInput();
 		
-		
 		window.drawActiveScene();
 
 		//DEBUGGING

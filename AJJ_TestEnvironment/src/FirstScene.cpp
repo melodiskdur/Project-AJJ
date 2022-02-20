@@ -68,24 +68,12 @@ static std::vector<int> bg_layer2 =
 //18x34
 static std::vector<int> bg_layer3 =
 {
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11,
-	11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11
+	11, 11, 11, 11, 11, 11,
+	11, 11, 11, 11, 11, 11,
+	11, 11, 11, 11, 11, 11,
+	11, 11, 11, 11, 11, 11,
+	11, 11, 11, 11, 11, 11,
+	11, 11, 11, 11, 11, 11
 };
 
 //10x35
@@ -110,10 +98,14 @@ Scene* FirstScene::createScene()
 	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", bg_layer1, 10, 35, 1, 1.3f, 0.9f, sf::Vector2f(-50.0f, -350.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
 	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", bg_layer2, 13, 25, 2, 10.0f, 0.8f, sf::Vector2f(50.0f, -350.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
 	FirstScene::createBackgroundLayer(first_scene, "Boss", bg_layer_1_5, 10, 25, 3, 1.8f, 0.7f, sf::Vector2f(-50.0f, -350.0f), sf::Vector2f(200.0f, 200.0f), "Boss");
-	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", bg_layer3, 18, 34, 4, 100.0f, 0.7f, sf::Vector2f(-600.0f, -550.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
+	FirstScene::createStaticBackgroundLayer(first_scene, "Dirt Tiles", bg_layer3, 6, 6, 4, 1.f, 10.f, "Tile");
 	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", fg_layer1, 10, 35, -1, 0.5f, 1.7f, sf::Vector2f(200.0f, -400.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
+	
+
 	return first_scene;
 }
+
+
 
 void FirstScene::createWorldLayer(Scene* scene, sf::String texture_name, std::vector<int> map, int rows,
 	                              int cols, sf::Vector2f start_pos, sf::Vector2f object_size)
@@ -151,10 +143,8 @@ void FirstScene::createBackgroundLayer(Scene* scene, sf::String texture_name, st
 	float current_x;
 	float current_y;
 
-	if (layer_num == 4)
-		scene->createSceneLayer(layer_num, layer_depth, layer_scale, LAYER_TYPE::STATIC_FIXATED);
-	else
-		scene->createSceneLayer(layer_num, layer_depth, layer_scale, LAYER_TYPE::STATIC_FLEXIBLE);
+	SceneLayer* new_layer = new StaticInteractiveLayer(layer_num, layer_scale, layer_depth);
+	scene->addSceneLayer(new_layer);
 
 	for (int i = 0; i < rows; i++)
 	{
@@ -174,6 +164,39 @@ void FirstScene::createBackgroundLayer(Scene* scene, sf::String texture_name, st
 			tile_frame.region_name = region_name;
 			tile->setFrame(tile_frame);
 			scene->addObjectToSceneLayer(tile, layer_num);
+		}
+	}
+}
+
+void FirstScene::createStaticBackgroundLayer(Scene* scene, sf::String texture_name, std::vector<int> map, int rows, int cols,
+	int layer_num, float layer_depth, float layer_scale, sf::String region_name)
+{
+	float current_x;
+	float current_y;
+	sf::Vector2f start_pos = {-500.f, -400.f};
+	sf::Vector2f object_size = {200.f, 200.f};
+
+	SceneLayer* layer = new StaticFixatedLayer(4, 10.f, sf::View({ 0.f, 0.f }, { 800.f, 600.f }));
+	scene->addSceneLayer(layer);
+
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < cols; j++)
+		{
+			if (map[i * cols + j] == -1)
+				continue;
+
+			current_x = start_pos.x + j * object_size.x;
+			current_y = start_pos.y + i * object_size.y;
+			Object* tile = new Object(sf::Vector2f(current_x, current_y), object_size);
+			tile->setTextureName(texture_name);
+			Frame tile_frame;
+			tile_frame.duration = 200;
+			tile_frame.frame_index = map[i * cols + j];
+			tile_frame.texture_id = TEXTURE_ID::NONE;
+			tile_frame.region_name = region_name;
+			tile->setFrame(tile_frame);
+			layer->addObject(tile);
 		}
 	}
 }
