@@ -22,6 +22,10 @@ public:
 	sf::FloatRect getCameraViewRect();
 	float getCameraZoom();
 	Object* getTargetObject() { return this->target_object; };
+	// Copies the current camera view and manipulates it with respect to given
+	// parameters.
+	sf::View getManipulatedCameraView(float depth, float scale, float rotation);
+	sf::View getManipulatedCameraView(float depth, float scale, float rotation, sf::Vector2f position);
 
 	//Setters
 	void setCameraView(sf::View* view);

@@ -41,6 +41,24 @@ float Camera::getCameraZoom()
 	return this->current_zoom;
 }
 
+sf::View Camera::getManipulatedCameraView(float depth, float scale, float rotation)
+{
+	return this->getManipulatedCameraView(depth, scale, rotation, this->camera_view->getCenter());
+}
+
+sf::View Camera::getManipulatedCameraView(float depth, float scale, float rotation, sf::Vector2f position)
+{
+	if (this->camera_view == nullptr) return sf::View();
+	sf::View manipulated_view = *(this->camera_view);
+	// Resize the viewable area with regards to the depth.
+	manipulated_view.zoom(depth);
+	// Rotate the view with regards to the rotation.
+	manipulated_view.rotate(rotation);
+	// Reposition the view.
+	manipulated_view.setCenter(position);
+	return manipulated_view;
+}
+
 //Setters
 void Camera::setCameraView(sf::View* view)
 {

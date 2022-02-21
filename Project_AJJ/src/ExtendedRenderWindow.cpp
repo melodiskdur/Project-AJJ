@@ -294,19 +294,19 @@ void ExtendedRenderWindow::clearSceneLayerTextures()
 
 void ExtendedRenderWindow::drawLayers()
 {
-	this->active_scene->updateSceneLayers();
-
-	std::vector<SceneLayer*>& layers = this->active_scene->getSceneLayers(); //For readability.
+	std::vector<int> layer_nums = this->active_scene->getLayerNums();
+	// Get the layer-manipulated views of Camera.view.
+	std::vector<sf::View> layer_views = this->active_scene->getLayerManipulatedViews();
 	for (int i = 0; i < this->scene_layer_textures.size(); i++)
 	{
-		//Clears each RenderTexture in preparation for rendering.
+		// Clears each RenderTexture in preparation for rendering.
 		this->scene_layer_textures[i]->clear(sf::Color::Transparent);
+		// Set RenderTexture view to that of the corresponding layer.
+		this->scene_layer_textures[i]->setView(layer_views[i]);
 
-		//Camera-view must be equal to the active_scene's camera-view.
-		this->scene_layer_textures[i]->setView(*(active_scene->getCamera()->getCameraView()));
-
-		//Calculates the Drawable and positioning of each object in each layer.
-		for (Object* o : layers[i]->layer_objects)
+		// Calculates the Drawable and positioning of each object WITHIN the view_rect corresponding
+		// to the manipulated Camera view.
+		for (Object* o : this->active_scene->getObjectsWithinCamera(layer_nums[i]))
 		{
 			TextureAtlas* obj_atlas = this->texture_manager->getAtlas(o->getTextureName());	//For readability.
 			if (obj_atlas == nullptr)
@@ -320,10 +320,10 @@ void ExtendedRenderWindow::drawLayers()
 			//Scaling to fit within object boundaries.
 			obj_sprite.scale((obj_gs[1].position.x - obj_gs[0].position.x) / (sprite_r.width), (obj_gs[2].position.y - obj_gs[1].position.y) / (sprite_r.height));
 
-			if (layers[i]->layer_num == 0)
+			if (layer_nums[i] == 0)
 			{
 				//Draws object directly onto RenderWindow if main scene layer.
-				// 
+				/*
 				//DEBUGGING
 				this->draw(obj_gs);
 				this->draw(o->vel_vec[0]);
@@ -331,7 +331,7 @@ void ExtendedRenderWindow::drawLayers()
 				this->draw(o->vel_vec[2]);
 				this->draw(o->vel_vec[3]);
 				//END DEBUGGING
-
+				*/
 				this->draw(obj_sprite);
 			}
 			else
@@ -342,7 +342,7 @@ void ExtendedRenderWindow::drawLayers()
 		}
 
 		//Converts all layer textures (except main scene layer (0) ) to sprites and draws them onto RenderWindow.
-		if (layers[i]->layer_num != 0)
+		if (layer_nums[i] != 0)
 		{
 			//Converts texture to a sprite.
 			sf::Sprite layer_sprite(this->scene_layer_textures[i]->getTexture());

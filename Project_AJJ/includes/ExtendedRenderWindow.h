@@ -64,7 +64,7 @@ private:
 	Scene* active_scene = nullptr;							//Active Scene-object.
 	std::vector<Scene*> scenes;								//All of the available scenes
 	TextureManager* texture_manager = nullptr;				//TextureManager-object.
-	std::vector<sf::RenderTexture*> scene_layer_textures;	//all of the spritesheets
+	std::vector<sf::RenderTexture*> scene_layer_textures;	//Off-screen rendering of the active scene's layers.
 	bool window_state = true;								//Activated/deactivated
 	std::vector<Layout*> layouts;							//Windows layouts(main_menu,side_menus,messages,etc.)
 
