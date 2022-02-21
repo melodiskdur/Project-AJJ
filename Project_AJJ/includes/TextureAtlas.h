@@ -69,6 +69,7 @@ public:
 	void assignRegionName(sf::String region_name, sf::Vector2u tex_cell, int frame_index);
 	void assignRegionNames(sf::String region_name, int first_row, int last_row);
 
+	static unsigned int instanceCount() { return instance_counter; };
 private:
 	sf::String atlas_name = "";
 	sf::String file_name = "";
@@ -81,5 +82,6 @@ private:
 
 	bool atlas_loaded = false;
 
+	static unsigned int instance_counter;
 protected:
 };

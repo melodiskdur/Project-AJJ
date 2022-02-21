@@ -6,6 +6,8 @@
 #include "includes/MainController.h"
 #include "includes/TestLayout.h"
 
+void instanceCounts(std::string s);
+
 int main()
 {
 	sf::Event event;
@@ -54,8 +56,6 @@ int main()
 	test_scene->setPhysicsManager(phys_mag);
 	test_scene->setCamera(&scene_camera);
 	window.setActiveScene(test_scene);
-	//sf::Clock clock;
-	//sf::Time time;
 
 	//----------------------- Create Players & Lock View --------------------
 
@@ -160,7 +160,8 @@ int main()
 
 	//last, add the main_controller_object to the scene
 	test_scene->addSceneObject(main_contr_obj);
-
+	
+	instanceCounts(" created");
 	//---------------------------------- Game Loop -----------------------------------------
 	
 	while (window.isOpen())
@@ -228,11 +229,38 @@ int main()
 		//End debugging
 		
 	}
-	delete player_1;
-	delete player_2;
-	delete main_contr_obj;
+	delete test_scene;
+	delete phys_mag;
 	delete col_det;
-	delete tex_mag;
+	delete col_graph;
+	delete airfric;
+	delete gravity;
 	delete test_layout;
+	delete tex_mag;
+	window.~ExtendedRenderWindow();
+	scene_camera.~Camera();
+	contr_player_1.~Controller();
+	contr_player_2.~Controller();
+	main_contr.~MainController();
+
+	instanceCounts(" remaining");
+
 	return 0;
+}
+
+void instanceCounts(std::string s)
+{
+	std::cout << "Actions" << s << ": " << Action::instanceCount() << "\n";
+	std::cout << "Animations" << s << ": " << Animation::instanceCount() << "\n";
+	std::cout << "Cameras" << s << ": "<< Camera::instanceCount() << "\n";
+	std::cout << "Controllers" << s << ": " << Controller::instanceCount() << "\n";
+	std::cout << "ExtendedRenderWindows" << s << ": " << ExtendedRenderWindow::instanceCount() << "\n";
+	std::cout << "Layouts" << s << ": " << Layout::instanceCount() << "\n";
+	std::cout << "Objects" << s << ": " << Object::instanceCount() << "\n";
+	std::cout << "PhysicsAttributes" << s << ": " << PhysicsAttribute::instanceCount() << "\n";
+	std::cout << "Scene" << s << ": " << Scene::instanceCount() << "\n";
+	std::cout << "SceneLayer" << s << ": " << SceneLayer::instanceCount() << "\n";
+	std::cout << "TextureAtlases" << s << ": " << TextureAtlas::instanceCount() << "\n";
+	std::cout << "TextureManagers" << s << ": " << TextureManager::instanceCount() << "\n";
+	std::cout << "\n========================================================\n";
 }

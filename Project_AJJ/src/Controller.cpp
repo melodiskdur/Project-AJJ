@@ -1,13 +1,15 @@
 #include "Controller.h"
 
+unsigned int Controller::instance_counter = 0;
+
 Controller::Controller()
 {
-
+	Controller::instance_counter++;
 }
 
 Controller::~Controller()
 {
-
+	Controller::instance_counter--;
 }
 
 void Controller::bindActionToKey(Action* action, sf::Keyboard::Key key)

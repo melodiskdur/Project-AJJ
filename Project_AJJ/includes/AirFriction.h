@@ -22,6 +22,7 @@ public:
 
     // Other.
     void applyAirFriction(sf::FloatRect window_rect);
+
 private:
     float friction_constant = 0.2f;             // Should be between the x and y values of limits.          
     sf::Vector2f limits = { 0.f, 1.f};          // See above.

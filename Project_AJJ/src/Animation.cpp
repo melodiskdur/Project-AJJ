@@ -1,16 +1,19 @@
 #include "Animation.h"
 
+unsigned int Animation::instance_counter = 0;
+
 sf::Clock Animation::animation_clock;
 
 //Constructor
 Animation::Animation()
 {
-
+	Animation::instance_counter++;
 }
 
 //Constructor
 Animation::Animation(TEXTURE_ID texture_id, int start_index, int stop_index, double duration)
 {
+	Animation::instance_counter++;
 	for (int i = start_index; i <= stop_index; i++)
 	{
 		addFrame(texture_id, i, duration);
@@ -20,7 +23,7 @@ Animation::Animation(TEXTURE_ID texture_id, int start_index, int stop_index, dou
 //Destructor
 Animation::~Animation()
 {
-
+	Animation::instance_counter--;
 }
 
 //returns the active frame ie the frame currently displayed

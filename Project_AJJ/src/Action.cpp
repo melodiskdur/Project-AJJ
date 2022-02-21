@@ -1,14 +1,10 @@
 #include "Action.h"
 
-Action::Action()
-{
+unsigned int Action::instance_counter = 0;
 
-}
+Action::Action() { Action::instance_counter++; }
 
-Action::~Action()
-{
-
-}
+Action::~Action() { Action::instance_counter--; }
 
 //Getters
 std::string Action::getActionName()

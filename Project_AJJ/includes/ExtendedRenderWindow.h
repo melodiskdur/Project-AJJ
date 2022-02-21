@@ -60,6 +60,7 @@ public:
 	//returns a vector of rects that the cursor is hovering from a set of rects
 	std::vector<sf::FloatRect> cursorHoverRects(std::vector<sf::FloatRect> rects);
 	
+	static unsigned int instanceCount() { return instance_counter; };
 private:
 	Scene* active_scene = nullptr;							//Active Scene-object.
 	std::vector<Scene*> scenes;								//All of the available scenes
@@ -77,5 +78,7 @@ private:
 	bool debugger_mode = false;
 	void debugDraw();
 	// End debugging.
+
+	static unsigned int instance_counter;
 };
 

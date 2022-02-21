@@ -140,6 +140,7 @@ public:
 	//check for if the size is a valid size for this layout i.e. that it is larger than the minimum size
 	bool validSize(sf::Vector2f size);
 	
+	static unsigned int instanceCount() { return instance_counter; };
 protected:
 	sf::Text text;									//text inside of the layout
 
@@ -166,5 +167,7 @@ protected:
 	Frame current_frame;							//the current frame for this layout. includes information about texture id, region, frameindex, duration
 
 	LAYOUT_PLACEMENT layout_placement = LAYOUT_PLACEMENT::LP_NONE;	//placement of the layout in relation to the window or parent-layout
+
+	static unsigned int instance_counter;
 };
 

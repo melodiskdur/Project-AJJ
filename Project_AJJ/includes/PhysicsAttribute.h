@@ -28,6 +28,7 @@ typedef struct _ObjectData
 class PhysicsAttribute
 {
 public:
+	PhysicsAttribute();
 	PhysicsAttribute(std::string attrib_name);
 	virtual ~PhysicsAttribute();
 	
@@ -41,7 +42,12 @@ public:
 	// Returns the opposite INTERSECTED_SIDE
 	static INTERSECTED_SIDE oppositeSide(INTERSECTED_SIDE& side);
 	sf::String intersectString(INTERSECTED_SIDE& side);
+
+	static unsigned int instanceCount() { return instance_counter; };
 protected:
 	std::string attribute_name;
+
+private:
+	static unsigned int instance_counter;
 };
 

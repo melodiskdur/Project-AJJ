@@ -26,6 +26,7 @@
 class SceneLayer
 {
 public:
+	SceneLayer();
 	SceneLayer(int layer_num);
 	SceneLayer(int layer_num, float depth, float scale);
 	virtual ~SceneLayer();
@@ -47,6 +48,8 @@ public:
 	virtual void addObject(Object* o) { this->layer_objects.push_back(o); };
 	virtual void addObjects(std::vector<Object*> o_vec) { this->layer_objects.insert(this->layer_objects.end(), o_vec.begin(), o_vec.end()); };
 	virtual void updateLayerObjects() {};
+
+	static unsigned int instanceCount() { return instance_counter; };
 protected:
 	std::vector<Object*> layer_objects;	// The contents of the SceneLayer.		
 	float depth = 1.f;					// How fast the layer should scroll in relation to the main layer. x > 1 slower. 0 < x < 1 faster. 
@@ -55,6 +58,8 @@ protected:
 	bool enabled = true;				// Decides whether the layer is enabled for drawing/rendering or not.
 private:
 	signed int layer_num = 1;			// Rendering order. x = 0: Main layer (reserved). x > 0 background, x < 0 : foreground.
+
+	static unsigned int instance_counter;
 };
 
 

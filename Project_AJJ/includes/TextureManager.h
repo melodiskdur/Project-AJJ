@@ -20,9 +20,12 @@ public:
 	//Others
 	void loadAtlas(sf::String name, sf::String file_name);
 
+	static unsigned int instanceCount() { return instance_counter; };
 private:
 	std::vector<TextureAtlas*> atlases;
 	bool exists(sf::String name);
 	int search_index = -1; //Index of the latest queried Atlas.
+
+	static unsigned int instance_counter;
 };
 

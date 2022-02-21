@@ -15,8 +15,8 @@ Base class for all entities that exist within a scene.
 class Object
 {
 public:
-	Object(sf::Vector2f pos, sf::Vector2f size);
 	Object();
+	Object(sf::Vector2f pos, sf::Vector2f size);
 	virtual ~Object();
 
 	//Getters
@@ -68,10 +68,11 @@ public:
 								 sf::VertexArray(sf::Lines, 2), //UL
 								 sf::VertexArray(sf::Lines, 2), //LL
 								 sf::VertexArray(sf::Lines, 2) }; //LR
-protected:
 
+	static unsigned int instanceCount() { return instance_counter; };
+protected:
 	//Parameters
-	int obj_id;													//object id
+	int obj_id = 0;												//object id
 	sf::String class_id = "default";							//object class
 	sf::Vector2f world_position = sf::Vector2f(0.0f, 0.0f);		//Position on-screen
 	sf::Vector2f velocity = sf::Vector2f(0.0f, 0.0f);			//Current velocity
@@ -85,6 +86,9 @@ protected:
 	std::vector<Action*> object_actions;
 	int num_actions = 0;
 
+	//Animations
+	std::vector<Animation*> object_animations;
+
 	//Textures
 	sf::String object_texture_name = "";				//Name of the texture atlas that we want to draw frames of this object from.
 	TEXTURE_ID active_texture = TEXTURE_ID::NONE;
@@ -95,4 +99,5 @@ protected:
 	std::vector<std::string> attributes;				      // The Physics Attribute types that the Object should be affected by.
 
 private:
+	static unsigned int instance_counter;
 };

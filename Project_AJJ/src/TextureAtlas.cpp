@@ -1,5 +1,6 @@
  #include "TextureAtlas.h"
 
+unsigned int TextureAtlas::instance_counter = 0;
 
 /*Texture Regions
 * Used together with the textureid enums to retrieve specific regions
@@ -22,21 +23,15 @@ const sf::IntRect TEXTURE_REGIONS[10] =
 
 };
 
-TextureAtlas::TextureAtlas()
-{
+TextureAtlas::TextureAtlas() { TextureAtlas::instance_counter++; }
 
-}
-
-TextureAtlas::TextureAtlas(sf::String name, sf::String atlas_file_name)
+TextureAtlas::TextureAtlas(sf::String name, sf::String atlas_file_name) : TextureAtlas()
 {
 	//constructor that loads an atlas directly
 	this->loadAtlas(name, atlas_file_name);
 }
 
-TextureAtlas::~TextureAtlas()
-{
-
-}
+TextureAtlas::~TextureAtlas() { TextureAtlas::instance_counter--; }
 
 //Getters
 int TextureAtlas::getWidth(TEXTURE_ID texture_id)

@@ -2,7 +2,11 @@
 #include <SFML/Graphics/PrimitiveType.hpp>
 #include <iostream>
 
-Object::Object(sf::Vector2f pos, sf::Vector2f size)
+unsigned int Object::instance_counter = 0;
+
+Object::Object() { Object::instance_counter++; }
+
+Object::Object(sf::Vector2f pos, sf::Vector2f size) : Object()
 {
     this->world_position = pos;
     this->geo_shape = sf::VertexArray(sf::Quads, 4);
@@ -22,14 +26,11 @@ Object::Object(sf::Vector2f pos, sf::Vector2f size)
     geo_shape[3].color = gc;
 }
 
-Object::Object()
-{
-    //empty constructor.
-}
-
-Object::~Object()
-{
-    std::cout << "Object deleted" << std::endl;
+Object::~Object() 
+{ 
+    Object::instance_counter--; 
+    for (Action* a : this->object_actions) delete a; 
+    for (Animation* a : this->object_animations) delete a;
 }
 
 /*Getters*/

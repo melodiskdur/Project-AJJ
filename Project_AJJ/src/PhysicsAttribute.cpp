@@ -1,22 +1,21 @@
 #include "PhysicsAttribute.h"
 
-PhysicsAttribute::PhysicsAttribute(std::string attrib_name)
+unsigned int PhysicsAttribute::instance_counter = 0;
+
+PhysicsAttribute::PhysicsAttribute() { PhysicsAttribute::instance_counter++; }
+
+PhysicsAttribute::PhysicsAttribute(std::string attrib_name) : PhysicsAttribute()
 {
 	attribute_name = attrib_name;
 }
 
-PhysicsAttribute::~PhysicsAttribute()
-{
-
-}
+PhysicsAttribute::~PhysicsAttribute() { PhysicsAttribute::instance_counter--; }
 
 //Getters
 std::string PhysicsAttribute::getId()
 {
 	return this->attribute_name;
 }
-
-
 
 //Setters
 

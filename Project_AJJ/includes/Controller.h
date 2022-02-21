@@ -59,6 +59,7 @@ public:
 	std::vector<ActionKey> getActiveActionKeys() { return this->active_actionkeys; };
 	int getNumOfActiveActions() { return this->num_of_active_actions; };
 
+	static unsigned int instanceCount() { return instance_counter; };
 protected:
 	Object * obj = nullptr;						//the object connected to the controller
 	std::vector<ActionKey> action_keys;			//all action+keys combinations
@@ -69,6 +70,6 @@ protected:
 	sf::Vector2f original_view_size;			//the original view_size
 	ExtendedRenderWindow* window = nullptr;		//the main exteneded render window
 private:
-
+	static unsigned int instance_counter;
 };
 
