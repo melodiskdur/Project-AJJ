@@ -195,7 +195,7 @@ void FirstScene::createStaticBackgroundLayer(Scene* scene, sf::String texture_na
 			tile_frame.frame_index = map[i * cols + j];
 			tile_frame.texture_id = TEXTURE_ID::NONE;
 			tile_frame.region_name = region_name;
-			tile->setFrame(tile_frame);
+			tile->setCurrentFrame(tile_frame);
 			layer->addObject(tile);
 		}
 	}
