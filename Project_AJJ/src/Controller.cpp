@@ -26,6 +26,20 @@ void Controller::bindActionToKey(Action* action, std::vector<sf::Keyboard::Key> 
 	this->action_keys.push_back(new_actionkey);
 }
 
+void Controller::bindActionToMouseButton(Action* action, sf::Mouse::Button button)
+{
+	ActionKey new_actionkey;
+	new_actionkey.action = action;
+	new_actionkey.mouse_button = button;
+	this->action_keys.push_back(new_actionkey);
+}
+
+void Controller::setWindow(ExtendedRenderWindow* window)
+{
+	this->window = window;
+	this->original_view_size = this->window->getActiveScene()->getCamera()->getCameraView()->getSize();
+}
+
 
 void Controller::setObject(Object* obj)
 {
@@ -91,27 +105,86 @@ void Controller::breakMovement(int hori_move, int vert_move, float break_value)
 	this->obj->setVelocity(set_vel);
 }
 
-std::vector<Action*> Controller::constructActiveActions()
+bool Controller::sameActionKey(ActionKey ak1, ActionKey ak2)
 {
-	//for-loop for constructing the active_actions vector
+	//assume that they are the same
+	bool action_match = true;
+	bool keys_match = true;
+	bool mouse_btn_match = true;
+
+	//check if action match
+	if (ak1.action != ak2.action) action_match = false;
+
+	//check if keys match
+	for (auto& k1 : ak1.keys)
+	{
+		for (auto& k2 : ak2.keys)
+		{
+			if (k1 != k2) keys_match = false;
+		}
+	}
+
+	//check if mouse button match
+	if (ak1.mouse_button != ak2.mouse_button) mouse_btn_match = false;
+
+	//if the action match and if at least keys or mouse button match, return true.
+	return (action_match && (keys_match || mouse_btn_match) ? true : false);
+}
+
+std::vector<ActionKey> Controller::constructActiveActions()
+{
+	//for-loop for constructing the active_actionkeys vector
 	for (auto& action_key : this->action_keys)
 	{
-		bool action_state = true;									//Assumes action state.
+		//Assumes action state.
+		bool action_state = true;		
+
+		if (action_key.mouse_button == sf::Mouse::Button::Left)
+		{
+			if (!(sf::Mouse::isButtonPressed(action_key.mouse_button) && this->window->cursorHover(this->window->getLayouts()[0]->getButtons()[0]->getFloatRect())))
+			{
+				//the assumption is wrong.
+				action_state = false;
+
+				int k = 0;											//keeps track of index
+				//loop all of the current active_actions
+				for (auto& ak : this->active_actionkeys)
+				{
+					//if the action_keys action is in the active_actionkeys vector
+					if (sameActionKey(ak, action_key))
+					{
+						//remove it, since its key is not pressed
+						this->active_actionkeys.erase(this->active_actionkeys.begin() + k);
+
+						//reduce the number of active_actions
+						if (this->num_of_active_actions > 0)
+							this->num_of_active_actions--;
+					}
+					k++;
+				}
+			}
+		}
+		
 
 		for (int j = 0; j < action_key.keys.size(); j++)
 		{
-			if (!sf::Keyboard::isKeyPressed(action_key.keys[j]))	//If one of the binded action keys is not pressed, 
+			//If one of the binded action keys is not pressed, 
+			if (!sf::Keyboard::isKeyPressed(action_key.keys[j]))	
 			{
-				action_state = false;								//the assumption is wrong.
+				//the assumption is wrong.
+				action_state = false;								
 
-				int k = 0;
-				for (auto& active_action_element : active_actions)
+				int k = 0;											//keeps track of index
+				//loop all of the current active_actions
+				for (auto& ak : this->active_actionkeys)
 				{
-					if (active_action_element == action_key.action)
+					//if the action_keys action is in the active_actionkeys vector
+					if (sameActionKey(ak,action_key))
 					{
-						//if the action is in the active_actions vector, remove it
-						active_actions.erase(active_actions.begin() + k);
+						//remove it, since its key is not pressed
+						this->active_actionkeys.erase(this->active_actionkeys.begin() + k);
 
+						//reduce the number of active_actions
 						if (this->num_of_active_actions > 0)
 							this->num_of_active_actions--;
 					}
@@ -120,6 +193,7 @@ std::vector<Action*> Controller::constructActiveActions()
 				break;
 			}
 		}
+		
 
 		//if the action_state is true(1) for this specific action_key
 		if (action_state)
@@ -128,9 +202,9 @@ std::vector<Action*> Controller::constructActiveActions()
 
 			//check if we want to add the actions to the active_action vector
 			int add_to_active_actions = 1;
-			for (auto& active_action_element : active_actions)
+			for (auto& aak : active_actionkeys)
 			{
-				if (active_action_element == action_key.action)
+				if (sameActionKey(aak, action_key))
 				{
 					add_to_active_actions = 0;								//if its already in the list, set to false(0)
 					break;
@@ -141,7 +215,7 @@ std::vector<Action*> Controller::constructActiveActions()
 			//if its not in the list already
 			if (add_to_active_actions)
 			{
-				active_actions.push_back(action_key.action);				//add to active action vector
+				active_actionkeys.push_back(action_key);				//add to active action vector
 				this->num_of_active_actions++;
 			}
 
@@ -150,7 +224,7 @@ std::vector<Action*> Controller::constructActiveActions()
 
 	}
 
-	return this->active_actions;
+	return this->active_actionkeys;
 }
 
 void Controller::triggerActiveActions()
@@ -175,10 +249,10 @@ void Controller::triggerActiveActions()
 	{
 		int perform_action = 1;											//assumes action state
 
-		ACTIONTYPE type = this->active_actions[i]->getActionType();		//current actiontype
+		ACTIONTYPE type = this->active_actionkeys[i].action->getActionType();		//current actiontype
 
 		//if we want to move horizontally
-		if (type == ACTIONTYPE::MOVE_LEFT || type == ACTIONTYPE::MOVE_RIGHT)
+		if (type == ACTIONTYPE::AT_MOVE_LEFT || type == ACTIONTYPE::AT_MOVE_RIGHT)
 		{
 			//if we have moved horizontally already
 			if (hori_move != 0)
@@ -191,7 +265,7 @@ void Controller::triggerActiveActions()
 		}
 
 		//if we want to move vertically
-		else if (type == ACTIONTYPE::MOVE_UP || type == ACTIONTYPE::MOVE_DOWN)
+		else if (type == ACTIONTYPE::AT_MOVE_UP || type == ACTIONTYPE::AT_MOVE_DOWN)
 		{
 			//if we have moved vertically already
 			if (vert_move != 0)
@@ -206,7 +280,7 @@ void Controller::triggerActiveActions()
 		//if the assumed action state remains true(1)
 		if (perform_action)
 		{
-			this->active_actions[i]->triggerAction();
+			this->active_actionkeys[i].action->triggerAction();
 		}
 
 	}
@@ -225,7 +299,7 @@ void Controller::correctMovement()
 	sf::Vector2f cor_vel = obj_vel;												//objects corrected velocity vector
 	sf::Vector2f max_vel = this->obj->getMaxVelocity();							//objects maximum velocity 
 	float len_vel = sqrt(obj_vel.x * obj_vel.x + obj_vel.y * obj_vel.y);		//length of object velocity vector
-	const float PI = 3.1415927;													//constant for PI
+	const float PI = 3.1415927f;												//constant for PI
 
 	//calculate the point on the velocity-ellipsiod from the angle of the objects velocity
 	//compare the vector given from the objects center to that point with len_vel
@@ -310,9 +384,9 @@ void Controller::processUserInput()
 		constructActiveActions();
 
 		//if there are no active_actions
-		if (active_actions.empty())
+		if (active_actionkeys.empty())
 		{
-			active_actions.push_back(action_keys[0].action);				//add the idle/not-active action
+			active_actionkeys.push_back(action_keys[0]);				//add the idle/not-active action
 			this->num_of_active_actions++;
 		}
 

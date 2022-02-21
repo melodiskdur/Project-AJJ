@@ -1,5 +1,4 @@
 #include "Project_AJJ.h"
-//#include <SFML/OpenGL.hpp>
 #include "includes/TestObject.h"
 #include "includes/FirstScene.h"
 #include "includes/ResourceLoader.h"
@@ -13,11 +12,11 @@ int main()
 	sf::Clock clock;
 
 	//Test environment
-	float sc_f = 1; //scale_factor for window width/height
-	float window_width = 800 * sc_f;
-	float window_height = 600 * sc_f;
+	int sc_f = 1; //scale_factor for window width/height
+	unsigned int window_width = static_cast<unsigned int>(800 * sc_f);
+	unsigned int window_height = static_cast<unsigned int>(600 * sc_f);
 	sf::ContextSettings settings;
-	settings.antialiasingLevel = 10;
+	settings.antialiasingLevel = 8;
 	ExtendedRenderWindow window(sf::Vector2u(window_width, window_height), "Project AJJ", settings);
 	window.setFramerateLimit(30);
 	window.setVerticalSyncEnabled(true);
@@ -26,7 +25,7 @@ int main()
 
 	Layout* test_layout = TestLayout::createTestLayout();
 	window.addLayout(test_layout);
-	
+
 	//------------------------- TextureAtlas test ----------------------------
 
 	TextureManager* tex_mag = ResourceLoader::loadResources();
@@ -155,6 +154,10 @@ int main()
 	main_contr.bindActionToKey(main_contr_obj->getActions()[7], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Up });		//MENU_MOVE_UP
 	main_contr.bindActionToKey(main_contr_obj->getActions()[8], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Enter });		//MENU_CHOOSE_ALTERNATIVE
 	main_contr.bindActionToKey(main_contr_obj->getActions()[9], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Delete });	//EXIT_TO_MENU
+	
+	//bind a button to the left mouse button
+	main_contr.bindActionToMouseButton(window.getLayouts()[0]->getButtons()[0]->getActions()[0], sf::Mouse::Button::Left);		//LAYOUT BUTTON TEST
+
 	//last, add the main_controller_object to the scene
 	test_scene->addSceneObject(main_contr_obj);
 
@@ -171,46 +174,54 @@ int main()
 		//for closing the window
 		while (window.pollEvent(event))
 		{
-			/*
 			if (event.type == sf::Event::KeyPressed)
 			{
-				
+				//DEBUGGING
 				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
 				{
-
+					window.getLayouts()[0]->setBorderSizeForAll({ window.getLayouts()[0]->getBorderSize().x + 1, window.getLayouts()[0]->getBorderSize().y + 1 });
 				}
-				
-			}*/
+				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::BackSpace))
+				{
+					window.getLayouts()[0]->setBorderSizeForAll({ window.getLayouts()[0]->getBorderSize().x - 1, window.getLayouts()[0]->getBorderSize().y - 1 });
+				}
+				//END DEBUGGING
+			}
 			if (event.type == sf::Event::Closed)
 			{
 				window.close();
-			}
-			else if (event.type == sf::Event::Resized)
-			{ 
-				//glViewport(0, 0, event.size.width, event.size.height);
-			}
-				
+			}	
 		}
 
 		main_contr.processUserInput();
-
 		
 		contr_player_1.processUserInput();
 		contr_player_2.processUserInput();
 		
-		
 		window.drawActiveScene();
+
 
 		//DEBUGGING
 		/*
-		window.getLayouts()[0]->setPosition({ window.getLayouts()[0]->getPosition().x + 1 , window.getLayouts()[0]->getPosition().y + 1});
+		sf::FloatRect recty = window.getLayouts()[0]->getButtons()[0]->getFloatRect();
+		sf::FloatRect rect2({ 310,-110 }, { 30,30 });
+		std::vector<sf::FloatRect> rects;
+		rects.push_back(recty);
+		rects.push_back(rect2);
+
+		std::vector<sf::FloatRect> hr = window.cursorHoverRects(rects);
+		for (auto& r : hr)
+		{
+			//std::cout << "Mouse currently hovering rect with pos = { " << r.left << ", " << r.top << " } and size = { " << r.width << ", " << r.height << " } " << std::endl;
+		}
+		window.getLayouts()[0]->setPositionForAll({ window.getLayouts()[0]->getPosition().x + 1 , window.getLayouts()[0]->getPosition().y + 1});
 		window.getLayouts()[0]->setSize({ window.getLayouts()[0]->getSize().x + 2, window.getLayouts()[0]->getSize().y + 2});
+		window.getLayouts()[0]->moveForAll({ 1,0 });
 		test_layout->resetMarginSpaces();
 		test_layout->placeLayouts();
 		*/
 		//END DEBUGGING
 		
-
 		//Start debugging
 		//prints out the framerate
 		//std::cout << 1.0f / framerate.asSeconds() << std::endl;

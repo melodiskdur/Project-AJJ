@@ -1,17 +1,13 @@
 #include "Button.h"
 
 
-Button::Button(int char_size, sf::Text::Style text_style, sf::Color text_color, std::string text_string, sf::Vector2f button_size, sf::Vector2f button_pos)
+Button::Button(sf::Vector2f button_pos, sf::Vector2f button_size, std::string text_string, int char_size, sf::Text::Style text_style, sf::Color text_color)
+	: Object(button_pos,button_size)
 {
-	//Set button size
-	this->size = button_size;
-
-	//Set button position
-	this->world_position = button_pos;
-
 	//Set class id
 	this->class_id = "button";
 
+	//DEBUGGING
 	//Load font
 	loadFont("../Project_AJJ/assets/ayar_takhu.ttf");
 
@@ -26,7 +22,15 @@ Button::Button(int char_size, sf::Text::Style text_style, sf::Color text_color, 
 	new_frame.texture_id = TEXTURE_ID::IDLE;
 	new_frame.frame_index = 0;
 	new_frame.duration = 0;
-	this->setFrame(new_frame);
+	this->setCurrentFrame(new_frame);
+	//END DEBUGGING
+}
+
+Button::Button(sf::Vector2f button_pos, sf::Vector2f button_size)
+	: Object(button_pos, button_size)
+{
+	//Set class id
+	this->class_id = "button";
 }
 
 Button::~Button()

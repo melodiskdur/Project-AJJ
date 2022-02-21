@@ -31,11 +31,12 @@ public:
 	sf::String getTextureName();
 	std::vector<Action*> getActions();
 	TEXTURE_ID getTextureId() { return this->active_texture; };
-	Frame getFrame() { return this->current_frame; };
+	Frame getCurrentFrame() { return this->current_frame; };
 	float getVelocityIncrement() { return this->velocity_inc; };
 	std::vector<std::string> getPhysicsAttributes() { return this->attributes; };
 	OBJECT_BEHAVIOR getBehaviorType() { return this->behavior_type; };
-
+	sf::FloatRect getFloatRect();
+	int getNumActions() { return this->num_actions; }
 
 	//Setters
 	void setId(int id);
@@ -47,17 +48,19 @@ public:
 	void setRotation(int rot);
 	void setTextureName(sf::String name);
 	void setTextureId(TEXTURE_ID texture_id) { this->active_texture = texture_id; };
-	void setFrame(Frame frame) { this->current_frame = frame; };
+	void setCurrentFrame(Frame frame) { this->current_frame = frame; };
 	void setColor(sf::Color color);
 	void setVelocityIncrement(float vel_inc) { this->velocity_inc = vel_inc; };
 	//void setActions(std::vector<int> actions);
-	void setBehaviorType(OBJECT_BEHAVIOR behavior) { this->behavior_type = behavior; };
+	void setBehaviorType(OBJECT_BEHAVIOR behavior) { this->behavior_type = behavior;  };
 
 
 	//Others
 	//Called when the object is queried for an action. Looks through its vector for the action 
 	//with a name corresponding to std::string action_name.
 	void onActionRequest(std::string action_name);
+
+	void addAction(Action* action) { this->object_actions.push_back(action); num_actions++;}
 
 	//DEBUGGING
 	sf::VertexArray vel_vec[4] = { sf::VertexArray(sf::Lines, 2), //UR
@@ -79,6 +82,7 @@ protected:
 
 	//Actions
 	std::vector<Action*> object_actions;
+	int num_actions = 0;
 
 	//Textures
 	sf::String object_texture_name = "";				//Name of the texture atlas that we want to draw frames of this object from.

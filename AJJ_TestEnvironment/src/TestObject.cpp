@@ -24,52 +24,52 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size)
 
     idle->setActionName("Idle");
     idle->setParentObject(this);
-    idle->setActionType(ACTIONTYPE::IDLE);
+    idle->setActionType(ACTIONTYPE::AT_IDLE);
 
     actionUp->setActionName("Up");
     actionUp->setParentObject(this);
-    actionUp->setActionType(ACTIONTYPE::MOVE_UP);
+    actionUp->setActionType(ACTIONTYPE::AT_MOVE_UP);
     actionUp->setParameterManipulation(-velocity_inc);
 
     actionDown->setActionName("Down");
-    actionDown->setActionType(ACTIONTYPE::MOVE_DOWN);
+    actionDown->setActionType(ACTIONTYPE::AT_MOVE_DOWN);
     actionDown->setParameterManipulation(velocity_inc);
     actionDown->setParentObject(this);
 
     actionLeft->setActionName("Left");
-    actionLeft->setActionType(ACTIONTYPE::MOVE_LEFT);
+    actionLeft->setActionType(ACTIONTYPE::AT_MOVE_LEFT);
     actionLeft->setParameterManipulation(-velocity_inc);
     actionLeft->setParentObject(this);
 
     actionRight->setActionName("Right");
-    actionRight->setActionType(ACTIONTYPE::MOVE_RIGHT);
+    actionRight->setActionType(ACTIONTYPE::AT_MOVE_RIGHT);
     actionRight->setParameterManipulation(velocity_inc);
     actionRight->setParentObject(this);
 
     attack->setActionName("Attack");
-    attack->setActionType(ACTIONTYPE::ATTACK);
+    attack->setActionType(ACTIONTYPE::AT_ATTACK);
     attack->setParentObject(this);
 
     /*
 
     speedUp->setActionName("SpeedUp");
     speedUp->setParentObject(this);
-    speedUp->setActionType(ACTIONTYPE::MOVE_UP);
+    speedUp->setActionType(ACTIONTYPE::AT_MOVE_UP);
     speedUp->setParameterManipulation(2 * -velocity_inc);
 
     speedDown->setActionName("SpeedDown");
     speedDown->setParentObject(this);
-    speedDown->setActionType(ACTIONTYPE::MOVE_DOWN);
+    speedDown->setActionType(ACTIONTYPE::AT_MOVE_DOWN);
     speedDown->setParameterManipulation(2 * velocity_inc);
 
     speedLeft->setActionName("SpeedLeft");
     speedLeft->setParentObject(this);
-    speedLeft->setActionType(ACTIONTYPE::MOVE_LEFT);
+    speedLeft->setActionType(ACTIONTYPE::AT_MOVE_LEFT);
     speedLeft->setParameterManipulation(-2 * velocity_inc);
 
     speedRight->setActionName("SpeedRight");
     speedRight->setParentObject(this);
-    speedRight->setActionType(ACTIONTYPE::MOVE_RIGHT);
+    speedRight->setActionType(ACTIONTYPE::AT_MOVE_RIGHT);
     speedRight->setParameterManipulation(2 * velocity_inc);
 
     */
@@ -133,7 +133,7 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size, bool npc)
     npc_frame.frame_index = 0;
     npc_frame.texture_id = TEXTURE_ID::NONE;
     npc_frame.region_name = sf::String("Boss");
-    this->setFrame(npc_frame);
+    this->setCurrentFrame(npc_frame);
 
     std::cout << "TestObject called\n";
 }

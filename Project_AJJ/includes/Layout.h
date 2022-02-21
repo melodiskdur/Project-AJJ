@@ -10,6 +10,8 @@
 * Layouts can contain objects such as buttons...(more will be added)
 * It can also contain text and other layouts.
 * Each layout has a layout-placement, similar to the placement method used in html
+* this is used to make the placement of layouts inside of other layouts simpler
+* If this functionality is not wanted, set LP_NONE and specify a position.
 */
 
 //placement of the layout in relation to the window or parent-layout
@@ -38,7 +40,6 @@ public:
 	/*Destructor*/
 	~Layout();
 
-
 	/*Getters*/
 	//returns the sf::Text contained inside of the layout
 	sf::Text getText() { return this->text; }
@@ -63,19 +64,25 @@ public:
 	std::vector<Layout*> getLayouts() { return this->layouts; }
 	//get the vector of available marginspaces to place a layout/object inside of
 	std::vector<sf::FloatRect> getMarginSpaces() { return this->margin_spaces; }
-	//sometimes calculations get easier if we use the "total_rect" of the layout
-	//this rect includes the padding and margin. The result of the calulations
-	//often result in a position for this rect, which then nedd to be adjusted
-	//so that it doesnt include the layouts padding and margin. This function does that.
-	sf::Vector2f correctPosition(sf::Vector2f total_rect_pos);
-
+	
+	//returns the name of the texture that this layout use
 	sf::String getTextureName() { return this->texture_name; };
-	TEXTURE_ID getTextureId() { return this->active_texture; };
-	Frame getFrame() { return this->current_frame; };
+	//returns the current frame
+	Frame getCurrentFrame() { return this->current_frame; };
 
+	//returns the layouts parent-layout. This layout is contained inside of its parent
 	Layout* getParentLayout() { return this->parent_layout; }
 
+	//returns the minimum size for the layout
 	sf::Vector2f getMinSize() { return this->min_size; }
+	//returns the current border_size for the layout. Cant exceed half of the minimum size
+	sf::Vector2f getBorderSize() { return this->border_size; }
+	//returns the state of the layout and if its fixated to a view or not.
+	bool getfixedToView() { return this->fixed_to_view; }
+
+	int getNumLayouts() { return this->num_layouts; }
+	int getNumObjects() { return this->num_objects; }
+	int getNumButtons() { return this->num_buttons; }
 
 
 	/*Setters*/
@@ -83,18 +90,20 @@ public:
 	void setRect(sf::FloatRect rect) { this->rect = rect; }
 	void setSize(sf::Vector2f size ) { this->rect.width = size.x, this->rect.height = size.y; }
 	void setPosition(sf::Vector2f new_pos);
+	void setPositionForAll(sf::Vector2f new_pos);
+	void move(sf::Vector2f move_dist);
+	void moveForAll(sf::Vector2f move_dist);
 	void setPadding(sf::Vector2f padding) { this->padding = padding; }
 	void setMargin(sf::Vector2f margin) { this->margin = margin; }
 	void setMarginSpaceRect(sf::FloatRect new_margin_space, int index) { this->margin_spaces[index] = new_margin_space; }
-
 	void setTextureName(sf::String name) { this->texture_name = name; };
-	void setTextureId(TEXTURE_ID texture_id) { this->active_texture = texture_id; };
-	void setFrame(Frame frame) { this->current_frame = frame; };
-
+	void setTextureNameForAll(sf::String name);
+	void setCurrentFrame(Frame frame) { this->current_frame = frame; };
+	void setFrameForAll(Frame frame);
 	void setParentLayout(Layout* parent_layout) { this->parent_layout = parent_layout; }
-
-	bool getfixedToView() { return this->fixed_to_view; }
 	void setFixedToView(bool state) { this->fixed_to_view = state; }
+	void setBorderSize(sf::Vector2f border_size);
+	void setBorderSizeForAll(sf::Vector2f new_border_size);
 
 	/*Others*/
 	//add a another layout inside of this one i.e. add it to the Layout*-vector
@@ -112,8 +121,15 @@ public:
 	void setBestLayoutPlacement();
 	//correct/update the available margin_spaces after placing a layout
 	void updateParentMarginSpaces();
-
+	//resets all of the margin_spaces for all of the layouts
+	//this step is needed before placeLayouts() if it is run again
 	void resetMarginSpaces();
+
+	//sometimes calculations get easier if we use the "total_rect" of the layout
+	//this rect includes the padding and margin. The result of the calulations
+	//often result in a position for this rect, which then nedd to be adjusted
+	//so that it doesnt include the layouts padding and margin. This function does that.
+	sf::Vector2f correctPosition(sf::Vector2f total_rect_pos);
 
 	//calculate the position so that rect fits inside of margin_space
 	sf::Vector2f fitInside(sf::FloatRect margin_space, sf::FloatRect rect);
@@ -121,7 +137,7 @@ public:
 	bool possibleFit(sf::FloatRect margin_space, sf::FloatRect rect);
 	//calculates the distance between two xy-points
 	float distance(sf::Vector2f s, sf::Vector2f d);
-
+	//check for if the size is a valid size for this layout i.e. that it is larger than the minimum size
 	bool validSize(sf::Vector2f size);
 	
 protected:
@@ -139,6 +155,7 @@ protected:
 	sf::Vector2f padding = { 0,0 };					//padding around the layout, left/right and top/bottom
 	sf::Vector2f margin = { 0,0 };					//space between other layouts or window-bordes, left/right and top/bottom
 	sf::Vector2f min_size = { 4,4 };				//the minimum width and height for a layout
+	sf::Vector2f border_size = { 4,4 };				//the layouts borders size in pixels, width and height
 
 	std::vector<sf::FloatRect> margin_spaces;		//used to check the remaining space of the layout (top,bottom,left,right margin space)
 
@@ -146,8 +163,7 @@ protected:
 
 	//Textures
 	sf::String texture_name = "";					//Name of the texture atlas that we want to draw frames of this object from.
-	TEXTURE_ID active_texture = TEXTURE_ID::NONE;
-	Frame current_frame;
+	Frame current_frame;							//the current frame for this layout. includes information about texture id, region, frameindex, duration
 
 	LAYOUT_PLACEMENT layout_placement = LAYOUT_PLACEMENT::LP_NONE;	//placement of the layout in relation to the window or parent-layout
 };

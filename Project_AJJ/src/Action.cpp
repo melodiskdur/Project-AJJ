@@ -66,21 +66,21 @@ void Action::triggerAction()
 	sf::Vector2f set_vel = this->parent_object->getVelocity();
 	
 	//horizontal movement
-	if (this->action_type == ACTIONTYPE::MOVE_LEFT || this->action_type == ACTIONTYPE::MOVE_RIGHT)
+	if (this->action_type == ACTIONTYPE::AT_MOVE_LEFT || this->action_type == ACTIONTYPE::AT_MOVE_RIGHT)
 	{
 		set_vel.x += this->parameter_manipulation;
 	}
 	//vertical movement
-	else if (this->action_type == ACTIONTYPE::MOVE_UP || this->action_type == ACTIONTYPE::MOVE_DOWN)
+	else if (this->action_type == ACTIONTYPE::AT_MOVE_UP || this->action_type == ACTIONTYPE::AT_MOVE_DOWN)
 	{
 		set_vel.y += this->parameter_manipulation;
 	}
 
-	else if (this->action_type == ACTIONTYPE::ATTACK)
+	else if (this->action_type == ACTIONTYPE::AT_ATTACK)
 	{
 		//DO SOMETHING
 	}
-	else if (this->action_type == ACTIONTYPE::IDLE)
+	else if (this->action_type == ACTIONTYPE::AT_IDLE)
 	{
 		//DO SOMETHING
 		//If an object has any actions other than Idle, Idle should also be added
@@ -98,7 +98,7 @@ void Action::triggerAction()
 	if (this->animation != nullptr)
 	{
 		//set the texture to the active frame(update sprite)
-		parent_object->setFrame(this->animation->getActiveFrame());
+		parent_object->setCurrentFrame(this->animation->getActiveFrame());
 		//update the animation(got to the next frame)
 		this->animation->updateAnimation();
 	}

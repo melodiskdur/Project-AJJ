@@ -136,7 +136,7 @@ int CollisionGraph::createNode(Object* object)
 	new_node.m_node_object = object;
 	new_node.m_frame_pos = object->getWorldPosition();
 	new_node.m_updated_pos = new_node.m_frame_pos;
-	new_node.m_storage_index = this->node_storage.size();
+	new_node.m_storage_index = static_cast<int>(this->node_storage.size());
 
 	// Node storage.
 	this->node_storage.push_back(new_node);
@@ -156,7 +156,7 @@ void CollisionGraph::createEdge(ObjectData& odata)
 	new_edge.m_i_node = c_i->m_storage_index;
 	new_edge.m_i_adjacent = c_j->m_storage_index;
 	new_edge.m_proposed_resolve = odata.m_wp;
-	new_edge.m_storage_index = this->edge_storage.size();
+	new_edge.m_storage_index = static_cast<int>(this->edge_storage.size());
 	new_edge.m_side = odata.m_intersect;
 
 	// Store Edge and add index to the storage to object's Node.primary.
@@ -182,7 +182,7 @@ void CollisionGraph::createCloseCallEdge(CollisionNode* node, CollisionNode* adj
 	new_edge.m_i_node = node->m_storage_index;
 	new_edge.m_i_adjacent = adjacent->m_storage_index;
 	new_edge.m_proposed_resolve = node->m_updated_pos;
-	new_edge.m_storage_index = this->edge_storage.size();
+	new_edge.m_storage_index = static_cast<int>(this->edge_storage.size());
 	new_edge.m_side = INTERSECTED_SIDE::ODATA_NONE;
 	// Set edge as relaxed.
 	new_edge.m_is_relaxed = true;
@@ -282,7 +282,7 @@ void CollisionGraph::collisionTriggered(CollisionEdge* r, CollisionEdge* e)
 	{
 		int i_e = e->m_storage_index;
 		this->createInvertedEdge(r);
-		r_inv = this->findEdge(this->edge_storage.size() - 1);
+		r_inv = this->findEdge(static_cast<int>(this->edge_storage.size()) - 1);
 		r = this->invertedEdge(r_inv);
 		e = this->findEdge(i_e);
 	}
@@ -596,9 +596,9 @@ void CollisionGraph::sortEdges(CollisionNode* c)
 		for (int j = 0; j < c->i_m_primary.size() - i - 1; j++)
 		{
 			int current_index = c->i_m_primary[j];
-			int current_size = this->edge_storage[current_index].i_m_bonus_resolves.size();
-			int comparison_index = c->i_m_primary[j+1];
-			int comparison_size = this->edge_storage[comparison_index].i_m_bonus_resolves.size();
+			int current_size = static_cast<int>(this->edge_storage[current_index].i_m_bonus_resolves.size());
+			int comparison_index = c->i_m_primary[j + 1];
+			int comparison_size = static_cast<int>(this->edge_storage[comparison_index].i_m_bonus_resolves.size());
 			if (current_size < comparison_size)
 			{
 				c->i_m_primary[j] = comparison_index;
@@ -627,7 +627,7 @@ void CollisionGraph::sortPrimaryCollisions()
 	for (int i = 1; i < this->i_active_nodes.size(); i++)
 	{
 		int current_index = this->i_active_nodes[i];
-		int i_current_size = this->node_storage[current_index].i_m_primary.size();
+		int i_current_size = static_cast<int>(this->node_storage[current_index].i_m_primary.size());
 
 		for (int j = i - 1; j > -2; j--)
 		{
@@ -637,7 +637,7 @@ void CollisionGraph::sortPrimaryCollisions()
 				break;
 			}
 			int comparison_index = this->i_active_nodes[j];
-			int i_comparison_size = this->node_storage[comparison_index].i_m_primary.size();
+			int i_comparison_size = static_cast<int>(this->node_storage[comparison_index].i_m_primary.size());
 			if (i_current_size < i_comparison_size)
 			{
 				this->i_active_nodes[j + 1] = current_index;

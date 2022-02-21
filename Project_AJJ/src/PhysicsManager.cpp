@@ -104,7 +104,7 @@ void PhysicsManager::storeObjectData(ObjectData odata)
 		CollisionData new_data;
 		new_data.m_object = odata.m_object;
 		this->data.push_back(new_data);
-		index = this->data.size() - 1;
+		index = static_cast<int>(this->data.size()) - 1;
 	}
 	// Add values.
 	this->data[index].m_repositions.push_back(odata.m_wp);
@@ -138,7 +138,7 @@ void PhysicsManager::setAverageHitboxRes(CollisionData& data)
 	std::vector<int> unresolved;
 	unresolved.resize(data.m_colliding_objects.size());
 	std::fill(unresolved.begin(), unresolved.end(), 0);
-	int num_of_unresolved = unresolved.size();
+	int num_of_unresolved = static_cast<int>(unresolved.size());
 
 	// The positions that will be assigned to the object at the end of the function.
 	std::vector<sf::Vector2f> repos_vector;

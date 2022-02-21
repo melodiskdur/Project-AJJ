@@ -1,7 +1,6 @@
 #pragma once
 #include "Controller.h"
 #include "Action.h"
-#include "ExtendedRenderWindow.h"
 
 class MainController :
 	public Controller
@@ -11,8 +10,7 @@ public:
 	~MainController();
 
 	//Setters
-	void setWindow(ExtendedRenderWindow* scene);
-
+	
 	//Getters
 	ExtendedRenderWindow* getWindow() { return this->window; }
 
@@ -29,10 +27,8 @@ public:
 
 
 private:
-	sf::Vector2f original_view_size;
-	ExtendedRenderWindow* window = nullptr;
-	std::vector<Controller*> controllers;
-	int num_of_controllers = 0;
+	std::vector<Controller*> controllers;		//all of the object controllers in the game
+	int num_of_controllers = 0;					//the number of controllers
 
 };
 

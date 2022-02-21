@@ -84,11 +84,54 @@ Layout* TestLayout::createTestLayout()
 	test_layout->placeLayouts();
 
 	//this layout will be fixed and adjustment to be in the users view
-	test_layout->setFixedToView(true);
+	//test_layout->setFixedToView(true);
+
+	Frame new_frame;
+	new_frame.region_name = "LayoutBlock";
+	new_frame.texture_id = TEXTURE_ID::IDLE;
+	new_frame.frame_index = 0;
+	new_frame.duration = 0;
+
+	test_layout->setFrameForAll(new_frame);
+	test_layout->setTextureNameForAll("LayoutBlock");
+
+	//test_layout->setBorderSizeForAll({ 10,10 });
 
 	//add a test-button
-	//Button* btn = new Button(10, sf::Text::Style::Bold, sf::Color::Red, std::string("hello"), { 10,10 }, { 300,-100 });
-	//test_layout->addObject(btn);
+	
+	
+	Button* btn = new Button({ 300,-100 }, { 20,12 });
+
+	Frame def_btn;
+	def_btn.texture_id = TEXTURE_ID::IDLE;
+	def_btn.region_name = "MenuButtons";
+	def_btn.frame_index = 0;
+
+	Frame hov_btn;
+	hov_btn.texture_id = TEXTURE_ID::HOVER;
+	hov_btn.region_name = "MenuButtons";
+	hov_btn.frame_index = 1;
+
+	Frame prs_btn;
+	prs_btn.texture_id = TEXTURE_ID::PRESSED;
+	prs_btn.region_name = "MenuButtons";
+	prs_btn.frame_index = 2;
+
+	btn->setCurrentFrame(def_btn);
+	btn->setDefaultFrame(def_btn);
+	btn->setHoverFrame(hov_btn);
+	btn->setPressedFrame(prs_btn);
+
+	btn->setTextureName("MenuButtons");
+
+	Action* btn_prs = new Action;
+	btn_prs->setParameterManipulation(0.01f);
+	btn_prs->setActionName("ButtonPressed");
+	btn_prs->setParentObject(btn);
+	btn_prs->setActionType(ACTIONTYPE::AT_ZOOM_OUT);
+	btn->addAction(btn_prs);
+
+	test_layout->addObject(btn);
 
 	return test_layout;
 }

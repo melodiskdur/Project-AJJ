@@ -28,10 +28,11 @@ TextureManager* ResourceLoader::loadResources()
 
 	//Set up Menu Buttons.
 	TextureAtlas* menu_buttons = tex_mag->getAtlas("MenuButtons");
-	menu_buttons->createRegionGrid(3, 3);
-	menu_buttons->assignRegionName("MenuButtons", sf::Vector2u(2,0), 0);
+	menu_buttons->createRegionGrid(3, 3);;
+	menu_buttons->assignRegionNames("MenuButtons", 0, 0);
 	menu_buttons->assignTextureId(TEXTURE_ID::IDLE, sf::Vector2u(0, 0), sf::Vector2u(0, 0));
 	menu_buttons->assignTextureId(TEXTURE_ID::HOVER, sf::Vector2u(1, 0), sf::Vector2u(1, 0));
+	menu_buttons->assignTextureId(TEXTURE_ID::PRESSED, sf::Vector2u(2, 0), sf::Vector2u(2, 0));
 
 	//Set up layout test
 	TextureAtlas* layouts = tex_mag->getAtlas("LayoutBlock");

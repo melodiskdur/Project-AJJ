@@ -17,15 +17,6 @@ Layout::Layout(sf::FloatRect rect, sf::Vector2f padding, sf::Vector2f margin, LA
 
 	//create 4 margin_spaces(top,right,left,bottom)
 	this->margin_spaces = std::vector<sf::FloatRect>(4, sf::FloatRect({ this->rect.left, this->rect.top }, { this->rect.width, this->rect.height }) );
-
-	Frame new_frame;
-	new_frame.region_name = "LayoutBlock";
-	new_frame.texture_id = TEXTURE_ID::IDLE;
-	new_frame.frame_index = 0;
-	new_frame.duration = 0;
-
-	this->current_frame = new_frame;
-	this->texture_name = "LayoutBlock";
 }
 
 /*Destructor*/
@@ -68,6 +59,116 @@ sf::FloatRect Layout::getTotalRect()
 }
 
 /*Setters*/
+void Layout::setBorderSize(sf::Vector2f new_border_size)
+{
+	//check if the new border_size is acceptable  
+	if (new_border_size.x > this->min_size.x / 2 && new_border_size.y > this->min_size.y / 2)
+	{
+		//set the new border_size
+		this->border_size = new_border_size;
+	}
+}
+
+void Layout::setBorderSizeForAll(sf::Vector2f new_border_size)
+{
+	//set the new border_size
+	setBorderSize(new_border_size);
+
+	//return if there are no layouts
+	if (this->num_layouts == 0) return;
+
+	//loop all of the contained layouts inside of this one 
+	for (auto& l : this->layouts)
+	{
+		//use recursion to the set the new border_size for all layouts
+		l->setBorderSizeForAll(new_border_size);
+	}
+	
+}
+
+void Layout::setPosition(sf::Vector2f new_pos)
+{
+	//update layouts position
+	this->rect.left = new_pos.x;
+	this->rect.top = new_pos.y;
+
+	//also, update its margin_spaces position
+	int index = 0;
+	for (auto& ms : this->margin_spaces)
+	{
+		ms.left = new_pos.x;
+		ms.top = new_pos.y;
+		this->setMarginSpaceRect(ms, index);
+		index++;
+	}
+
+}
+
+void Layout::setPositionForAll(sf::Vector2f new_pos)
+{
+	sf::Vector2f move_dist = sf::Vector2f(new_pos.x - this->rect.left, new_pos.y - this->rect.top);		//the distance this layout will be moved
+
+	//set the new position
+	setPosition(new_pos);
+
+	//return if there are no layouts
+	if (this->num_layouts == 0) return;
+
+	//finally, use recursion to move all of the layouts inside of this one
+	for (auto& child_layout : this->layouts)
+	{
+		child_layout->setPositionForAll({ child_layout->getPosition().x + move_dist.x, child_layout->getPosition().y + move_dist.y });
+	}
+
+}
+
+void Layout::move(sf::Vector2f move_dist)
+{
+	//add to the current position i.e. move
+	setPosition({ getPosition().x + move_dist.x, getPosition().y + move_dist.y });
+}
+
+void Layout::moveForAll(sf::Vector2f move_dist)
+{
+	move(move_dist);
+
+	//return if there are no layouts
+	if (this->num_layouts == 0) return;
+
+	//finally, use recursion to move all of the layouts inside of this one
+	for (auto& child_layout : this->layouts)
+	{
+		child_layout->moveForAll(move_dist);
+	}
+
+}
+
+void Layout::setTextureNameForAll(sf::String name)
+{
+	setTextureName(name);
+
+	//return if there are no layouts
+	if (this->num_layouts == 0) return;
+
+	for (auto& l : this->layouts)
+	{
+		l->setTextureNameForAll(name);
+	}
+}
+
+void Layout::setFrameForAll(Frame frame)
+{
+	setCurrentFrame(frame);
+
+	//return if there are no layouts
+	if (this->num_layouts == 0) return;
+
+	for (auto& l : this->layouts)
+	{
+		l->setFrameForAll(frame);
+	}
+}
+
 
 /*Others*/
 void Layout::addLayout(Layout* new_layout)
@@ -113,7 +214,6 @@ void Layout::addObject(Object* new_object)
 	this->num_objects++;
 }
 
-
 void Layout::placeLayouts()
 {
 	//check if this layout contain any layouts. If no layouts exist, return.
@@ -147,41 +247,41 @@ void Layout::setIdealPosition()
 	//TOP
 	if (this->layout_placement == LAYOUT_PLACEMENT::LP_TOP_CENTERED)
 	{
-		this->setPosition({ pl_pos.x + (pl_size.x / 2) - (this->rect.width / 2), pl_pos.y });
+		this->setPositionForAll({ pl_pos.x + (pl_size.x / 2) - (this->rect.width / 2), pl_pos.y });
 	}
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_TOP_LEFT)
 	{
-		this->setPosition(pl_pos);
+		this->setPositionForAll(pl_pos);
 	}
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_TOP_RIGHT)
 	{
-		this->setPosition({ pl_pos.x + pl_size.x - this->rect.width , pl_pos.y });
+		this->setPositionForAll({ pl_pos.x + pl_size.x - this->rect.width , pl_pos.y });
 	}
 	//BOTTOM
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_BOTTOM_CENTERED)
 	{
-		this->setPosition({ pl_pos.x + (pl_size.x / 2) - (this->rect.width / 2) , pl_pos.y + pl_size.y - this->rect.height });
+		this->setPositionForAll({ pl_pos.x + (pl_size.x / 2) - (this->rect.width / 2) , pl_pos.y + pl_size.y - this->rect.height });
 	}
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_BOTTOM_LEFT)
 	{
-		this->setPosition({ pl_pos.x , pl_pos.y + pl_size.y - this->rect.height });
+		this->setPositionForAll({ pl_pos.x , pl_pos.y + pl_size.y - this->rect.height });
 	}
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_BOTTOM_RIGHT)
 	{
-		this->setPosition({ pl_pos.x + pl_size.x - this->rect.width , pl_pos.y + pl_size.y - this->rect.height });
+		this->setPositionForAll({ pl_pos.x + pl_size.x - this->rect.width , pl_pos.y + pl_size.y - this->rect.height });
 	}
 	//CENTERED
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_CENTERED_LEFT)
 	{
-		this->setPosition({ pl_pos.x , pl_pos.y + (pl_size.y / 2) - (this->rect.height / 2) });
+		this->setPositionForAll({ pl_pos.x , pl_pos.y + (pl_size.y / 2) - (this->rect.height / 2) });
 	}
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_CENTERED_RIGHT)
 	{
-		this->setPosition({ pl_pos.x + pl_size.x - this->rect.width , pl_pos.y + (pl_size.y / 2) - (this->rect.height / 2) });
+		this->setPositionForAll({ pl_pos.x + pl_size.x - this->rect.width , pl_pos.y + (pl_size.y / 2) - (this->rect.height / 2) });
 	}
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_CENTERED)
 	{
-		this->setPosition({ pl_pos.x + (pl_size.x / 2) - (this->rect.width / 2) , pl_pos.y + (pl_size.y / 2) - (this->rect.height / 2) });
+		this->setPositionForAll({ pl_pos.x + (pl_size.x / 2) - (this->rect.width / 2) , pl_pos.y + (pl_size.y / 2) - (this->rect.height / 2) });
 	}
 	//CUSTOM and NONE
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_CUSTOM)
@@ -228,7 +328,7 @@ void Layout::setBestLayoutPlacement()
 
 	}
 
-	this->setPosition(correctPosition(adjusted_placement));
+	this->setPositionForAll(correctPosition(adjusted_placement));
 }
 
 void Layout::updateParentMarginSpaces()
@@ -408,17 +508,23 @@ void Layout::updateParentMarginSpaces()
 
 void Layout::resetMarginSpaces()
 {
+	//resturn if this layout dont contain any other layouts
+	//if so, the margin_spaces havent changed
+	if (this->num_layouts == 0) return;
+
+	//loop all margin_spaces and reset them
 	for (auto& ms : this->margin_spaces)
 	{
-		if (this->num_layouts == 0) return;
-
 		ms = this->rect;
 	}
+	//loop all of the contained layouts inside of this one 
 	for (auto& l : this->layouts)
 	{
+		//use recursion to reset every other margin_space
 		l->resetMarginSpaces();
 	}
 }
+
 
 /*Help-mehthods*/
 float Layout::distance(sf::Vector2f s, sf::Vector2f d)
@@ -430,7 +536,7 @@ float Layout::distance(sf::Vector2f s, sf::Vector2f d)
 	// d = destination
 
 	// calculating distance
-	return sqrt(pow(d.x - s.x, 2) + pow(d.y - s.y, 2) * 1.0);
+	return static_cast<float>(sqrt(pow(d.x - s.x, 2) + pow(d.y - s.y, 2) * 1.0));
 }
 
 bool Layout::possibleFit(sf::FloatRect margin_space, sf::FloatRect rect)
@@ -528,32 +634,6 @@ sf::Vector2f Layout::correctPosition(sf::Vector2f total_rect_pos)
 
 	//return the corrected position
 	return total_rect_pos;
-}
-
-void Layout::setPosition(sf::Vector2f new_pos)
-{
-	sf::Vector2f move_dist = sf::Vector2f(new_pos.x - this->rect.left, new_pos.y - this->rect.top);		//the distance this layout will be moved
-
-	//update layouts position
-	this->rect.left = new_pos.x;
-	this->rect.top = new_pos.y;
-
-	//also, update its margin_spaces position
-	int index = 0;
-	for (auto& ms : this->margin_spaces)
-	{
-		ms.left = new_pos.x;
-		ms.top = new_pos.y;
-		this->setMarginSpaceRect(ms, index);
-		index++;
-	}
-
-	//finally, use recursion to move all of the layouts inside of this one
-	for (auto& child_layout : this->layouts)
-	{
-		child_layout->setPosition({ child_layout->getRect().left + move_dist.x, child_layout->getRect().top + move_dist.y });
-	}
-	
 }
 
 bool Layout::validSize(sf::Vector2f size)

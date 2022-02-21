@@ -32,6 +32,7 @@ Object::~Object()
     std::cout << "Object deleted" << std::endl;
 }
 
+/*Getters*/
 int Object::getId()
 {
     return this->obj_id;
@@ -72,6 +73,12 @@ std::vector<Action*> Object::getActions()
     return object_actions;
 }
 
+sf::FloatRect Object::getFloatRect()
+{
+    return sf::FloatRect(this->world_position, this->size);
+}
+
+/*Setters*/
 void Object::setId(int id)
 {
     this->obj_id = id;
@@ -150,7 +157,7 @@ void Object::setColor(sf::Color color)
     this->geo_shape[3].color = color;
 }
 
-//Others
+/*Others*/
 void Object::onActionRequest(std::string action_name)
 {
     //loop all actions assigned to this object

@@ -10,24 +10,25 @@ class Object;
 
 enum ACTIONTYPE 
 { 
-	MOVE_LEFT, 
-	MOVE_RIGHT, 
-	MOVE_UP, 
-	MOVE_DOWN, 
-	JUMP, 
-	ATTACK, 
-	IDLE,
-	ZOOM_IN,
-	ZOOM_OUT,
-	PAUSE,
-	PLAY,
-	STEP_FORWARD,
-	STEP_BACK,
-	SWITCH_CAMERA_LOCKED_OBJECT,
-	MENU_MOVE_UP,
-	MENU_MOVE_DOWN,
-	MENU_CHOOSE_ALTERNATIVE,
-	EXIT_TO_MENU
+	AT_MOVE_LEFT, 
+	AT_MOVE_RIGHT, 
+	AT_MOVE_UP, 
+	AT_MOVE_DOWN, 
+	AT_JUMP, 
+	AT_ATTACK, 
+	AT_IDLE,
+	AT_ZOOM_IN,
+	AT_ZOOM_OUT,
+	AT_PAUSE,
+	AT_PLAY,
+	AT_STEP_FORWARD,
+	AT_STEP_BACK,
+	AT_SWITCH_CAMERA_LOCKED_OBJECT,
+	AT_MENU_MOVE_UP,
+	AT_MENU_MOVE_DOWN,
+	AT_MENU_CHOOSE_ALTERNATIVE,
+	AT_EXIT_TO_MENU,
+	AT_BUTTON_PRESSED
 };
 
 /* Action
@@ -59,7 +60,7 @@ public:
 
 private:
 	std::string action_name;
-	ACTIONTYPE action_type = ACTIONTYPE::IDLE;
+	ACTIONTYPE action_type = ACTIONTYPE::AT_IDLE;
 	Object* parent_object = nullptr;
 	float parameter_manipulation = 0;	    //The value of which the parameter shall be manipulated by.
 	float action_duration = 0;				//Amount of time the action is run. -1 is default, meaing 

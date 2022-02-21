@@ -138,7 +138,7 @@ void FirstScene::createWorldLayer(Scene* scene, sf::String texture_name, std::ve
 			tile_frame.frame_index = map[i * cols + j];
 			tile_frame.texture_id = TEXTURE_ID::NONE;
 			tile_frame.region_name = "Tile";
-			tile->setFrame(tile_frame);
+			tile->setCurrentFrame(tile_frame);
 			scene->addSceneObject(tile);
 			counter++;
 		}
@@ -169,7 +169,7 @@ void FirstScene::createBackgroundLayer(Scene* scene, sf::String texture_name, st
 			tile_frame.frame_index = map[i * cols + j];
 			tile_frame.texture_id = TEXTURE_ID::NONE;
 			tile_frame.region_name = region_name;
-			tile->setFrame(tile_frame);
+			tile->setCurrentFrame(tile_frame);
 			scene->addObjectToSceneLayer(tile, layer_num);
 		}
 	}

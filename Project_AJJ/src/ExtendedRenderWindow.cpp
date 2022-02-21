@@ -30,8 +30,9 @@ Scene* ExtendedRenderWindow::getSceneFromDenotation(SCENE_DENOTATION scene_denot
 		{
 			return scn;
 		}
-	}
+	}	
 	std::cout << "ERROR: Scene* ExtendedRenderWindow::getSceneFromDenotation(SCENE_DENOTATION scene_denotation), no scene exists with that denotation" << std::endl;
+	return nullptr;
 }
 
 //Setters
@@ -39,7 +40,7 @@ void ExtendedRenderWindow::setActiveScene(Scene* scene)
 {
 	active_scene = scene;
 	this->clearSceneLayerTextures();
-	int num_layers = active_scene->getSceneLayers().size();
+	int num_layers = static_cast<int>(active_scene->getSceneLayers().size());
 	for (int i = 0; i < num_layers; i++)
 	{
 		sf::RenderTexture* t_new = new sf::RenderTexture();
@@ -53,6 +54,7 @@ void ExtendedRenderWindow::setTextureManager(TextureManager* tex_mag)
 	this->texture_manager = tex_mag;
 }
 
+//Others
 void ExtendedRenderWindow::drawActiveScene()
 {
 	//TEST-GAME
@@ -60,8 +62,6 @@ void ExtendedRenderWindow::drawActiveScene()
 	{
 		// clear the window with transparent(black) color
 		this->clear(sf::Color::Transparent);
-
-		
 
 		if (active_scene != nullptr)
 		{
@@ -80,7 +80,14 @@ void ExtendedRenderWindow::drawActiveScene()
 		//DEBUGGING
 		this->drawLayouts(this->layouts[0]);
 		//this->drawLayoutsDEBUG(this->layouts[0]);
-		//this->drawButton((Button*)this->layouts[0]->getObjects()[0]);
+		
+		//check if we have any buttons
+		if (this->layouts[0]->getNumButtons() > 0)
+		{
+			//draw a button(test)
+			this->drawButton(this->layouts[0]->getObjects()[0]);
+		}
+			
 		//END DEBUGGING
 		
 		// end the current frame. Display all changes
@@ -116,7 +123,168 @@ void ExtendedRenderWindow::drawActiveScene()
 	}
 }
 
+void ExtendedRenderWindow::drawButton(Object* btn)
+{
+	//DEBUGGING
+	//Extract sprite from region
+	Button* button = (Button*)btn;
+	/*
+	sf::RectangleShape rect(button->getSize());
+	rect.setPosition(button->getWorldPosition());*/
+	sf::Sprite btn_sprite;
+	btn_sprite = this->texture_manager->getAtlas(button->getTextureName())->getSprite(button->getCurrentFrame().texture_id, button->getCurrentFrame().region_name, button->getCurrentFrame().frame_index);
+	btn_sprite.setPosition(button->getWorldPosition());
+	btn_sprite.setScale(button->getSize().x / btn_sprite.getLocalBounds().width, button->getSize().y / btn_sprite.getLocalBounds().height);
+	this->draw(btn_sprite);
+
+	/*
+	TextureAtlas* atlas = this->texture_manager->getAtlas(btn->getTextureName());
+	sf::Sprite button_sprite = atlas->getSprite(btn->getCurrentFrame().texture_id, btn->getCurrentFrame().region_name, btn->getCurrentFrame().frame_index);
+
+	//Set position and correct its scaling
+	button_sprite.setPosition(btn->getWorldPosition());
+	button_sprite.setScale(btn->getSize().x/ button_sprite.getLocalBounds().width, btn->getSize().y / button_sprite.getLocalBounds().height);
+
+	//Draw the button sprite
+	this->draw(button_sprite);
+	*/
+
+	//END DEBUGGING
+}
+
+void ExtendedRenderWindow::drawObject(Object* obj)
+{
+
+}
+
+void ExtendedRenderWindow::drawLayouts(Layout* parent_layout)
+{
+	//check if we need to adjust its position depending on the camera view
+	if (parent_layout->getfixedToView() == true)
+	{
+		//DEBUGGING
+		//Currently it fixates the layout to the center of the screen
+		sf::FloatRect cam_rect = this->getActiveScene()->getCamera()->getCameraViewRect();
+		parent_layout->setPositionForAll({ cam_rect.left + (cam_rect.width / 2) - (parent_layout->getRect().width / 2),
+							cam_rect.top + (cam_rect.height / 2) - (parent_layout->getRect().height / 2) });
+		//END DEBUGGING
+	}
+
+	//draw the layout
+	drawLayout(parent_layout);
+
+	//loop all child-layouts
+	for (auto& l : parent_layout->getLayouts())
+	{
+		//recursion(draw the child-layout's children, grandchildren etc.)
+		this->drawLayouts(l);
+	}
+}
+
+void ExtendedRenderWindow::drawLayout(Layout* layout)
+{
+	sf::Sprite layout_sprite;
+	float bsw = layout->getBorderSize().x / 2;														//border set width
+	float bsh = layout->getBorderSize().y / 2;														//border set height
+
+	sf::Vector2f l_pos = layout->getPosition();														//layouts position
+	sf::Vector2f l_size = layout->getSize();														//layouts size
+	int num_rows = this->texture_manager->getAtlas(layout->getTextureName())->getNumRows();			//the number of rows in the layouts atlas
+	int num_columns = this->texture_manager->getAtlas(layout->getTextureName())->getNumColumns();	//the number of columns in the layoputs atlas
+
+	sf::Vector2f set_size;																			//the sprites size to be set at the end
+	sf::Vector2f set_pos;																			//the sprites position to be set at the end
+
+	//loop all of the rows in the atlas
+	for (int i = 0; i < num_rows; i++)
+	{
+		//loop all of the columns in the atlas
+		for (int j = 0; j < num_columns; j++)
+		{
+			//reset the set_size to the border size att each iteration
+			//also, set the set_pos to the layouts position at each iteration
+			set_size = { bsw,bsh };
+			set_pos = l_pos;
+
+			//get the sprite
+			layout_sprite = this->texture_manager->getAtlas(layout->getTextureName())->getSprite(TEXTURE_ID::IDLE, i * num_columns + j);
+
+			/*NOTE:
+			Below we dont check for the first row. This is because
+			the default y-position and height that is set above will be used.
+			We also dont check for the first column. This is because
+			the default x-position and width that is set above will be used.*/
+
+			//check if last row
+			if (i == num_rows - 1)
+			{
+				set_pos.y = l_pos.y + l_size.y - bsh;
+			}
+			//check if any other row, except for the first one
+			else if (i > 0)
+			{
+				set_size.y = (l_size.y - (2 * bsh)) / (num_rows - 2);
+				set_pos.y = l_pos.y + bsh + (i - 1) * set_size.y;
+
+			}
+
+			//check if last column
+			if (j == num_columns - 1)
+			{
+				set_pos.x = l_pos.x + l_size.x - bsw;
+			}
+			else if (j > 0)
+			{
+				set_size.x = (l_size.x - (2 * bsw)) / (num_columns - 2);
+				set_pos.x = l_pos.x + bsw + (j - 1) * set_size.x;
+			}
+
+
+			//set position
+			layout_sprite.setPosition(set_pos);
+
+			//correct the layout_sprite's scaling
+			layout_sprite.setScale(set_size.x / layout_sprite.getLocalBounds().width, set_size.y / layout_sprite.getLocalBounds().height);
+
+			//draw the sprite
+			this->draw(layout_sprite);
+		}
+	}
+}
+
+bool ExtendedRenderWindow::cursorHover(sf::FloatRect rect)
+{
+	//get the cursors position relative to the window
+	sf::Vector2i cursor_pos = sf::Mouse::getPosition(*this);
+
+	//map the coordinates to the current view
+	sf::Vector2f real_world_pos = this->mapPixelToCoords(cursor_pos);
+
+	//return true or false depending on if the cursor is contained in the rect
+	return (rect.contains(real_world_pos) ? true : false);
+}
+
+std::vector<sf::FloatRect> ExtendedRenderWindow::cursorHoverRects(std::vector<sf::FloatRect> rects)
+{
+	std::vector<sf::FloatRect> hovered_rects;		//the rects that the mouse is hovering
+
+	//loop all of the input rects
+	for (auto& rect : rects)
+	{
+		//if the cursor hovers the rect
+		if (cursorHover(rect))
+		{
+			//push it to the vector to be returned
+			hovered_rects.push_back(rect);
+		}
+	}
+
+	//at last, return all of the hovered rects
+	return hovered_rects;
+}
+
 //Private functions.
+
 void ExtendedRenderWindow::clearSceneLayerTextures()
 {
 	for (sf::RenderTexture* t : this->scene_layer_textures)
@@ -145,7 +313,7 @@ void ExtendedRenderWindow::drawLayers()
 				continue;
 
 			//Prepare sprite and geo_shape of current object.
-			sf::Sprite obj_sprite = obj_atlas->getSprite(o->getFrame().texture_id, o->getFrame().region_name, o->getFrame().frame_index);
+			sf::Sprite obj_sprite = obj_atlas->getSprite(o->getCurrentFrame().texture_id, o->getCurrentFrame().region_name, o->getCurrentFrame().frame_index);
 			obj_sprite.setPosition(o->getWorldPosition());
 			sf::VertexArray obj_gs = o->getGeoShape();
 			sf::FloatRect sprite_r = obj_sprite.getLocalBounds();
@@ -157,17 +325,17 @@ void ExtendedRenderWindow::drawLayers()
 				//Draws object directly onto RenderWindow if main scene layer.
 				// 
 				//DEBUGGING
-				this->draw(obj_gs);		  
+				this->draw(obj_gs);
 				this->draw(o->vel_vec[0]);
 				this->draw(o->vel_vec[1]);
 				this->draw(o->vel_vec[2]);
-				this->draw(o->vel_vec[3]);	
+				this->draw(o->vel_vec[3]);
 				//END DEBUGGING
 
 				this->draw(obj_sprite);
 			}
 			else
-			{		
+			{
 				//Draws object to RenderTexture if any other layer.
 				this->scene_layer_textures[i]->draw(obj_sprite);
 			}
@@ -183,7 +351,7 @@ void ExtendedRenderWindow::drawLayers()
 			//Scale each render texture
 			layer_sprite.move(this->active_scene->getCamera()->getCameraViewRect().left, this->active_scene->getCamera()->getCameraViewRect().top);
 			float zoom_factor = this->active_scene->getCamera()->getCameraZoom();
-			layer_sprite.scale(sf::Vector2f({ zoom_factor, zoom_factor}));
+			layer_sprite.scale(sf::Vector2f({ zoom_factor, zoom_factor }));
 
 			//Texture sprite is drawn onto ExtenderRenderWindow for rendering onto the window screen.
 			this->draw(layer_sprite);
@@ -194,116 +362,33 @@ void ExtendedRenderWindow::drawLayers()
 	}
 }
 
-void ExtendedRenderWindow::drawButton(Button * button)
-{
-	//Extract sprite from region
-	sf::Sprite button_sprite = this->texture_manager->getAtlas(button->getTextureName())->getSprite(button->getFrame().texture_id, button->getFrame().region_name, button->getFrame().frame_index);
 
-	//Set position and correct its scaling
-	button_sprite.setPosition(button->getWorldPosition());
-	button_sprite.setScale(button->getSize().x/ button_sprite.getLocalBounds().width, button->getSize().y / button_sprite.getLocalBounds().height);
-
-	//Draw the button sprite
-	this->draw(button_sprite);
-	
-	//Draw the button text on top
-	this->draw(button->getText());
-}
-
-void ExtendedRenderWindow::drawLayouts(Layout* parent_layout)
+// Debugging.
+void ExtendedRenderWindow::debugDraw()
 {
 	
-	//only print the base-layout. Prevents double-draw
-	if (parent_layout->getParentLayout() == nullptr)
-	{	
-		//check if we need to adjust its position depending on the camera view
-		if (parent_layout->getfixedToView() == true)
-		{
-			//DEBUGGING
-			sf::FloatRect cam_rect = this->getActiveScene()->getCamera()->getCameraViewRect();
-			parent_layout->setPosition({ cam_rect.left + (cam_rect.width / 2) - (parent_layout->getRect().width / 2),
-							   cam_rect.top + (cam_rect.height / 2) - (parent_layout->getRect().height / 2) });
-			//END DEBUGGING
-		}
-
-		//draw the base-layout
-		//this will only occur for the layout without a parent
-		drawLayout(parent_layout);
-	}
-	
-	//loop all child-layouts
-	for (auto& l : parent_layout->getLayouts())
+	// COLLISIONDETECTION GRID LINES
+	if (this->active_scene != nullptr)
 	{
-		//draw the child-layout
-		drawLayout(l);
-
-		//recursion(draw the child-layout's children, grandchildren etc.)
-		this->drawLayouts(l);
-	}
-}
-
-void ExtendedRenderWindow::drawLayout(Layout* layout)
-{
-	sf::Sprite layout_sprite;
-	float bsw = layout->getMinSize().x / 2;
-	float bsh = layout->getMinSize().y / 2;
-
-	sf::Vector2f l_pos = layout->getPosition();
-	sf::Vector2f l_size = layout->getSize();
-	int num_rows = this->texture_manager->getAtlas(layout->getTextureName())->getNumRows();
-	int num_columns = this->texture_manager->getAtlas(layout->getTextureName())->getNumColumns();
-
-	sf::Vector2f set_size;
-	sf::Vector2f set_pos;
-	
-
-	for (int i = 0; i < num_rows; i++)
-	{
-		for (int j = 0; j < num_columns; j++)
+		std::vector<sf::VertexArray> grid = this->active_scene->getCollisionDetection()->getGrid();
+		for (int i = 0; i < grid.size(); i++)
 		{
-			set_size = { bsw,bsh };
-			set_pos = l_pos;
-			if (set_size.x > l_size.x) set_size.x = l_size.x;
-			if (set_size.y > l_size.y) set_size.y = l_size.y;
-
-			// Get the sprite
-			layout_sprite = this->texture_manager->getAtlas(layout->getTextureName())->getSprite(TEXTURE_ID::IDLE, i * num_columns + j);
-			
-
-			//check if last row
-			if (i == num_rows - 1)
-			{
-				set_pos.y = l_pos.y + l_size.y - bsh;
-			}
-			else if (i > 0)
-			{
-				set_size.y = (l_size.y - (2 * bsh)) / (num_rows - 2);
-				set_pos.y = l_pos.y + bsh + (i - 1) * set_size.y;
-
-			}
-
-			//check if last column
-			if (j == num_columns - 1)
-			{
-				set_pos.x = l_pos.x + l_size.x - bsw;
-			}
-			else if (j > 0)
-			{
-				set_size.x = (l_size.x - (2 * bsw)) / (num_columns - 2);
-				set_pos.x = l_pos.x + bsw + (j - 1) * set_size.x;
-			}
-
-
-			//Set position
-			layout_sprite.setPosition(set_pos);
-
-			//Correct the layout_sprite's scaling
-			layout_sprite.setScale(set_size.x / layout_sprite.getLocalBounds().width, set_size.y / layout_sprite.getLocalBounds().height);
-
-			//Draw the sprite
-			this->draw(layout_sprite);
+			this->draw(grid[i]);
 		}
 	}
+	
+	
+	/*
+	// COLLISIONGRAPH EDGES.
+	if (this->active_scene != nullptr)
+	{
+		std::vector<sf::VertexArray> edges = this->active_scene->getPhysicsManager()->col_graph->getTree();
+		for (int i = 0; i < edges.size(); i++)
+		{
+			this->draw(edges[i]);
+		}
+	}
+	*/
 }
 
 void ExtendedRenderWindow::drawLayoutsDEBUG(Layout* parent_layout)
@@ -365,63 +450,3 @@ void ExtendedRenderWindow::drawLayoutsDEBUG(Layout* parent_layout)
 	}
 }
 
-// Debugging.
-void ExtendedRenderWindow::debugDraw()
-{
-	
-	// COLLISIONDETECTION GRID LINES
-	if (this->active_scene != nullptr)
-	{
-		std::vector<sf::VertexArray> grid = this->active_scene->getCollisionDetection()->getGrid();
-		for (int i = 0; i < grid.size(); i++)
-		{
-			this->draw(grid[i]);
-		}
-	}
-	
-	
-	/*
-	// COLLISIONGRAPH EDGES.
-	if (this->active_scene != nullptr)
-	{
-		std::vector<sf::VertexArray> edges = this->active_scene->getPhysicsManager()->col_graph->getTree();
-		for (int i = 0; i < edges.size(); i++)
-		{
-			this->draw(edges[i]);
-		}
-	}
-	*/
-}
-
-/*void ExtendedRenderWindow::drawLayouts(Layout* parent_layout)
-{
-	sf::Sprite layout_sprite;
-
-	//only print the base-layout. Prevents double-draw
-	if (parent_layout->getParentLayout() == nullptr)
-	{
-
-		layout_sprite = this->texture_manager->getAtlas(parent_layout->getTextureName())->
-						getSprite(parent_layout->getFrame().texture_id, parent_layout->getFrame().region_name, parent_layout->getFrame().frame_index);
-		//Set position and correct its scaling
-		layout_sprite.setPosition(parent_layout->getPosition());
-		layout_sprite.setScale(parent_layout->getSize().x / layout_sprite.getLocalBounds().width, parent_layout->getSize().y / layout_sprite.getLocalBounds().height);
-
-		this->draw(layout_sprite);
-	}
-	
-	//loop all child-layouts
-	for (auto& l : parent_layout->getLayouts())
-	{
-		layout_sprite = this->texture_manager->getAtlas(l->getTextureName())->
-						getSprite(l->getFrame().texture_id, l->getFrame().region_name, l->getFrame().frame_index);		
-		//Set position and correct its scaling
-		layout_sprite.setPosition(l->getPosition());
-		layout_sprite.setScale(l->getSize().x / layout_sprite.getLocalBounds().width, l->getSize().y / layout_sprite.getLocalBounds().height);
-
-		this->draw(layout_sprite);
-
-		//recursion
-		this->drawLayouts(l);
-	}
-}*/

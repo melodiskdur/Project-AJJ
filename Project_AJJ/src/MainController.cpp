@@ -27,16 +27,10 @@ void MainController::addController(Controller* new_controller)
 	this->num_of_controllers++;
 }
 
-void MainController::setWindow(ExtendedRenderWindow* window)
-{
-	this->window = window;
-	this->original_view_size = this->window->getActiveScene()->getCamera()->getCameraView()->getSize();
-}
-
 void MainController::triggerAction(int index)
 {
 
-	ACTIONTYPE type = this->active_actions[index]->getActionType();		//the current actions type
+	ACTIONTYPE type = this->active_actionkeys[index].action->getActionType();		//the current actions type
 	Camera* camera = this->window->getActiveScene()->getCamera();		//the window camera
 	bool window_active = this->window->getWindowState();				//if the window is active or not
 	Scene* active_scene = this->window->getActiveScene();				//the windows active scene
@@ -46,7 +40,7 @@ void MainController::triggerAction(int index)
 	if (active_scene->getSceneDenotation() == SCENE_DENOTATION::TEST_GAME)
 	{
 		//PAUSE
-		if (type == ACTIONTYPE::PAUSE && window_active)
+		if (type == ACTIONTYPE::AT_PAUSE && window_active)
 		{
 			for (auto& contr : this->controllers)
 			{
@@ -54,8 +48,17 @@ void MainController::triggerAction(int index)
 			}
 			this->window->deactivateWindow();
 		}
+		/*
+		else if (type == ACTIONTYPE::AT_PAUSE && !window_active)
+		{
+			for (auto& contr : this->controllers)
+			{
+				contr->Controller::activateController();
+			}
+			this->window->activateWindow();
+		}*/
 		//PLAY
-		if (type == ACTIONTYPE::PLAY && !window_active)
+		if (type == ACTIONTYPE::AT_PLAY && !window_active)
 		{
 			for (auto& contr : this->controllers)
 			{
@@ -64,17 +67,17 @@ void MainController::triggerAction(int index)
 			this->window->activateWindow();
 		}
 		//ZOOM IN/OUT
-		if ((type == ACTIONTYPE::ZOOM_IN || type == ACTIONTYPE::ZOOM_OUT) && window_active)
+		if ((type == ACTIONTYPE::AT_ZOOM_IN || type == ACTIONTYPE::AT_ZOOM_OUT) && window_active)
 		{
 			//get the current zoom_factor
 			float cur_zoom = camera->getCameraZoom();
 			//set the view-size to the original one. Needed
 			camera->getCameraView()->setSize(this->original_view_size);
 			//zoom the view by the current zoom_factor + the actions specific parameter manipulation value
-			camera->setCameraZoom(cur_zoom + this->active_actions[index]->getParameterManipulation());
+			camera->setCameraZoom(cur_zoom + this->active_actionkeys[index].action->getParameterManipulation());
 		}
 		//SWITCH CAMERA OBJECT
-		if (type == ACTIONTYPE::SWITCH_CAMERA_LOCKED_OBJECT && window_active)
+		if (type == ACTIONTYPE::AT_SWITCH_CAMERA_LOCKED_OBJECT && window_active)
 		{
 			//get the id of the object that the camera is currently locked on
 			int locked_obj_id = camera->getTargetObject()->getId();
@@ -106,22 +109,22 @@ void MainController::triggerAction(int index)
 			}
 		}
 		//EXIT TO MAIN MENU
-		if (type == ACTIONTYPE::EXIT_TO_MENU)
+		if (type == ACTIONTYPE::AT_EXIT_TO_MENU)
 		{
 
 		}
 	}
 
 	//menu main-controller actions
-	if (active_scene->getSceneDenotation() == SCENE_DENOTATION::TEST_GAME && window_active)
+	if (active_scene->getSceneDenotation() == SCENE_DENOTATION::MAIN_MENU && window_active)
 	{
 		//MOVE UP/DOWN IN THE MENU
-		if (type == ACTIONTYPE::MENU_MOVE_DOWN || type == ACTIONTYPE::MENU_MOVE_UP)
+		if (type == ACTIONTYPE::AT_MENU_MOVE_DOWN || type == ACTIONTYPE::AT_MENU_MOVE_UP)
 		{
 
 		}
 		//CHOOSE MENU ALTERNATIVE
-		if (type == ACTIONTYPE::MENU_CHOOSE_ALTERNATIVE)
+		if (type == ACTIONTYPE::AT_MENU_CHOOSE_ALTERNATIVE)
 		{
 
 		}
@@ -131,11 +134,11 @@ void MainController::triggerAction(int index)
 
 
 	//TO BE CONTINUED.....
-	if (type == ACTIONTYPE::STEP_FORWARD)
+	if (type == ACTIONTYPE::AT_STEP_FORWARD)
 	{
 
 	}
-	if (type == ACTIONTYPE::STEP_BACK)
+	if (type == ACTIONTYPE::AT_STEP_BACK)
 	{
 
 	}
@@ -156,13 +159,12 @@ void MainController::processUserInput()
 	Controller::constructActiveActions();
 
 	//if there are no active_actions
-	if (active_actions.empty())
+	if (active_actionkeys.empty())
 	{
-		active_actions.push_back(action_keys[0].action);				//add the idle/not-active action
+		active_actionkeys.push_back(action_keys[0]);				//add the idle/not-active action
 		this->num_of_active_actions++;
 	}
 
 	//at last, trigger all active_actions
 	MainController::triggerActiveActions();
-
 }

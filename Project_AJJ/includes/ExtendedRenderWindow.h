@@ -1,6 +1,7 @@
 #pragma once
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <SFML/Window/Mouse.hpp>
 #include "TextureAtlas.h"
 #include "TextureIds.h"
 #include "TextureManager.h"
@@ -32,16 +33,32 @@ public:
 	void setActiveScene(Scene* scene);
 	void setTextureManager(TextureManager* tex_mag);
 	
-	//Etc
+	/*Etc*/
 	//Draws a frame of the active Scene-object.
 	void drawActiveScene();
-	void deactivateWindow() { this->window_state = false; }
-	void activateWindow() { this->window_state = true; }
-	void drawButton(Button * button);
+	//draw a button on the screen
+	void drawButton(Object * btn);
+	//draw an object on the screen
+	void drawObject(Object* obj);
+	//draw the layouts and all of the layouts contained inside
 	void drawLayouts(Layout* parent_layout);
+	//draw a specific layout
 	void drawLayout(Layout* layout);
+	//debug view for the layout. Draws the layout and the contained margin_spaces
 	void drawLayoutsDEBUG(Layout* layout);
+
+	//adds a layout to the vector of layouts in the window
 	void addLayout(Layout* new_layout) { this->layouts.push_back(new_layout); }
+
+	//deactivates the window
+	void deactivateWindow() { this->window_state = false; }
+	//activates the window
+	void activateWindow() { this->window_state = true; }
+
+	//returns true or false if the cursor is over the rect
+	bool cursorHover(sf::FloatRect rect);
+	//returns a vector of rects that the cursor is hovering from a set of rects
+	std::vector<sf::FloatRect> cursorHoverRects(std::vector<sf::FloatRect> rects);
 	
 private:
 	Scene* active_scene = nullptr;							//Active Scene-object.
@@ -58,7 +75,6 @@ private:
 
 	// Debugging.
 	bool debugger_mode = false;
-	// Debugging.
 	void debugDraw();
 	// End debugging.
 };

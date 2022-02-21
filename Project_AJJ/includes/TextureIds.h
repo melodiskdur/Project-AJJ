@@ -14,5 +14,6 @@ enum class TEXTURE_ID
 	JUMP,
 	FALL,
 	ATTACK,
-	HOVER
+	HOVER,
+	PRESSED
 };

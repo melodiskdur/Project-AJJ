@@ -45,6 +45,7 @@ enum SCENE_DENOTATION
 	the Scene as generalized as possible, creating opportunity to derive many different Scene types
 	(maps, menu screens, cutscenes etc).
 */
+
 class Scene
 {
 public:
