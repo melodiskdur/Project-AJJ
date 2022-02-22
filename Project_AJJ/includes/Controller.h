@@ -9,11 +9,13 @@
 Base class for controlling the object ingame.
 */
 
-struct ActionKey
+struct ActionNode
 {
 	std::vector<sf::Keyboard::Key> keys;		//the key or key-combination that trigger the action
 	sf::Mouse::Button mouse_button;				//the mouse button that trigger the action
-	Action* action;								//the action to be triggered
+	Action* action = nullptr;					//the action to be triggered
+	Object* obj = nullptr;						//the object related to the action
+	int id;										//action_key identifier
 };
 
 class Controller
@@ -24,11 +26,9 @@ public:
 
 	/*Other*/
 	//looks at the input from mouse and keyoboard and construct a priority-vector of actions to be triggered
-	std::vector<ActionKey> constructActiveActions();
+	std::vector<ActionNode> constructActiveActions();
 	//trigger the actions in the active_action-vector constructed by constructActiveActions()
 	void triggerActiveActions();
-	//Experimental!!
-	void breakMovement(int hori_move, int vert_move, float break_value);
 	//process the user input from keyboard and mouse. Uses constructActiveActions() 
 	//in combination with the triggerActiveActions().
 	void processUserInput();
@@ -38,6 +38,8 @@ public:
 	void bindActionToKey(Action* action, std::vector<sf::Keyboard::Key> keys);
 	//binds an action to a mouse button
 	void bindActionToMouseButton(Action* action, sf::Mouse::Button button);
+	//binds an action to a mouse button
+	void bindActionToMouseButton(Action* action, Object* obj, sf::Mouse::Button button);
 	//deacativate the controller
 	void deactivateController() { this->controller_state = false; };
 	//activate the controller
@@ -45,25 +47,29 @@ public:
 	//corrects the objects movement depending on its direction. Calling thhis prevents the object
 	//from traveling faster on the diagonal.
 	void correctMovement();
-	//check if the actionkeys are identical
-	bool sameActionKey(ActionKey ak1, ActionKey ak2);
+	//check if the actionnodes are identical
+	bool sameActionnode(ActionNode actionnode_1, ActionNode actionnode_2);
 
 	/*Setters*/
 	void setWindow(ExtendedRenderWindow* scene);
 	void setObject(Object* obj);
-	void setNumOfActiveActions(int i) { this->num_of_active_actions = i; };
 
 	/*Getters*/
 	bool getControllerState() { return this->controller_state; };
 	Object* getObject() { return obj; };
-	std::vector<ActionKey> getActiveActionKeys() { return this->active_actionkeys; };
-	int getNumOfActiveActions() { return this->num_of_active_actions; };
+	std::vector<ActionNode> getActiveActionnodes() { return this->active_actionnodes; };
+	int getNumActiveActionnodes() { return this->num_active_actionnodes; };
+	int getNumActionnodes() { return this->num_actionnodes; };
 
 protected:
 	Object * obj = nullptr;						//the object connected to the controller
-	std::vector<ActionKey> action_keys;			//all action+keys combinations
-	int num_of_active_actions = 0;				//the number of active actions
-	std::vector<ActionKey> active_actionkeys;	//actionkeys currently activated by user
+
+	std::vector<ActionNode> actionnodes;			//all action+keys combinations
+	int num_actionnodes = 0;						//the number of actionnodes
+
+	std::vector<ActionNode> active_actionnodes;	//actionnodes currently activated by user
+	int num_active_actionnodes = 0;				//the number of active actions
+
 	bool controller_state = true;				//activated/deactivated i.e. in use or not in use
 
 	sf::Vector2f original_view_size;			//the original view_size

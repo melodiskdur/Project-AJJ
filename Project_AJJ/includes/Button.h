@@ -26,6 +26,7 @@ public:
 	void setText(sf::Text button_text) { this->button_text = button_text; }
 	void setText(int char_size, sf::Text::Style text_style, sf::Color text_color, std::string text_string);
 	void setTextString(std::string text_string);
+
 	void setDefaultFrame(Frame default_frame) { this->default_frame = default_frame; }
 	void setHoverFrame(Frame hover_frame) { this->hover_frame = hover_frame; }
 	void setPressedFrame(Frame pressed_frame) { this->pressed_frame = pressed_frame; }
@@ -37,11 +38,11 @@ public:
 
 private:
 	//Parameters
-	sf::Font button_font;
-	sf::Text button_text;
-	Frame default_frame;
-	Frame hover_frame;
-	Frame pressed_frame;
-	
+	sf::Font button_font;			//font for the text
+	sf::Text button_text;			//text string
+
+	Frame default_frame;			//the default frame
+	Frame hover_frame;				//the frame when the cursor is hovering the button
+	Frame pressed_frame;			//the frame when the button is pressed
 
 };

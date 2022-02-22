@@ -22,7 +22,7 @@ Button::Button(sf::Vector2f button_pos, sf::Vector2f button_size, std::string te
 	new_frame.texture_id = TEXTURE_ID::IDLE;
 	new_frame.frame_index = 0;
 	new_frame.duration = 0;
-	this->setCurrentFrame(new_frame);
+	this->Object::setCurrentFrame(new_frame);
 	//END DEBUGGING
 }
 

@@ -12,6 +12,7 @@ Hitbox::~Hitbox()
 {
 
 }
+
 std::vector<ObjectData> Hitbox::separateHitboxes(Object* i, Object* j)
 {
 	sf::Vector2f wp_i = i->getWorldPosition();
@@ -99,6 +100,7 @@ std::vector<ObjectData> Hitbox::separateHitboxes(Object* i, Object* j)
 	// Return the collected data.
 	return wp_and_vel_re;
 }
+
 ObjectData Hitbox::singleObjectSeparation(Object* moving, Object* other)
 {
 	// Return value.

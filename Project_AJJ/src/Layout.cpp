@@ -111,8 +111,10 @@ void Layout::setPositionForAll(sf::Vector2f new_pos)
 	//set the new position
 	setPosition(new_pos);
 
-	//return if there are no layouts
-	if (this->num_layouts == 0) return;
+	for (auto& obj : this->objects)
+	{
+		obj->setWorldPosition({ obj->getWorldPosition().x + move_dist.x, obj->getWorldPosition().y + move_dist.y });
+	}
 
 	//finally, use recursion to move all of the layouts inside of this one
 	for (auto& child_layout : this->layouts)
@@ -216,72 +218,93 @@ void Layout::addObject(Object* new_object)
 
 void Layout::placeLayouts()
 {
-	//check if this layout contain any layouts. If no layouts exist, return.
-	if (this->num_layouts == 0) { return; }
+	//if this is the base-layout
+	if (this->parent_layout == nullptr)
+	{
+		//DO SOMETHING...maybe
+	}
+
+	//place all of the available objects
+	this->placeLayoutObjects();
 
 	//loop all "child"-layouts to be placed inside of this layout
 	for (auto& l : this->layouts)
 	{
 		//set ideal positioning depending on the layout-placement
-		l->setIdealPosition();
+		l->setLayoutIdealPosition();
 
 		//calculate and set the bestplacement for the layout within th margin_spaces
 		l->setBestLayoutPlacement();
 
 		//update the parent-layouts margin_spaces to match with the newly placed layout
 		//the parent_layout is in this case "this"
-		l->updateParentMarginSpaces();
+		l->updateParentMarginSpaces(l->getTotalRect(),this);
 
-		         //use recursion to place the layouts inside of layout l
+		//use recursion to place the layouts inside of layout l
 		//this way, we place every layout available inside of the whole "base"-layout
 		l->placeLayouts();
 	}
 }
 
-void Layout::setIdealPosition()
+void Layout::placeLayoutObjects()
 {
+	//loop all of the objects and place them
+	for (auto& obj : this->objects)
+	{
+		//set the ideal object_placement inside of this layout
+		this->setObjectIdealPosition(obj);
 
-	sf::Vector2f pl_pos = this->parent_layout->getPosition();							//the parentlayouts position
-	sf::Vector2f pl_size = this->parent_layout->getSize();								//the parentlayouts size
+		//set the best placement along what is available 
+		//from the margin_spaces and is closest to the ideal position
+		this->setBestObjectPlacement(obj);
+
+		//update all of the margin_spaces so that the placed object dont overlap
+		this->updateParentMarginSpaces(obj->getFloatRect(), this);
+	}
+}
+
+void Layout::setLayoutIdealPosition()
+{
+	sf::FloatRect pl_rect = this->parent_layout->getRect();			//the rect for the parent_layout
 
 	//TOP
 	if (this->layout_placement == LAYOUT_PLACEMENT::LP_TOP_CENTERED)
 	{
-		this->setPositionForAll({ pl_pos.x + (pl_size.x / 2) - (this->rect.width / 2), pl_pos.y });
+		this->setPosition({ pl_rect.left + (pl_rect.width / 2) - (this->rect.width / 2), pl_rect.top });
 	}
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_TOP_LEFT)
 	{
-		this->setPositionForAll(pl_pos);
+		this->setPosition({ pl_rect.left,pl_rect.top });
 	}
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_TOP_RIGHT)
 	{
-		this->setPositionForAll({ pl_pos.x + pl_size.x - this->rect.width , pl_pos.y });
+		this->setPosition({ pl_rect.left + pl_rect.width - this->rect.width , pl_rect.top });
 	}
 	//BOTTOM
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_BOTTOM_CENTERED)
 	{
-		this->setPositionForAll({ pl_pos.x + (pl_size.x / 2) - (this->rect.width / 2) , pl_pos.y + pl_size.y - this->rect.height });
+		this->setPosition({ pl_rect.left + (pl_rect.width / 2) - (this->rect.width / 2) , pl_rect.top + pl_rect.height - this->rect.height });
 	}
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_BOTTOM_LEFT)
 	{
-		this->setPositionForAll({ pl_pos.x , pl_pos.y + pl_size.y - this->rect.height });
+		this->setPosition({ pl_rect.left , pl_rect.top + pl_rect.height - this->rect.height });
 	}
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_BOTTOM_RIGHT)
 	{
-		this->setPositionForAll({ pl_pos.x + pl_size.x - this->rect.width , pl_pos.y + pl_size.y - this->rect.height });
+		this->setPosition({ pl_rect.left + pl_rect.width - this->rect.width , pl_rect.top + pl_rect.height - this->rect.height });
 	}
 	//CENTERED
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_CENTERED_LEFT)
 	{
-		this->setPositionForAll({ pl_pos.x , pl_pos.y + (pl_size.y / 2) - (this->rect.height / 2) });
+		this->setPosition({ pl_rect.left , pl_rect.top + (pl_rect.height / 2) - (this->rect.height / 2) });
 	}
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_CENTERED_RIGHT)
 	{
-		this->setPositionForAll({ pl_pos.x + pl_size.x - this->rect.width , pl_pos.y + (pl_size.y / 2) - (this->rect.height / 2) });
+		this->setPosition({ pl_rect.left + pl_rect.width - this->rect.width , pl_rect.top + (pl_rect.height / 2) - (this->rect.height / 2) });
 	}
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_CENTERED)
 	{
-		this->setPositionForAll({ pl_pos.x + (pl_size.x / 2) - (this->rect.width / 2) , pl_pos.y + (pl_size.y / 2) - (this->rect.height / 2) });
+		this->setPosition({ pl_rect.left + (pl_rect.width / 2) - (this->rect.width / 2) , pl_rect.top + (pl_rect.height / 2) - (this->rect.height / 2) });
 	}
 	//CUSTOM and NONE
 	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_CUSTOM)
@@ -295,6 +318,64 @@ void Layout::setIdealPosition()
 	}
 }
 
+void Layout::setObjectIdealPosition(Object * obj)
+{
+	if (!(this->num_objects > 0)) return;
+
+	sf::FloatRect pl_rect = this->getRect();			//the rect for the parent_layout
+	sf::FloatRect obj_rect = obj->getFloatRect();
+
+	//TOP
+	if (this->objects_placement == LAYOUT_PLACEMENT::LP_TOP_CENTERED)
+	{
+		obj->setWorldPosition({ pl_rect.left + (pl_rect.width / 2) - (obj_rect.width / 2), pl_rect.top });
+	}
+	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_TOP_LEFT)
+	{
+		obj->setWorldPosition({ pl_rect.left,pl_rect.top });
+	}
+	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_TOP_RIGHT)
+	{
+		obj->setWorldPosition({ pl_rect.left + pl_rect.width - obj_rect.width , pl_rect.top });
+	}
+	//BOTTOM
+	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_BOTTOM_CENTERED)
+	{
+		obj->setWorldPosition({ pl_rect.left + (pl_rect.width / 2) - (obj_rect.width / 2) , pl_rect.top + pl_rect.height - obj_rect.height });
+	}
+	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_BOTTOM_LEFT)
+	{
+		obj->setWorldPosition({ pl_rect.left , pl_rect.top + pl_rect.height - this->rect.height });
+	}
+	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_BOTTOM_RIGHT)
+	{
+		obj->setWorldPosition({ pl_rect.left + pl_rect.width - obj_rect.width , pl_rect.top + pl_rect.height - obj_rect.height });
+	}
+	//CENTERED
+	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_CENTERED_LEFT)
+	{
+		obj->setWorldPosition({ pl_rect.left , pl_rect.top + (pl_rect.height / 2) - (obj_rect.height / 2) });
+	}
+	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_CENTERED_RIGHT)
+	{
+		obj->setWorldPosition({ pl_rect.left + pl_rect.width - obj_rect.width , pl_rect.top + (pl_rect.height / 2) - (obj_rect.height / 2) });
+	}
+	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_CENTERED)
+	{
+		obj->setWorldPosition({ pl_rect.left + (pl_rect.width / 2) - (obj_rect.width / 2) , pl_rect.top + (pl_rect.height / 2) - (obj_rect.height / 2) });
+	}
+	//CUSTOM and NONE
+	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_CUSTOM)
+	{
+		//continue with the given position
+	}
+	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_NONE)
+	{
+		//no position has been given
+		//could be useful when implementing a drag and drop i.e. in hand/not placed
+	}
+}
+
 void Layout::setBestLayoutPlacement()
 {
 	/*This function calculates the best possible placement for this layout.
@@ -302,7 +383,7 @@ void Layout::setBestLayoutPlacement()
 	in some cases its ideal position. This function then look at all of the available
 	margin_spaces that it can be placed inside of and finds the closest possible position*/
 
-	sf::FloatRect layout = getTotalRect();										//the whole layout, including padding and margins
+	sf::FloatRect layout = this->getTotalRect();								//the whole layout, including padding and margins
 	float distance_to_ideal_pos = 9999999;										//sentinel value for the distance to the ideal placement
 	sf::Vector2f adjusted_placement;											//the final adjusted postion. This layouts position will be set to this value at the end
 
@@ -328,13 +409,42 @@ void Layout::setBestLayoutPlacement()
 
 	}
 
-	this->setPositionForAll(correctPosition(adjusted_placement));
+	this->setPosition(correctPosition(adjusted_placement));
 }
 
-void Layout::updateParentMarginSpaces()
+void Layout::setBestObjectPlacement(Object* obj)
 {
-	sf::FloatRect layout = this->getTotalRect();						//the whole layout, including padding and margins
+	sf::FloatRect obj_rect = obj->getFloatRect();								//the whole layout, including padding and margins
+	float distance_to_ideal_pos = 9999999;										//sentinel value for the distance to the ideal placement
+	sf::Vector2f adjusted_placement;											//the final adjusted postion. This layouts position will be set to this value at the end
 
+	for (auto& ms : this->getMarginSpaces())
+	{
+		//check if the layout can fit inside the margin_space
+		if (possibleFit(ms, obj_rect))
+		{
+			//calculate adjusted new position inside of the margin_space
+			sf::Vector2f new_pos = fitInside(ms, obj_rect);
+
+			//calculate the distance to the ideal position
+			float d_new = distance(new_pos, { obj_rect.left, obj_rect.top });
+
+			//if that placement currently is the best option for the layout
+			if (d_new < distance_to_ideal_pos)
+			{
+				//update adjusted placement position
+				distance_to_ideal_pos = d_new;
+				adjusted_placement = new_pos;
+			}
+		}
+
+	}
+
+	obj->setWorldPosition(adjusted_placement);
+}
+
+void Layout::updateParentMarginSpaces(sf::FloatRect rect, Layout * layout)
+{
 	int index = 0;
 	//index % 4 = 0 -> treat the margin as a top_margin. DECREASE HEIGHT
 	//index % 4 = 1 -> treat the margin as a right_margin. INCREASE LEFT-POSITION AND DECREASE WIDTH
@@ -342,19 +452,19 @@ void Layout::updateParentMarginSpaces()
 	//index % 4 = 3 -> treat the margin as a left_margin. DECREASE WIDTH
 
 	//loop all of the parent_layout's margin_spaces
-	for (auto& ms : this->parent_layout->getMarginSpaces())
+	for (auto& ms : layout->getMarginSpaces())
 	{
 		
 		sf::FloatRect instersect_area;
-		if (ms.intersects(layout, instersect_area))
+		if (ms.intersects(rect, instersect_area))
 		{
 			//positive diff: rect's left/right side is to the right of margin_space's left/right side.
-			float right_diff = (layout.left + layout.width) - (ms.left + ms.width);
-			float left_diff = layout.left - ms.left;
+			float right_diff = (rect.left + rect.width) - (ms.left + ms.width);
+			float left_diff = rect.left - ms.left;
 
 			//positive diff: rect's top/bottom side is below the margin_space's top/bottom side.
-			float bottom_diff = (layout.top + layout.height) - (ms.top + ms.height);
-			float top_diff = layout.top - ms.top;
+			float bottom_diff = (rect.top + rect.height) - (ms.top + ms.height);
+			float top_diff = rect.top - ms.top;
 
 			int no_adjustment = 1;								//check if an adjustment were made
 
@@ -381,13 +491,13 @@ void Layout::updateParentMarginSpaces()
 					}
 					else if (right_diff < 0)
 					{
-						ms.left = layout.left + layout.width;
+						ms.left = rect.left + rect.width;
 						ms.width = -right_diff;
 						no_adjustment = 0;
 					}
 					else if (bottom_diff < 0)
 					{
-						ms.top = layout.top + layout.height;
+						ms.top = rect.top + rect.height;
 						ms.height = -bottom_diff;
 						no_adjustment = 0;
 					}
@@ -400,7 +510,7 @@ void Layout::updateParentMarginSpaces()
 				//check if right-adjustment is possible
 				if (right_diff < 0)
 				{
-					ms.left = layout.left + layout.width;
+					ms.left = rect.left + rect.width;
 					ms.width = -right_diff;
 					no_adjustment = 0;
 				}
@@ -411,7 +521,7 @@ void Layout::updateParentMarginSpaces()
 
 					if (bottom_diff < 0)
 					{
-						ms.top = layout.top + layout.height;
+						ms.top = rect.top + rect.height;
 						ms.height = -bottom_diff;
 						no_adjustment = 0;
 					}
@@ -434,7 +544,7 @@ void Layout::updateParentMarginSpaces()
 				//check if bottom-adjustment is possible
 				if (bottom_diff < 0)
 				{
-					ms.top = layout.top + layout.height;
+					ms.top = rect.top + rect.height;
 					ms.height = -bottom_diff;
 					no_adjustment = 0;
 				}
@@ -445,7 +555,7 @@ void Layout::updateParentMarginSpaces()
 
 					if (right_diff < 0)
 					{
-						ms.left = layout.left + layout.width;
+						ms.left = rect.left + rect.width;
 						ms.width = -right_diff;
 						no_adjustment = 0;
 					}
@@ -484,13 +594,13 @@ void Layout::updateParentMarginSpaces()
 					}
 					else if (bottom_diff < 0)
 					{
-						ms.top = layout.top + layout.height;
+						ms.top = rect.top + rect.height;
 						ms.height = -bottom_diff;
 						no_adjustment = 0;
 					}
 					else if (right_diff < 0)
 					{
-						ms.left = layout.left + layout.width;
+						ms.left = rect.left + rect.width;
 						ms.width = -right_diff;
 						no_adjustment = 0;
 					}
@@ -499,7 +609,7 @@ void Layout::updateParentMarginSpaces()
 		
 			// Update the margin_rect's floatrect. 
 			// The ms is in this case not updated by the operations above. This step is necessary
-			this->parent_layout->setMarginSpaceRect(ms,index);
+			layout->setMarginSpaceRect(ms,index);
 		}
 
 		index++;
@@ -510,7 +620,7 @@ void Layout::resetMarginSpaces()
 {
 	//resturn if this layout dont contain any other layouts
 	//if so, the margin_spaces havent changed
-	if (this->num_layouts == 0) return;
+	if (this->num_layouts == 0 && this->num_objects == 0) return;
 
 	//loop all margin_spaces and reset them
 	for (auto& ms : this->margin_spaces)

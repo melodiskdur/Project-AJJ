@@ -77,19 +77,10 @@ void ExtendedRenderWindow::drawActiveScene()
 		if (this->debugger_mode)
 			this->debugDraw();
 
-		//DEBUGGING
-		this->drawLayouts(this->layouts[0]);
-		//this->drawLayoutsDEBUG(this->layouts[0]);
-		
-		//check if we have any buttons
-		if (this->layouts[0]->getNumButtons() > 0)
-		{
-			//draw a button(test)
-			this->drawButton(this->layouts[0]->getObjects()[0]);
-		}
-			
-		//END DEBUGGING
-		
+		//draw oall of the available layouts
+		for(auto& l : this->layouts)
+			this->drawLayouts(l);
+	
 		// end the current frame. Display all changes
 		this->display();
 	}
@@ -123,33 +114,30 @@ void ExtendedRenderWindow::drawActiveScene()
 	}
 }
 
-void ExtendedRenderWindow::drawButton(Object* btn)
+void ExtendedRenderWindow::drawLayoutObject(Object* obj)
 {
-	//DEBUGGING
-	//Extract sprite from region
-	Button* button = (Button*)btn;
-	/*
-	sf::RectangleShape rect(button->getSize());
-	rect.setPosition(button->getWorldPosition());*/
-	sf::Sprite btn_sprite;
-	btn_sprite = this->texture_manager->getAtlas(button->getTextureName())->getSprite(button->getCurrentFrame().texture_id, button->getCurrentFrame().region_name, button->getCurrentFrame().frame_index);
-	btn_sprite.setPosition(button->getWorldPosition());
-	btn_sprite.setScale(button->getSize().x / btn_sprite.getLocalBounds().width, button->getSize().y / btn_sprite.getLocalBounds().height);
-	this->draw(btn_sprite);
+	//BUTTON
+	if (obj->getClassId() == "button")
+	{
+		//cast it as a Button *
+		Button* button = (Button*)obj;
 
-	/*
-	TextureAtlas* atlas = this->texture_manager->getAtlas(btn->getTextureName());
-	sf::Sprite button_sprite = atlas->getSprite(btn->getCurrentFrame().texture_id, btn->getCurrentFrame().region_name, btn->getCurrentFrame().frame_index);
+		//get the sprite associated with the button
+		sf::Sprite btn_sprite;
+		btn_sprite = this->texture_manager->getAtlas(button->getTextureName())->getSprite(button->getCurrentFrame().texture_id, button->getCurrentFrame().region_name, button->getCurrentFrame().frame_index);
+		
+		//adjust its position and scaling to fit inside of the object
+		btn_sprite.setPosition(button->getWorldPosition());
+		btn_sprite.setScale(button->getSize().x / btn_sprite.getLocalBounds().width, button->getSize().y / btn_sprite.getLocalBounds().height);
 
-	//Set position and correct its scaling
-	button_sprite.setPosition(btn->getWorldPosition());
-	button_sprite.setScale(btn->getSize().x/ button_sprite.getLocalBounds().width, btn->getSize().y / button_sprite.getLocalBounds().height);
+		//at last, draw the sprite
+		this->draw(btn_sprite);
+	}
+	//DEFAULT OBJECT
+	else if (obj->getClassId() == "default")
+	{
 
-	//Draw the button sprite
-	this->draw(button_sprite);
-	*/
-
-	//END DEBUGGING
+	}
 }
 
 void ExtendedRenderWindow::drawObject(Object* obj)
@@ -162,22 +150,31 @@ void ExtendedRenderWindow::drawLayouts(Layout* parent_layout)
 	//check if we need to adjust its position depending on the camera view
 	if (parent_layout->getfixedToView() == true)
 	{
-		//DEBUGGING
-		//Currently it fixates the layout to the center of the screen
+		//get the viewRect of the camera
 		sf::FloatRect cam_rect = this->getActiveScene()->getCamera()->getCameraViewRect();
+
+		//update the position for the parent_layout and all of its children
+		//the parent_layout will be centered and everything else will be adjusted accordingly
 		parent_layout->setPositionForAll({ cam_rect.left + (cam_rect.width / 2) - (parent_layout->getRect().width / 2),
 							cam_rect.top + (cam_rect.height / 2) - (parent_layout->getRect().height / 2) });
-		//END DEBUGGING
+
 	}
 
 	//draw the layout
 	drawLayout(parent_layout);
 
+	//check if we have any objects in the layout
+	for(auto& layout_obj : parent_layout->getObjects())
+	{
+		//draw a button
+		this->drawLayoutObject(layout_obj);
+	}
+
 	//loop all child-layouts
-	for (auto& l : parent_layout->getLayouts())
+	for (auto& child_layout : parent_layout->getLayouts())
 	{
 		//recursion(draw the child-layout's children, grandchildren etc.)
-		this->drawLayouts(l);
+		this->drawLayouts(child_layout);
 	}
 }
 
