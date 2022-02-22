@@ -113,7 +113,7 @@ std::vector<ActionNode> Controller::constructActiveActions()
 		if (action_state)
 		{
 			//DEBUGGING
-			std::cout << a_node.action->getActionName() << std::endl;
+			//std::cout << a_node.action->getActionName() << std::endl;
 			//END DEBUGGING
 
 			//check if we want to add the actions to the active_action vector
