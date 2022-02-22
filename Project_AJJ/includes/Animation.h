@@ -39,6 +39,7 @@ public:
 
 	void updateAnimation();
 
+	static unsigned int instanceCount() { return instance_counter; };
 private:
 	std::vector<Frame> frames;			//a collection of frames
 	int active_frame_index = 0;
@@ -49,6 +50,7 @@ private:
 
 	static sf::Clock animation_clock;
 
+	static unsigned int instance_counter;
 protected:
 
 };

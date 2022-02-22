@@ -1,17 +1,15 @@
 #include "Scene.h"
 
+unsigned int Scene::instance_counter = 0;
+
 Scene::Scene()
 {
+	Scene::instance_counter++;
 	// Create the main Scene-layer.
 	this->addSceneLayer(new SceneLayer(0, 1.f, 1.f));
 }
 
-Scene::~Scene()
-{
-	for (Object* o : scene_objects)
-		delete o;
-	std::cout << "Scene deleted" << std::endl;
-}
+Scene::~Scene() { Scene::instance_counter--; for (SceneLayer* L : this->scene_layers) delete L; }
 
 //Getters
 Camera* Scene::getCamera()

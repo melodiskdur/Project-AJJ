@@ -1,18 +1,21 @@
 #include "SceneLayer.h"
 
+unsigned int SceneLayer::instance_counter = 0;
+
 /* * * * * * * * * * * * * * * * *  * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                    SceneLayer                                    *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
-SceneLayer::SceneLayer(int layer_num) { this->layer_num = layer_num; }
+SceneLayer::SceneLayer() { SceneLayer::instance_counter++; }
+SceneLayer::SceneLayer(int layer_num) : SceneLayer() { this->layer_num = layer_num; }
 
-SceneLayer::SceneLayer(int layer_num, float depth, float scale)
+SceneLayer::SceneLayer(int layer_num, float depth, float scale) : SceneLayer()
 {
     this->layer_num = layer_num;
     this->setDepth(depth);
     this->setScale(scale);
 }
 
-SceneLayer::~SceneLayer() {}
+SceneLayer::~SceneLayer() { SceneLayer::instance_counter--; for (Object* o : this->layer_objects) delete o; }
 
 std::vector<Object*> SceneLayer::getLayerObjectsWithinView(sf::FloatRect view_rect)
 {
@@ -71,7 +74,7 @@ StaticInteractiveLayer::StaticInteractiveLayer(int layer_num) : SceneLayer(layer
 
 StaticInteractiveLayer::StaticInteractiveLayer(int layer_num, float scale, float depth) : SceneLayer(layer_num, depth, scale) { }
 
-StaticInteractiveLayer::~StaticInteractiveLayer() { }
+StaticInteractiveLayer::~StaticInteractiveLayer() {}
 
 std::vector<Object*> StaticInteractiveLayer::getLayerObjectsWithinView(sf::FloatRect view_rect)
 {

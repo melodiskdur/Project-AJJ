@@ -1,16 +1,19 @@
 #include "Camera.h"
 
+unsigned int Camera::instance_counter = 0;
+
 Camera::Camera()
 {
+	Camera::instance_counter++;
 	camera_view = new sf::View(sf::Vector2f(400, 300), sf::Vector2f(800, 600));
 	camera_position = camera_view->getCenter();
 	setCameraViewRect();
 }
 
-Camera::~Camera()
-{
-	delete camera_view;
-	std::cout << "Camera deleted" << std::endl;
+Camera::~Camera() 
+{ 
+	Camera::instance_counter--;
+	if (camera_view != nullptr){ delete camera_view; camera_view = nullptr;}
 }
 
 //Getters

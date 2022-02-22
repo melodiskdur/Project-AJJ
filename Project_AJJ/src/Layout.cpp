@@ -1,14 +1,14 @@
 #include "Layout.h"
 
+unsigned int Layout::instance_counter = 0;
+
 /*Constructors*/
 Layout::Layout()
 {
-	/*
-	Button* new_test_button = new Button(20, sf::Text::Bold, sf::Color(178,178,178,255), (std::string)"TEST" , {150,70}, {100,100});
-	this->buttons.push_back(new_test_button);*/
+	Layout::instance_counter++;
 }
 
-Layout::Layout(sf::FloatRect rect, sf::Vector2f padding, sf::Vector2f margin, LAYOUT_PLACEMENT layout_placement)
+Layout::Layout(sf::FloatRect rect, sf::Vector2f padding, sf::Vector2f margin, LAYOUT_PLACEMENT layout_placement) : Layout()
 {
 	this->rect = rect;
 	this->padding = padding;
@@ -20,9 +20,13 @@ Layout::Layout(sf::FloatRect rect, sf::Vector2f padding, sf::Vector2f margin, LA
 }
 
 /*Destructor*/
-Layout::~Layout()
-{
-
+Layout::~Layout() 
+{ 
+	Layout::instance_counter--; 
+	for (Object* o : this->objects)
+		delete o;
+	for (Layout* L : this->layouts)
+		delete L;
 }
 
 /*Getters*/

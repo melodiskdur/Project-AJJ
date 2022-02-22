@@ -82,5 +82,4 @@ TestMainControllerObject::TestMainControllerObject()
 
 TestMainControllerObject::~TestMainControllerObject()
 {
-
 }

@@ -1,12 +1,12 @@
 #include "TextureManager.h"
 
-TextureManager::TextureManager()
-{
+unsigned int TextureManager::instance_counter = 0;
 
-}
+TextureManager::TextureManager() { TextureManager::instance_counter++; }
 
 TextureManager::~TextureManager()
 {
+	TextureManager::instance_counter--;
 	for (int i = 0; i < atlases.size(); i++)
 	{
 		delete atlases[i];

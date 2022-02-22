@@ -70,6 +70,7 @@ public:
 	void updateSceneFrame();
 	std::vector<sf::View> getLayerManipulatedViews();
 
+	static unsigned int instanceCount() { return instance_counter; };
 private:
 	Camera* scene_camera = nullptr;											//the scenes camera
 	std::vector<Object*> scene_objects;										//the objects currently in the scene
@@ -82,4 +83,6 @@ private:
 	//Adds a layer into vector scene_layers and sorts it in descending order (layer.layer_num). Returns
 	//false if there already is a layer with the same layer_num.
 	bool addLayer(SceneLayer* layer);
+
+	static unsigned int instance_counter;
 };

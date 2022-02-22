@@ -8,7 +8,6 @@ MainController::MainController()
 
 MainController::~MainController()
 {
-
 }
 
 void MainController::activateController(Controller* controller)

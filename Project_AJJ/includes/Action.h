@@ -58,6 +58,7 @@ public:
 	//Others
 	void triggerAction();
 
+	static unsigned int instanceCount() { return instance_counter; };
 private:
 	std::string action_name;
 	ACTIONTYPE action_type = ACTIONTYPE::AT_IDLE;
@@ -67,5 +68,7 @@ private:
 
 	//Animation
 	Animation* animation = nullptr;		//An animation, sequence of sprites
+
+	static unsigned int instance_counter;
 };
 

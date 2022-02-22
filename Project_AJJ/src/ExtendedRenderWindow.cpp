@@ -1,15 +1,14 @@
 #include "ExtendedRenderWindow.h"
 
+unsigned int ExtendedRenderWindow::instance_counter = 0;
+
 ExtendedRenderWindow::ExtendedRenderWindow(sf::Vector2u resolution, std::string window_title, sf::ContextSettings settings)
 	: sf::RenderWindow(sf::VideoMode(resolution.x, resolution.y), window_title, sf::Style::Default, settings)
 {
-	
+	ExtendedRenderWindow::instance_counter++;
 }
 
-ExtendedRenderWindow::~ExtendedRenderWindow()
-{
-	std::cout << "ExtendedRenderWindow deleted" << std::endl;
-}
+ExtendedRenderWindow::~ExtendedRenderWindow() { ExtendedRenderWindow::instance_counter--; }
 
 //Getters
 Scene* ExtendedRenderWindow::getActiveScene()

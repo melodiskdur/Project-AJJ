@@ -13,11 +13,6 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size)
     Action* actionLeft = new Action;
     Action* actionRight = new Action;
     Action* attack = new Action;
-    
-    Action* speedUp = new Action;
-    Action* speedDown = new Action;
-    Action* speedLeft = new Action;
-    Action* speedRight = new Action;
 
     //increase speed by:
     this->velocity_inc = 2.0f;
@@ -50,30 +45,6 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size)
     attack->setActionType(ACTIONTYPE::AT_ATTACK);
     attack->setParentObject(this);
 
-    /*
-
-    speedUp->setActionName("SpeedUp");
-    speedUp->setParentObject(this);
-    speedUp->setActionType(ACTIONTYPE::AT_MOVE_UP);
-    speedUp->setParameterManipulation(2 * -velocity_inc);
-
-    speedDown->setActionName("SpeedDown");
-    speedDown->setParentObject(this);
-    speedDown->setActionType(ACTIONTYPE::AT_MOVE_DOWN);
-    speedDown->setParameterManipulation(2 * velocity_inc);
-
-    speedLeft->setActionName("SpeedLeft");
-    speedLeft->setParentObject(this);
-    speedLeft->setActionType(ACTIONTYPE::AT_MOVE_LEFT);
-    speedLeft->setParameterManipulation(-2 * velocity_inc);
-
-    speedRight->setActionName("SpeedRight");
-    speedRight->setParentObject(this);
-    speedRight->setActionType(ACTIONTYPE::AT_MOVE_RIGHT);
-    speedRight->setParameterManipulation(2 * velocity_inc);
-
-    */
-  
     //---------------Animation test---------------
     
     Animation* idle_anim = new Animation(TEXTURE_ID::IDLE, 0, 9, 200.0f);
@@ -88,6 +59,8 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size)
     Animation* atk_anim = new Animation(TEXTURE_ID::ATTACK, 0, 9, 50.0f);
     attack->setAnimation(atk_anim);
 
+    this->object_animations.insert(this->object_animations.begin(), {idle_anim, run_anim, atk_anim});
+
     //--------------------------------------------
 
     object_actions.push_back(idle);
@@ -96,13 +69,6 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size)
     object_actions.push_back(actionLeft);
     object_actions.push_back(actionRight);
     object_actions.push_back(attack);
-    
-    /*
-    object_actions.push_back(speedUp);
-    object_actions.push_back(speedDown);
-    object_actions.push_back(speedLeft);
-    object_actions.push_back(speedRight);
-    */
 
     // ---------------PhysicsAttribute test---------------
 
@@ -111,8 +77,6 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size)
     this->attributes.push_back("Air Friction");
 
     //--------------------------------------------
-
-	std::cout << "TestObject called\n";
 }
 
 TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size, bool npc)
@@ -135,7 +99,6 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size, bool npc)
     npc_frame.region_name = sf::String("Boss");
     this->setCurrentFrame(npc_frame);
 
-    std::cout << "TestObject called\n";
 }
 
 TestObject::~TestObject()

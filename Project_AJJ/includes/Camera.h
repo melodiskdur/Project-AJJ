@@ -40,7 +40,7 @@ public:
 	//Zoom out/in with the camera
 	void addOrSubCameraZoom(float zoom_factor);
 	
-
+	static unsigned int instanceCount() { return instance_counter; };
 private:
 	sf::View* camera_view;				// Display region.
 	sf::Vector2f camera_position;		// Camera central point within a scene.
@@ -48,5 +48,7 @@ private:
 	float current_zoom = 1;				// Default = 1. If z_f > 1, objects appear smaller.
 	float max_zoom = 2;					// Maximum allowed zoom.
 	Object* target_object = nullptr;	// Object to follow.
+
+	static unsigned int instance_counter;
 };
 

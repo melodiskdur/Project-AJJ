@@ -1,14 +1,15 @@
 #include "PhysicsManager.h"
 
-PhysicsManager::PhysicsManager(std::vector<Object*>& objects)
+unsigned int PhysicsManager::instance_counter = 0;
+
+PhysicsManager::PhysicsManager() { PhysicsManager::instance_counter++; }
+
+PhysicsManager::PhysicsManager(std::vector<Object*>& objects) : PhysicsManager()
 {
 	this->scene_objects = &objects;
 }
 
-PhysicsManager::~PhysicsManager()
-{
-
-}
+PhysicsManager::~PhysicsManager() { PhysicsManager::instance_counter--; }
 
 void PhysicsManager::addAttribute(PhysicsAttribute* attribute)
 {

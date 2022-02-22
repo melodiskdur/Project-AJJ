@@ -61,6 +61,7 @@ public:
 	int getNumActiveActionnodes() { return this->num_active_actionnodes; };
 	int getNumActionnodes() { return this->num_actionnodes; };
 
+	static unsigned int instanceCount() { return instance_counter; };
 protected:
 	Object * obj = nullptr;						//the object connected to the controller
 
@@ -75,6 +76,6 @@ protected:
 	sf::Vector2f original_view_size;			//the original view_size
 	ExtendedRenderWindow* window = nullptr;		//the main exteneded render window
 private:
-
+	static unsigned int instance_counter;
 };
 
