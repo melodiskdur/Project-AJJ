@@ -123,7 +123,11 @@ void ExtendedRenderWindow::drawLayoutObject(Object* obj)
 
 		//get the sprite associated with the button
 		sf::Sprite btn_sprite;
-		btn_sprite = this->texture_manager->getAtlas(button->getTextureName())->getSprite(button->getCurrentFrame().texture_id, button->getCurrentFrame().region_name, button->getCurrentFrame().frame_index);
+
+		//get the current frame in use for the button
+		Frame btn_cur_frm = button->getCurrentFrame();
+
+		btn_sprite = this->texture_manager->getAtlas(button->getTextureName())->getSprite(btn_cur_frm.texture_id, btn_cur_frm.region_name, btn_cur_frm.frame_index);
 		
 		//adjust its position and scaling to fit inside of the object
 		btn_sprite.setPosition(button->getWorldPosition());
@@ -131,6 +135,12 @@ void ExtendedRenderWindow::drawLayoutObject(Object* obj)
 
 		//at last, draw the sprite
 		this->draw(btn_sprite);
+
+		//center the text
+		button->centerText();
+
+		//draw the text
+		this->draw(button->getText());
 	}
 	//DEFAULT OBJECT
 	else if (obj->getClassId() == "default")
@@ -246,37 +256,6 @@ void ExtendedRenderWindow::drawLayout(Layout* layout)
 			this->draw(layout_sprite);
 		}
 	}
-}
-
-bool ExtendedRenderWindow::cursorHover(sf::FloatRect rect)
-{
-	//get the cursors position relative to the window
-	sf::Vector2i cursor_pos = sf::Mouse::getPosition(*this);
-
-	//map the coordinates to the current view
-	sf::Vector2f real_world_pos = this->mapPixelToCoords(cursor_pos);
-
-	//return true or false depending on if the cursor is contained in the rect
-	return (rect.contains(real_world_pos) ? true : false);
-}
-
-std::vector<sf::FloatRect> ExtendedRenderWindow::cursorHoverRects(std::vector<sf::FloatRect> rects)
-{
-	std::vector<sf::FloatRect> hovered_rects;		//the rects that the mouse is hovering
-
-	//loop all of the input rects
-	for (auto& rect : rects)
-	{
-		//if the cursor hovers the rect
-		if (cursorHover(rect))
-		{
-			//push it to the vector to be returned
-			hovered_rects.push_back(rect);
-		}
-	}
-
-	//at last, return all of the hovered rects
-	return hovered_rects;
 }
 
 //Private functions.

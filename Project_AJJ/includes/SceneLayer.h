@@ -2,6 +2,7 @@
 #include "SFML/Graphics.hpp"
 #include "SFML/System.hpp"
 #include "Object.h"
+#include "Layout.h"
 
 #define MIN_LAYER_DEPTH 0.01f
 #define MAX_LAYER_DEPTH 100.f
@@ -30,6 +31,7 @@ public:
 	SceneLayer(int layer_num);
 	SceneLayer(int layer_num, float depth, float scale);
 	virtual ~SceneLayer();
+
 	// Getters.
 	float getDepth() { return this->depth; };
 	float getScale() { return this->scale; };
@@ -37,10 +39,12 @@ public:
 	signed int getLayerNum() { return this->layer_num; };
 	std::vector<Object*> getLayerObjects() { return this->layer_objects; };
 	virtual std::vector<Object*> getLayerObjectsWithinView(sf::FloatRect view_rect);
+
 	// Setters.
 	void setDepth(float depth) { if (depth > MIN_LAYER_DEPTH && depth < MAX_LAYER_DEPTH) this->depth = depth; };
 	void setScale(float scale) { if (scale > 0) this->scale = scale; };
 	void setAngle(float angle) { if (angle > MIN_LAYER_ANGLE && angle < MAX_LAYER_ANGLE) this->angle = angle; };
+
 	// Other functions.
 	void toggleLayer(bool enabled) { this->enabled = enabled; };
 	bool isEnabled() { return this->enabled; };
@@ -50,12 +54,14 @@ public:
 	virtual void updateLayerObjects() {};
 
 	static unsigned int instanceCount() { return instance_counter; };
+
 protected:
 	std::vector<Object*> layer_objects;	// The contents of the SceneLayer.		
 	float depth = 1.f;					// How fast the layer should scroll in relation to the main layer. x > 1 slower. 0 < x < 1 faster. 
 	float scale = 1.f;					// How the contents should be rescaled in relation to how they would appear in the main layer.
 	float angle = 0.0f;					// The rotation of the layer in degrees.
 	bool enabled = true;				// Decides whether the layer is enabled for drawing/rendering or not.
+
 private:
 	signed int layer_num = 1;			// Rendering order. x = 0: Main layer (reserved). x > 0 background, x < 0 : foreground.
 

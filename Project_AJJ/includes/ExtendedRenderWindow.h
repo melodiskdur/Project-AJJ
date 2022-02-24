@@ -1,13 +1,11 @@
 #pragma once
 #include <iostream>
 #include <SFML/Graphics.hpp>
-#include <SFML/Window/Mouse.hpp>
 #include "TextureAtlas.h"
 #include "TextureIds.h"
 #include "TextureManager.h"
 #include "Scene.h"
-#include "Layout.h"
-#include "Button.h"
+
 
 /* ExtendedRenderWindow
 	Inherits from sf::RenderWindow. Contains additional functionality
@@ -54,11 +52,6 @@ public:
 	void deactivateWindow() { this->window_state = false; }
 	//activates the window
 	void activateWindow() { this->window_state = true; }
-
-	//returns true or false if the cursor is over the rect
-	bool cursorHover(sf::FloatRect rect);
-	//returns a vector of rects that the cursor is hovering from a set of rects
-	std::vector<sf::FloatRect> cursorHoverRects(std::vector<sf::FloatRect> rects);
 	
 	static unsigned int instanceCount() { return instance_counter; };
 private:
@@ -68,6 +61,9 @@ private:
 	std::vector<sf::RenderTexture*> scene_layer_textures;	//Off-screen rendering of the active scene's layers.
 	bool window_state = true;								//Activated/deactivated
 	std::vector<Layout*> layouts;							//Windows layouts(main_menu,side_menus,messages,etc.)
+
+	sf::Vector2f last_cursor_press_pos;						//the position of the last cursor press (press + relase = click)
+	sf::Vector2f last_cursor_release_pos;					//the position of the last cursor release (press + relase = click)
 
 	//Used internally to clear all RenderTextures in preparation for the next frame draw.
 	void clearSceneLayerTextures();

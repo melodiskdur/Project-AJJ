@@ -168,54 +168,41 @@ int main()
 	while (window.isOpen())
 	{
 		
-		//Start debugging
-		sf::Time framerate = clock.getElapsedTime();
-		clock.restart();
-		//End debugging
+		//DEBUGGING
+		//sf::Time framerate = clock.getElapsedTime();
+		//clock.restart();
+		//END DEBUGGING
 
 		//for closing the window
 		while (window.pollEvent(event))
 		{
-			if (event.type == sf::Event::KeyPressed)
-			{
-				//DEBUGGING
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Space))
-				{
-					window.getLayouts()[0]->setBorderSizeForAll({ window.getLayouts()[0]->getBorderSize().x + 1, window.getLayouts()[0]->getBorderSize().y + 1 });
-				}
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::BackSpace))
-				{
-					window.getLayouts()[0]->setBorderSizeForAll({ window.getLayouts()[0]->getBorderSize().x - 1, window.getLayouts()[0]->getBorderSize().y - 1 });
-				}
-				//END DEBUGGING
-			}
 			if (event.type == sf::Event::Closed)
 			{
 				window.close();
 			}	
 		}
 
+		//take and process the input for the main_controller
 		main_contr.processUserInput();
-		contr_player_1.processUserInput();
-		contr_player_2.processUserInput();
+
+		//take and process the input for the active player_controllers
+		for (Controller* player_contr : main_contr.getControllers())
+		{
+			player_contr->processUserInput();
+		}
 		
+		//draw the active_scene
 		window.drawActiveScene();
 
-
 		//DEBUGGING
-		
 		//window.getLayouts()[0]->setPositionForAll({ window.getLayouts()[0]->getPosition().x + 1 , window.getLayouts()[0]->getPosition().y + 1});
 		//window.getLayouts()[0]->setSize({ window.getLayouts()[0]->getSize().x + 2, window.getLayouts()[0]->getSize().y + 2});
 		//window.getLayouts()[0]->moveForAll({ 1,0 });
-		test_layout->resetMarginSpaces();
-		test_layout->placeLayouts();
-		
-		//END DEBUGGING
-		
-		//Start debugging
+		//test_layout->resetMarginSpaces();
+		//test_layout->placeLayouts();
 		//prints out the framerate
 		//std::cout << 1.0f / framerate.asSeconds() << std::endl;
-		//End debugging
+		//END DEBUGGING
 		
 	}
 	delete test_scene;

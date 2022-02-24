@@ -9,80 +9,12 @@ Layout* TestLayout::createTestLayout()
 
 	//base->children
 	test_layout->addLayout(sf::FloatRect(0, 0, 460, 60), sf::Vector2f(0, 0), sf::Vector2f(20, 20), LAYOUT_PLACEMENT::LP_TOP_CENTERED);
-	test_layout->addLayout(sf::FloatRect(0, 0, 210, 250), sf::Vector2f(0, 0), sf::Vector2f(20, 15), LAYOUT_PLACEMENT::LP_TOP_LEFT);
-	test_layout->addLayout(sf::FloatRect(0, 0, 210, 40), sf::Vector2f(0, 0), sf::Vector2f(20, 15), LAYOUT_PLACEMENT::LP_TOP_RIGHT);
-	test_layout->addLayout(sf::FloatRect(0, 0, 210, 40), sf::Vector2f(0, 0), sf::Vector2f(20, 15), LAYOUT_PLACEMENT::LP_TOP_RIGHT);
-	test_layout->addLayout(sf::FloatRect(0, 0, 210, 40), sf::Vector2f(0, 0), sf::Vector2f(20, 15), LAYOUT_PLACEMENT::LP_TOP_RIGHT);
-	test_layout->addLayout(sf::FloatRect(0, 0, 210, 40), sf::Vector2f(0, 0), sf::Vector2f(20, 15), LAYOUT_PLACEMENT::LP_TOP_RIGHT);
 
 	//base->children[0]->children
 	test_layout->getLayouts()[0]->addLayout(sf::FloatRect(0, 0, 440, 40), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED);
 
-	//base->children[1]->children
-	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 140, 30), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_TOP_LEFT);
-	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 140, 30), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_TOP_LEFT);
-	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 140, 30), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_TOP_LEFT);
-	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 140, 30), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_TOP_LEFT);
-	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 140, 30), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_TOP_LEFT);
-	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 30, 30), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_TOP_RIGHT);
-	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 30, 30), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_TOP_RIGHT);
-	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 30, 30), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_TOP_RIGHT);
-	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 30, 30), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_TOP_RIGHT);
-	test_layout->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 30, 30), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_TOP_RIGHT);
-
-	//base->children[2]->children
-	test_layout->getLayouts()[2]->addLayout(sf::FloatRect(0, 0, 190, 7), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_TOP_CENTERED);
-	test_layout->getLayouts()[2]->addLayout(sf::FloatRect(0, 0, 80, 5), sf::Vector2f(0, 0), sf::Vector2f(10, 0), LAYOUT_PLACEMENT::LP_TOP_LEFT);
-	test_layout->getLayouts()[2]->addLayout(sf::FloatRect(0, 0, 80, 5), sf::Vector2f(0, 0), sf::Vector2f(10, 0), LAYOUT_PLACEMENT::LP_TOP_RIGHT);
-
-	//base->children[3]->children
-	test_layout->getLayouts()[3]->addLayout(sf::FloatRect(0, 0, 190, 7), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_TOP_CENTERED);
-	test_layout->getLayouts()[3]->addLayout(sf::FloatRect(0, 0, 80, 5), sf::Vector2f(0, 0), sf::Vector2f(10, 0), LAYOUT_PLACEMENT::LP_TOP_LEFT);
-	test_layout->getLayouts()[3]->addLayout(sf::FloatRect(0, 0, 80, 5), sf::Vector2f(0, 0), sf::Vector2f(10, 0), LAYOUT_PLACEMENT::LP_TOP_RIGHT);
-
-	//base->children[4]->children
-	test_layout->getLayouts()[4]->addLayout(sf::FloatRect(0, 0, 190, 7), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_TOP_CENTERED);
-	test_layout->getLayouts()[4]->addLayout(sf::FloatRect(0, 0, 80, 5), sf::Vector2f(0, 0), sf::Vector2f(10, 0), LAYOUT_PLACEMENT::LP_TOP_LEFT);
-	test_layout->getLayouts()[4]->addLayout(sf::FloatRect(0, 0, 80, 5), sf::Vector2f(0, 0), sf::Vector2f(10, 0), LAYOUT_PLACEMENT::LP_TOP_RIGHT);
-
-	//base->children[5]->children
-	test_layout->getLayouts()[5]->addLayout(sf::FloatRect(0, 0, 190, 7), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_TOP_CENTERED);
-	test_layout->getLayouts()[5]->addLayout(sf::FloatRect(0, 0, 80, 5), sf::Vector2f(0, 0), sf::Vector2f(10, 0), LAYOUT_PLACEMENT::LP_TOP_LEFT);
-	test_layout->getLayouts()[5]->addLayout(sf::FloatRect(0, 0, 80, 5), sf::Vector2f(0, 0), sf::Vector2f(10, 0), LAYOUT_PLACEMENT::LP_TOP_RIGHT);
-
-	//base->children[1]->children[0]->child
-	test_layout->getLayouts()[1]->getLayouts()[0]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->getLayouts()[1]->getLayouts()[0]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->getLayouts()[1]->getLayouts()[0]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->getLayouts()[1]->getLayouts()[0]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-
-	//base->children[1]->children[1]->child
-	test_layout->getLayouts()[1]->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->getLayouts()[1]->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->getLayouts()[1]->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->getLayouts()[1]->getLayouts()[1]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-
-	//base->children[1]->children[2]->child
-	test_layout->getLayouts()[1]->getLayouts()[2]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->getLayouts()[1]->getLayouts()[2]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->getLayouts()[1]->getLayouts()[2]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->getLayouts()[1]->getLayouts()[2]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-
-	//base->children[1]->children[3]->child
-	test_layout->getLayouts()[1]->getLayouts()[3]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->getLayouts()[1]->getLayouts()[3]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->getLayouts()[1]->getLayouts()[3]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->getLayouts()[1]->getLayouts()[3]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-
-	//base->children[1]->children[4]->child
-	test_layout->getLayouts()[1]->getLayouts()[4]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->getLayouts()[1]->getLayouts()[4]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->getLayouts()[1]->getLayouts()[4]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	test_layout->getLayouts()[1]->getLayouts()[4]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
-	
-	
 	//this layout will be fixed and adjustment to be in the users view
-	//test_layout->setFixedToView(true);
+	test_layout->setFixedToView(true);
 
 	Frame new_frame;
 	new_frame.region_name = "LayoutBlock";
@@ -96,8 +28,8 @@ Layout* TestLayout::createTestLayout()
 	//test_layout->setBorderSizeForAll({ 10,10 });
 
 	//add a test-button
-	Button* btn = new Button({ 300,-100 }, { 20,12 });
-	Button* btn2 = new Button({ 300,-70 }, { 20,12 });
+	Button* btn = new Button({ 300,-100 }, { 80,40 });
+	Button* btn2 = new Button({ 300,-70 }, { 80,40 });
 
 	Frame def_btn;
 	def_btn.texture_id = TEXTURE_ID::IDLE;
@@ -129,21 +61,26 @@ Layout* TestLayout::createTestLayout()
 	btn2->setTextureName("MenuButtons");
 
 	Action* btn_prs = new Action;
-	btn_prs->setParameterManipulation(0.01f);
+	btn_prs->setParameterManipulation(-0.01f);
 	btn_prs->setActionName("ButtonPause");
 	btn_prs->setParentObject(btn);
-	btn_prs->setActionType(ACTIONTYPE::AT_PAUSE);
+	btn_prs->setActionType(ACTIONTYPE::AT_ZOOM_IN);
 
 	Action* btn_prs2 = new Action;
 	btn_prs2->setParameterManipulation(0.01f);
 	btn_prs2->setActionName("ButtonPlay");
 	btn_prs2->setParentObject(btn);
-	btn_prs2->setActionType(ACTIONTYPE::AT_PLAY);
+	btn_prs2->setActionType(ACTIONTYPE::AT_ZOOM_OUT);
 
 
 	btn->addAction(btn_prs);
 	btn2->addAction(btn_prs2);
 
+	btn->loadFont("../Project_AJJ/assets/ayar_takhu.ttf");
+	btn2->loadFont("../Project_AJJ/assets/ayar_takhu.ttf");
+	btn->setText(btn->getSize().x / 8, sf::Text::Style::Bold, sf::Color::White, "ZOOM IN");
+	btn2->setText(btn2->getSize().x / 8, sf::Text::Style::Bold, sf::Color::White, "ZOOM OUT");
+	
 	test_layout->getLayouts()[0]->getLayouts()[0]->addObject(btn);
 	test_layout->getLayouts()[0]->getLayouts()[0]->addObject(btn2);
 

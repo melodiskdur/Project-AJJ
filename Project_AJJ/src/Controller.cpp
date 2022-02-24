@@ -12,6 +12,19 @@ Controller::~Controller()
 	Controller::instance_counter--;
 }
 
+/*Setters*/
+void Controller::setWindow(ExtendedRenderWindow* window)
+{
+	this->window = window;
+	this->original_view_size = this->window->getActiveScene()->getCamera()->getCameraView()->getSize();
+}
+
+void Controller::setObject(Object* obj)
+{
+	this->obj = obj;
+}
+
+/*Bind action to input*/
 void Controller::bindActionToKey(Action* action, sf::Keyboard::Key key)
 {
 	ActionNode new_actionnode;
@@ -53,23 +66,39 @@ void Controller::bindActionToMouseButton(Action* action, Object* obj, sf::Mouse:
 	this->actionnodes.push_back(new_actionkey);
 }
 
-void Controller::setWindow(ExtendedRenderWindow* window)
+/*Cursor related*/
+bool Controller::cursorHover(sf::FloatRect rect)
 {
-	this->window = window;
-	this->original_view_size = this->window->getActiveScene()->getCamera()->getCameraView()->getSize();
+	//get the cursors position relative to the window
+	sf::Vector2i cursor_pos = sf::Mouse::getPosition(*this->window);
+
+	//map the coordinates to the current view
+	sf::Vector2f real_world_pos = this->window->mapPixelToCoords(cursor_pos);
+
+	//return true or false depending on if the cursor is contained in the rect
+	return (rect.contains(real_world_pos) ? true : false);
 }
 
-void Controller::setObject(Object* obj)
+std::vector<sf::FloatRect> Controller::cursorHoverRects(std::vector<sf::FloatRect> rects)
 {
-	this->obj = obj;
+	std::vector<sf::FloatRect> hovered_rects;		//the rects that the mouse is hovering
+
+	//loop all of the input rects
+	for (auto& rect : rects)
+	{
+		//if the cursor hovers the rect
+		if (cursorHover(rect))
+		{
+			//push it to the vector to be returned
+			hovered_rects.push_back(rect);
+		}
+	}
+
+	//at last, return all of the hovered rects
+	return hovered_rects;
 }
 
-bool Controller::sameActionnode(ActionNode actionnode_1, ActionNode actionnode_2)
-{
-	//check the equality of the id's. If they are the same, return true.
-	return (actionnode_1.id == actionnode_2.id ? true : false);
-}
-
+/*Main methods for controlling an object*/
 std::vector<ActionNode> Controller::constructActiveActions()
 {
 	//for-loop for constructing the active_actionnodes vector
@@ -87,12 +116,30 @@ std::vector<ActionNode> Controller::constructActiveActions()
 		{	
 			//if it's a button and its not pressed
 			if (a_node.obj->getClassId() == "button" && 
-				!(sf::Mouse::isButtonPressed(a_node.mouse_button) && this->window->cursorHover(a_node.obj->getFloatRect())))
+				!(sf::Mouse::isButtonPressed(a_node.mouse_button) && cursorHover(a_node.obj->getFloatRect())))
 			{
 				//the assumption is wrong.
 				action_state = false;
 
+				//if the cursor is only hovering the button
+				if (cursorHover(a_node.obj->getFloatRect()) && !sf::Mouse::isButtonPressed(a_node.mouse_button))
+				{
+					Button* btn = (Button*)a_node.obj;
+					a_node.obj->setCurrentFrame(btn->getHoverFrame());
+				}
+				else
+				{
+					Button* btn = (Button*)a_node.obj;
+					a_node.obj->setCurrentFrame(btn->getDefaultFrame());
+				}
 			}
+			//if it's a button and its not  pressed or hovered
+			else if(a_node.obj->getClassId() == "button")
+			{
+				Button* btn = (Button*)a_node.obj;
+				a_node.obj->setCurrentFrame(btn->getPressedFrame());
+			}
+			
 		}		
 
 		for (int j = 0; j < a_node.keys.size(); j++)
@@ -330,4 +377,11 @@ void Controller::processUserInput()
 		//last, trigger all the actions that have been activated
 		triggerActiveActions();
 	}
+}
+
+/*Help functions*/
+bool Controller::sameActionnode(ActionNode actionnode_1, ActionNode actionnode_2)
+{
+	//check the equality of the id's. If they are the same, return true.
+	return (actionnode_1.id == actionnode_2.id ? true : false);
 }

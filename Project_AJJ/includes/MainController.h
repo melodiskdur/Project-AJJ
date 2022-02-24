@@ -13,6 +13,8 @@ public:
 	
 	//Getters
 	ExtendedRenderWindow* getWindow() { return this->window; }
+	std::vector<Controller*> getControllers() { return this->controllers; }
+	int getNumControllers() { return this->num_of_controllers; }
 
 	//Other
 	void activateController(Controller* controller);

@@ -2,6 +2,7 @@
 #include "Object.h"
 #include "Action.h"
 #include "ExtendedRenderWindow.h"
+#include <SFML/Window/Mouse.hpp>
 #include <SFML/Graphics.hpp>
 #include <SFML/Graphics/PrimitiveType.hpp>
 
@@ -49,6 +50,11 @@ public:
 	void correctMovement();
 	//check if the actionnodes are identical
 	bool sameActionnode(ActionNode actionnode_1, ActionNode actionnode_2);
+
+	//returns true or false if the cursor is over the rect
+	bool cursorHover(sf::FloatRect rect);
+	//returns a vector of rects that the cursor is hovering from a set of rects
+	std::vector<sf::FloatRect> cursorHoverRects(std::vector<sf::FloatRect> rects);
 
 	/*Setters*/
 	void setWindow(ExtendedRenderWindow* scene);

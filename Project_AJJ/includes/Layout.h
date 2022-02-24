@@ -104,6 +104,8 @@ public:
 	void setFixedToView(bool state) { this->fixed_to_view = state; }
 	void setBorderSize(sf::Vector2f border_size);
 	void setBorderSizeForAll(sf::Vector2f new_border_size);
+	void setLayoutPlacement(LAYOUT_PLACEMENT lyt_plc) { this->objects_placement = lyt_plc; }
+	void setObjectsPlacement(LAYOUT_PLACEMENT objs_plc) { this->objects_placement = objs_plc; }
 
 	/*Others*/
 	//add a another layout inside of this one i.e. add it to the Layout*-vector
@@ -180,7 +182,7 @@ protected:
 	Frame current_frame;							//the current frame for this layout. includes information about texture id, region, frameindex, duration
 
 	LAYOUT_PLACEMENT layout_placement = LAYOUT_PLACEMENT::LP_NONE;			//placement of the layout in relation to the window or parent-layout
-	LAYOUT_PLACEMENT objects_placement = LAYOUT_PLACEMENT::LP_TOP_CENTERED;		//placement of the objects inside of the layout
+	LAYOUT_PLACEMENT objects_placement = LAYOUT_PLACEMENT::LP_TOP_LEFT;		//placement of the objects inside of the layout
 	static unsigned int instance_counter;
 };
 
