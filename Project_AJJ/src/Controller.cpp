@@ -14,26 +14,43 @@ Controller::~Controller()
 
 void Controller::bindActionToKey(Action* action, sf::Keyboard::Key key)
 {
-	ActionKey new_actionkey;
-	new_actionkey.action = action;
-	new_actionkey.keys.push_back(key);
-	this->action_keys.push_back(new_actionkey);
+	ActionNode new_actionnode;
+	new_actionnode.action = action;
+	new_actionnode.keys.push_back(key);
+	new_actionnode.id = this->num_actionnodes;
+	this->num_actionnodes++;
+	this->actionnodes.push_back(new_actionnode);
 }
 
 void Controller::bindActionToKey(Action* action, std::vector<sf::Keyboard::Key> keys)
 {
-	ActionKey new_actionkey;
-	new_actionkey.action = action;
-	new_actionkey.keys = keys;
-	this->action_keys.push_back(new_actionkey);
+	ActionNode new_actionnode;
+	new_actionnode.action = action;
+	new_actionnode.keys = keys;
+	new_actionnode.id = this->num_actionnodes;
+	this->num_actionnodes++;
+	this->actionnodes.push_back(new_actionnode);
 }
 
 void Controller::bindActionToMouseButton(Action* action, sf::Mouse::Button button)
 {
-	ActionKey new_actionkey;
+	ActionNode new_actionnode;
+	new_actionnode.action = action;
+	new_actionnode.mouse_button = button;
+	new_actionnode.id = this->num_actionnodes;
+	this->num_actionnodes++;
+	this->actionnodes.push_back(new_actionnode);
+}
+
+void Controller::bindActionToMouseButton(Action* action, Object* obj, sf::Mouse::Button button)
+{
+	ActionNode new_actionkey;
 	new_actionkey.action = action;
 	new_actionkey.mouse_button = button;
-	this->action_keys.push_back(new_actionkey);
+	new_actionkey.obj = obj;
+	new_actionkey.id = this->num_actionnodes;
+	this->num_actionnodes++;
+	this->actionnodes.push_back(new_actionkey);
 }
 
 void Controller::setWindow(ExtendedRenderWindow* window)
@@ -42,173 +59,70 @@ void Controller::setWindow(ExtendedRenderWindow* window)
 	this->original_view_size = this->window->getActiveScene()->getCamera()->getCameraView()->getSize();
 }
 
-
 void Controller::setObject(Object* obj)
 {
 	this->obj = obj;
 }
 
-void Controller::breakMovement(int hori_move, int vert_move, float break_value)
+bool Controller::sameActionnode(ActionNode actionnode_1, ActionNode actionnode_2)
 {
-	//the set_velocity is the velocity that will be set
-	sf::Vector2f set_vel = this->obj->getVelocity();
-
-
-	//if the object is moving horizontally and no horizontal movementaction is triggered
-	//we want to slow down!!
-	if (set_vel.x != 0 && !hori_move)
-	{
-		set_vel.x = 0;
-		/*
-		if (set_vel.x < 0 && set_vel.x + break_value <= 0)
-		{
-			set_vel.x += break_value;
-		}
-		else if (set_vel.x < 0 && set_vel.x + break_value > 0)
-		{
-			set_vel.x = 0;
-		}
-		if (set_vel.x > 0 && set_vel.x - break_value >= 0)
-		{
-			set_vel.x -= break_value;
-		}
-		else if (set_vel.x > 0 && set_vel.x - break_value < 0)
-		{
-			set_vel.x = 0;
-		}
-		*/
-	}
-	//if the object is moving vertically and no vertical movementaction is triggered
-	//we want to slow down!!
-	if (set_vel.y != 0 && !vert_move)
-	{
-		set_vel.y = 0;
-		/*
-		if (set_vel.y < 0 && set_vel.y + break_value <= 0)
-		{
-			set_vel.y += break_value;
-		}
-		else if (set_vel.y < 0 && set_vel.y + break_value > 0)
-		{
-			set_vel.y = 0;
-		}
-		if (set_vel.y > 0 && set_vel.y - break_value >= 0)
-		{
-			set_vel.y -= break_value;
-		}
-		else if (set_vel.y > 0 && set_vel.y - break_value < 0)
-		{
-			set_vel.y = 0;
-		}
-		*/
-	}
-
-	//set the velocity
-	this->obj->setVelocity(set_vel);
+	//check the equality of the id's. If they are the same, return true.
+	return (actionnode_1.id == actionnode_2.id ? true : false);
 }
 
-bool Controller::sameActionKey(ActionKey ak1, ActionKey ak2)
+std::vector<ActionNode> Controller::constructActiveActions()
 {
-	//assume that they are the same
-	bool action_match = true;
-	bool keys_match = true;
-	bool mouse_btn_match = true;
-
-	//check if action match
-	if (ak1.action != ak2.action) action_match = false;
-
-	//check if keys match
-	for (auto& k1 : ak1.keys)
+	//for-loop for constructing the active_actionnodes vector
+	for (auto& a_node : this->actionnodes)
 	{
-		for (auto& k2 : ak2.keys)
-		{
-			if (k1 != k2) keys_match = false;
-		}
-	}
-
-	//check if mouse button match
-	if (ak1.mouse_button != ak2.mouse_button) mouse_btn_match = false;
-
-	//if the action match and if at least keys or mouse button match, return true.
-	return (action_match && (keys_match || mouse_btn_match) ? true : false);
-}
-
-std::vector<ActionKey> Controller::constructActiveActions()
-{
-	//for-loop for constructing the active_actionkeys vector
-	for (auto& action_key : this->action_keys)
-	{
-		//Assumes action state.
+		//assumes action state.
 		bool action_state = true;		
 
-		if (action_key.mouse_button == sf::Mouse::Button::Left)
-		{
-			if (!(sf::Mouse::isButtonPressed(action_key.mouse_button) && this->window->cursorHover(this->window->getLayouts()[0]->getButtons()[0]->getFloatRect())))
+		/*******************************************************************
+		 *-----------------Check if assumption is true---------------------*
+		 *******************************************************************/
+		
+		//check if we have an object to relate to
+		if (a_node.obj != nullptr)
+		{	
+			//if it's a button and its not pressed
+			if (a_node.obj->getClassId() == "button" && 
+				!(sf::Mouse::isButtonPressed(a_node.mouse_button) && this->window->cursorHover(a_node.obj->getFloatRect())))
 			{
 				//the assumption is wrong.
 				action_state = false;
 
-				int k = 0;											//keeps track of index
-				//loop all of the current active_actions
-				for (auto& ak : this->active_actionkeys)
-				{
-					//if the action_keys action is in the active_actionkeys vector
-					if (sameActionKey(ak, action_key))
-					{
-						//remove it, since its key is not pressed
-						this->active_actionkeys.erase(this->active_actionkeys.begin() + k);
-
-						//reduce the number of active_actions
-						if (this->num_of_active_actions > 0)
-							this->num_of_active_actions--;
-					}
-					k++;
-				}
 			}
-		}
-		
+		}		
 
-		for (int j = 0; j < action_key.keys.size(); j++)
+		for (int j = 0; j < a_node.keys.size(); j++)
 		{
 			//If one of the binded action keys is not pressed, 
-			if (!sf::Keyboard::isKeyPressed(action_key.keys[j]))	
+			if (!sf::Keyboard::isKeyPressed(a_node.keys[j]))
 			{
 				//the assumption is wrong.
 				action_state = false;								
-
-				int k = 0;											//keeps track of index
-				//loop all of the current active_actions
-				for (auto& ak : this->active_actionkeys)
-				{
-					//if the action_keys action is in the active_actionkeys vector
-					if (sameActionKey(ak,action_key))
-					{
-						//remove it, since its key is not pressed
-						this->active_actionkeys.erase(this->active_actionkeys.begin() + k);
-
-						//reduce the number of active_actions
-						if (this->num_of_active_actions > 0)
-							this->num_of_active_actions--;
-					}
-					k++;
-				}
-				break;
 			}
 		}
-		
+
+		/*******************************************************************
+		 *------------Add or remove from active_actionnodes----------------*
+		 *******************************************************************/
 
 		//if the action_state is true(1) for this specific action_key
 		if (action_state)
 		{
-			//std::cout << action_keys[i].action->getActionName() << std::endl;
+			//DEBUGGING
+			//std::cout << a_node.action->getActionName() << std::endl;
+			//END DEBUGGING
 
 			//check if we want to add the actions to the active_action vector
 			int add_to_active_actions = 1;
-			for (auto& aak : active_actionkeys)
+			for (auto& active_a_node : active_actionnodes)
 			{
-				if (sameActionKey(aak, action_key))
+				if (sameActionnode(active_a_node, a_node))
 				{
-					add_to_active_actions = 0;								//if its already in the list, set to false(0)
+					add_to_active_actions = 0;					//if its already in the list, set to false(0)
 					break;
 				}
 
@@ -217,16 +131,37 @@ std::vector<ActionKey> Controller::constructActiveActions()
 			//if its not in the list already
 			if (add_to_active_actions)
 			{
-				active_actionkeys.push_back(action_key);				//add to active action vector
-				this->num_of_active_actions++;
+				active_actionnodes.push_back(a_node);			//add to active action vector
+				this->num_active_actionnodes++;
 			}
+		}
+		//else, check if its in the list from previous addition. If so, remove it
+		else
+		{
+			int k = 0;											//keeps track of index
 
+			//loop all of the current active_actions
+			for (auto& active_a_node : this->active_actionnodes)
+			{
+				//if the actionnodes action is in the active_actionnodes vector
+				if (sameActionnode(active_a_node, a_node))
+				{
+					//remove it, since its key is not pressed
+					this->active_actionnodes.erase(this->active_actionnodes.begin() + k);
 
+					//reduce the number of active_actions
+					this->num_active_actionnodes--;
+
+					break;
+				}
+				k++;
+			}
 		}
 
 	}
 
-	return this->active_actionkeys;
+	//at last, return the active_actionnodes
+	return this->active_actionnodes;
 }
 
 void Controller::triggerActiveActions()
@@ -247,11 +182,11 @@ void Controller::triggerActiveActions()
 	int hori_move = 0;													//horizontal movement has been/not been made
 	int vert_move = 0;													//vertical movement has been/not been made
 
-	for (int i = this->num_of_active_actions - 1; i >= 0; i--)
+	for (int i = this->num_active_actionnodes - 1; i >= 0; i--)
 	{
 		int perform_action = 1;											//assumes action state
 
-		ACTIONTYPE type = this->active_actionkeys[i].action->getActionType();		//current actiontype
+		ACTIONTYPE type = this->active_actionnodes[i].action->getActionType();		//current actiontype
 
 		//if we want to move horizontally
 		if (type == ACTIONTYPE::AT_MOVE_LEFT || type == ACTIONTYPE::AT_MOVE_RIGHT)
@@ -282,7 +217,7 @@ void Controller::triggerActiveActions()
 		//if the assumed action state remains true(1)
 		if (perform_action)
 		{
-			this->active_actionkeys[i].action->triggerAction();
+			this->active_actionnodes[i].action->triggerAction();
 		}
 
 	}
@@ -386,17 +321,13 @@ void Controller::processUserInput()
 		constructActiveActions();
 
 		//if there are no active_actions
-		if (active_actionkeys.empty())
+		if (active_actionnodes.empty())
 		{
-			active_actionkeys.push_back(action_keys[0]);				//add the idle/not-active action
-			this->num_of_active_actions++;
+			active_actionnodes.push_back(actionnodes[0]);				//add the idle/not-active action
+			this->num_active_actionnodes++;
 		}
 
 		//last, trigger all the actions that have been activated
 		triggerActiveActions();
-	}
-	else
-	{
-		std::cout << "not active\n";
 	}
 }

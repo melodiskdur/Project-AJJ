@@ -37,7 +37,7 @@ public:
 	//Draws a frame of the active Scene-object.
 	void drawActiveScene();
 	//draw a button on the screen
-	void drawButton(Object * btn);
+	void drawLayoutObject(Object * obj);
 	//draw an object on the screen
 	void drawObject(Object* obj);
 	//draw the layouts and all of the layouts contained inside

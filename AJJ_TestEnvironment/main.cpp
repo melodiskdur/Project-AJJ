@@ -152,11 +152,12 @@ int main()
 	main_contr.bindActionToKey(main_contr_obj->getActions()[5], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::L });			//PLAY
 	main_contr.bindActionToKey(main_contr_obj->getActions()[6], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Down });		//MENU_MOVE_DOWN
 	main_contr.bindActionToKey(main_contr_obj->getActions()[7], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Up });		//MENU_MOVE_UP
-	main_contr.bindActionToKey(main_contr_obj->getActions()[8], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Enter });		//MENU_CHOOSE_ALTERNATIVE
-	main_contr.bindActionToKey(main_contr_obj->getActions()[9], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Delete });	//EXIT_TO_MENU
+	//main_contr.bindActionToKey(main_contr_obj->getActions()[8], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Enter });		//MENU_CHOOSE_ALTERNATIVE
+	//main_contr.bindActionToKey(main_contr_obj->getActions()[9], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Delete });	//EXIT_TO_MENU
 	
 	//bind a button to the left mouse button
-	main_contr.bindActionToMouseButton(window.getLayouts()[0]->getButtons()[0]->getActions()[0], sf::Mouse::Button::Left);		//LAYOUT BUTTON TEST
+	main_contr.bindActionToMouseButton(test_layout->getLayouts()[0]->getLayouts()[0]->getButtons()[0]->getActions()[0], test_layout->getLayouts()[0]->getLayouts()[0]->getButtons()[0], sf::Mouse::Button::Left);		//LAYOUT BUTTON TEST
+	main_contr.bindActionToMouseButton(test_layout->getLayouts()[0]->getLayouts()[0]->getButtons()[1]->getActions()[0], test_layout->getLayouts()[0]->getLayouts()[0]->getButtons()[1], sf::Mouse::Button::Left);		//LAYOUT BUTTON TEST
 
 	//last, add the main_controller_object to the scene
 	test_scene->addSceneObject(main_contr_obj);
@@ -195,7 +196,6 @@ int main()
 		}
 
 		main_contr.processUserInput();
-		
 		contr_player_1.processUserInput();
 		contr_player_2.processUserInput();
 		
@@ -203,24 +203,13 @@ int main()
 
 
 		//DEBUGGING
-		/*
-		sf::FloatRect recty = window.getLayouts()[0]->getButtons()[0]->getFloatRect();
-		sf::FloatRect rect2({ 310,-110 }, { 30,30 });
-		std::vector<sf::FloatRect> rects;
-		rects.push_back(recty);
-		rects.push_back(rect2);
-
-		std::vector<sf::FloatRect> hr = window.cursorHoverRects(rects);
-		for (auto& r : hr)
-		{
-			//std::cout << "Mouse currently hovering rect with pos = { " << r.left << ", " << r.top << " } and size = { " << r.width << ", " << r.height << " } " << std::endl;
-		}
-		window.getLayouts()[0]->setPositionForAll({ window.getLayouts()[0]->getPosition().x + 1 , window.getLayouts()[0]->getPosition().y + 1});
-		window.getLayouts()[0]->setSize({ window.getLayouts()[0]->getSize().x + 2, window.getLayouts()[0]->getSize().y + 2});
-		window.getLayouts()[0]->moveForAll({ 1,0 });
+		
+		//window.getLayouts()[0]->setPositionForAll({ window.getLayouts()[0]->getPosition().x + 1 , window.getLayouts()[0]->getPosition().y + 1});
+		//window.getLayouts()[0]->setSize({ window.getLayouts()[0]->getSize().x + 2, window.getLayouts()[0]->getSize().y + 2});
+		//window.getLayouts()[0]->moveForAll({ 1,0 });
 		test_layout->resetMarginSpaces();
 		test_layout->placeLayouts();
-		*/
+		
 		//END DEBUGGING
 		
 		//Start debugging

@@ -80,9 +80,7 @@ Layout* TestLayout::createTestLayout()
 	test_layout->getLayouts()[1]->getLayouts()[4]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
 	test_layout->getLayouts()[1]->getLayouts()[4]->addLayout(sf::FloatRect(0, 0, 15, 10), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED_LEFT);
 	
-	//place them all
-	test_layout->placeLayouts();
-
+	
 	//this layout will be fixed and adjustment to be in the users view
 	//test_layout->setFixedToView(true);
 
@@ -98,9 +96,8 @@ Layout* TestLayout::createTestLayout()
 	//test_layout->setBorderSizeForAll({ 10,10 });
 
 	//add a test-button
-	
-	
 	Button* btn = new Button({ 300,-100 }, { 20,12 });
+	Button* btn2 = new Button({ 300,-70 }, { 20,12 });
 
 	Frame def_btn;
 	def_btn.texture_id = TEXTURE_ID::IDLE;
@@ -124,14 +121,35 @@ Layout* TestLayout::createTestLayout()
 
 	btn->setTextureName("MenuButtons");
 
+	btn2->setCurrentFrame(def_btn);
+	btn2->setDefaultFrame(def_btn);
+	btn2->setHoverFrame(hov_btn);
+	btn2->setPressedFrame(prs_btn);
+
+	btn2->setTextureName("MenuButtons");
+
 	Action* btn_prs = new Action;
 	btn_prs->setParameterManipulation(0.01f);
-	btn_prs->setActionName("ButtonPressed");
+	btn_prs->setActionName("ButtonPause");
 	btn_prs->setParentObject(btn);
-	btn_prs->setActionType(ACTIONTYPE::AT_ZOOM_OUT);
-	btn->addAction(btn_prs);
+	btn_prs->setActionType(ACTIONTYPE::AT_PAUSE);
 
-	test_layout->addObject(btn);
+	Action* btn_prs2 = new Action;
+	btn_prs2->setParameterManipulation(0.01f);
+	btn_prs2->setActionName("ButtonPlay");
+	btn_prs2->setParentObject(btn);
+	btn_prs2->setActionType(ACTIONTYPE::AT_PLAY);
+
+
+	btn->addAction(btn_prs);
+	btn2->addAction(btn_prs2);
+
+	test_layout->getLayouts()[0]->getLayouts()[0]->addObject(btn);
+	test_layout->getLayouts()[0]->getLayouts()[0]->addObject(btn2);
+
+
+	//place them all
+	test_layout->placeLayouts();
 
 	return test_layout;
 }

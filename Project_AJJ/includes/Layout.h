@@ -38,7 +38,7 @@ public:
 	Layout(sf::FloatRect rect, sf::Vector2f padding, sf::Vector2f margin, LAYOUT_PLACEMENT layout_placement);
 
 	/*Destructor*/
-	~Layout();
+	virtual ~Layout();
 
 	/*Getters*/
 	//returns the sf::Text contained inside of the layout
@@ -113,14 +113,27 @@ public:
 	//add an object inside of the layout(button,other-stuff,etc.)
 	void addObject(Object* new_object);
 
-	//adjust the layout_placements
+	//adjust the layout_placements. A combination of setIdealLayoutPosition(), 
+	//setBestLayoutPlacement() and updateParentMarginSpaces(). Uses recursion to place
+	//all of the "child"-layouts contained inside
 	void placeLayouts();
-	//set the ideal placement inside of the parent_layout depending on LAYOUT_PLACEMENT
-	void setIdealPosition();
-	//calculate and return the best placement of this layout in the available margin_spaces
+
+	//place the objects inside of this layout
+	void placeLayoutObjects();
+
+	//set the ideal placement of this layout inside of its parent-layout
+	void setLayoutIdealPosition();
+	//calculate the best placement of this layout in the available margin_spaces
 	void setBestLayoutPlacement();
-	//correct/update the available margin_spaces after placing a layout
-	void updateParentMarginSpaces();
+
+	//set the ideal placement for the object inside of this layout
+	void setObjectIdealPosition(Object* object);
+	//calculate the best placement of the object in the available margin_spaces
+	void setBestObjectPlacement(Object* obj);
+
+	//correct/update the available margin_spaces in layout after placing rect(layout or object)
+	void updateParentMarginSpaces(sf::FloatRect rect, Layout * layout);
+
 	//resets all of the margin_spaces for all of the layouts
 	//this step is needed before placeLayouts() if it is run again
 	void resetMarginSpaces();
@@ -166,8 +179,8 @@ protected:
 	sf::String texture_name = "";					//Name of the texture atlas that we want to draw frames of this object from.
 	Frame current_frame;							//the current frame for this layout. includes information about texture id, region, frameindex, duration
 
-	LAYOUT_PLACEMENT layout_placement = LAYOUT_PLACEMENT::LP_NONE;	//placement of the layout in relation to the window or parent-layout
-
+	LAYOUT_PLACEMENT layout_placement = LAYOUT_PLACEMENT::LP_NONE;			//placement of the layout in relation to the window or parent-layout
+	LAYOUT_PLACEMENT objects_placement = LAYOUT_PLACEMENT::LP_TOP_CENTERED;		//placement of the objects inside of the layout
 	static unsigned int instance_counter;
 };
 
