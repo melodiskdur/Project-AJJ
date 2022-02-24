@@ -23,10 +23,12 @@
     <ClInclude Include="includes\CollisionGraph.h" />
     <ClInclude Include="includes\Button.h" />
     <ClInclude Include="includes\Gravity.h" />
-    <ClInclude Include="includes\Hitbox.h" />
+    <ClInclude Include="includes\CollisionHandler.h" />
+    <ClInclude Include="includes\HitboxNode.h" />
     <ClInclude Include="includes\MainController.h" />
     <ClInclude Include="includes\Layout.h" />
     <ClInclude Include="includes\PhysicsManager.h" />
+    <ClInclude Include="includes\PropertyNode.h" />
     <ClInclude Include="includes\SceneLayer.h" />
     <ClInclude Include="Project_AJJ.h" />
     <ClInclude Include="includes\Action.h" />
@@ -54,13 +56,15 @@
     <ClCompile Include="src\Controller.cpp" />
     <ClCompile Include="src\ExtendedRenderWindow.cpp" />
     <ClCompile Include="src\Gravity.cpp" />
-    <ClCompile Include="src\Hitbox.cpp" />
+    <ClCompile Include="src\CollisionHandler.cpp" />
+    <ClCompile Include="src\HitboxNode.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MainController.cpp" />
     <ClCompile Include="src\Layout.cpp" />
     <ClCompile Include="src\Object.cpp" />
     <ClCompile Include="src\PhysicsAttribute.cpp" />
     <ClCompile Include="src\PhysicsManager.cpp" />
+    <ClCompile Include="src\PropertyNode.cpp" />
     <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\SceneLayer.cpp" />
     <ClCompile Include="src\TextureAtlas.cpp" />
@@ -69,13 +73,20 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\boss.PNG" />
+    <Image Include="assets\bigcloud.png" />
+    <Image Include="assets\clouds.png" />
+    <Image Include="assets\cloudsbg.png" />
+    <Image Include="assets\Foresttowerbg.png" />
     <Image Include="assets\Inkedlayout_test_LI.jpg" />
     <Image Include="assets\layout_test.png" />
     <Image Include="assets\menu_buttons.png" />
+    <Image Include="assets\Mountain.png" />
     <Image Include="assets\platformertiles.png" />
     <Image Include="assets\rogue_atlas.png" />
+    <Image Include="assets\smallcloud.png" />
     <Image Include="assets\test_layout_block.png" />
     <Image Include="assets\texture_atlas_test.png" />
+    <Image Include="assets\Tree.png" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="assets\ayar_takhu.ttf" />

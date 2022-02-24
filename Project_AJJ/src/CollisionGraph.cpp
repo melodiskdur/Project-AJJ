@@ -103,8 +103,8 @@ void CollisionGraph::storeCollisions(std::vector<ObjectTuple> collision_tuples)
 	{
 		this->createNode(tuple.obj_i);
 		this->createNode(tuple.obj_j);
-		// Calculate Hitbox resolves and create the corresponding CollisionEdges.
-		std::vector<ObjectData> v_odata = Hitbox::separateHitboxes(tuple.obj_i, tuple.obj_j);
+		// Calculate CollisionHandler resolves and create the corresponding CollisionEdges.
+		std::vector<ObjectData> v_odata = CollisionHandler::separateCollisionHandleres(tuple.obj_i, tuple.obj_j);
 		for (ObjectData odata : v_odata)
 		{
 			this->createEdge(odata);
@@ -251,7 +251,7 @@ void CollisionGraph::recalibrateResolves(CollisionNode* c)
 			adj_intersect = e_inv->m_is_visited ? INTERSECTED_SIDE::ODATA_NONE : e_inv->m_side;
 		else
 			adj_intersect = INTERSECTED_SIDE::ODATA_NONE;
-		std::vector<sf::Vector2f> recab_repos = Hitbox::recalibrate(temp_data, c->m_updated_pos, adj_intersect, this->findNode(e->m_i_adjacent)->m_updated_pos);
+		std::vector<sf::Vector2f> recab_repos = CollisionHandler::recalibrate(temp_data, c->m_updated_pos, adj_intersect, this->findNode(e->m_i_adjacent)->m_updated_pos);
 		// Update Edges' proposed resolves.
 
 		//std::cout << "RECALIBRATE (" << c->m_node_object->getId() << ", " << this->findNode(e->m_i_adjacent)->m_node_object->getId()

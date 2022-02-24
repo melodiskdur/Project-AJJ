@@ -10,6 +10,13 @@ TextureManager* ResourceLoader::loadResources()
 	tex_mag->loadAtlas("Boss", "../Project_AJJ/assets/boss.PNG");
 	tex_mag->loadAtlas("MenuButtons", "../Project_AJJ/assets/menu_buttons.PNG");
 	tex_mag->loadAtlas("LayoutBlock", "../Project_AJJ/assets/test_layout_block.png");
+	tex_mag->loadAtlas("Bigcloud", "../Project_AJJ/assets/bigcloud.png");
+	tex_mag->loadAtlas("Smallcloud", "../Project_AJJ/assets/smallcloud.png");
+	tex_mag->loadAtlas("Mountain", "../Project_AJJ/assets/Mountain.png");
+	tex_mag->loadAtlas("Foresttowerbg", "../Project_AJJ/assets/Foresttowerbg.png");
+	tex_mag->loadAtlas("Cloudsbg", "../Project_AJJ/assets/cloudsbg.png");
+	tex_mag->loadAtlas("Tree", "../Project_AJJ/assets/Tree.png");
+	tex_mag->loadAtlas("Highclouds", "../Project_AJJ/assets/clouds.png");
 
 	//Set up Rogue.
 	TextureAtlas* rogue = tex_mag->getAtlas("Rogue");
@@ -38,6 +45,35 @@ TextureManager* ResourceLoader::loadResources()
 	TextureAtlas* layouts = tex_mag->getAtlas("LayoutBlock");
 	layouts->createRegionGrid(3, 3);
 	layouts->assignTextureId(TEXTURE_ID::IDLE, { 0,0 }, { 2,2 });
+
+	// Clouds.
+	TextureAtlas* bigcloud = tex_mag->getAtlas("Bigcloud");
+	bigcloud->createRegionGrid(1, 1);
+	bigcloud->assignRegionName("Bigcloud", sf::Vector2u(0, 0), 0);
+
+	TextureAtlas* smallcloud = tex_mag->getAtlas("Smallcloud");
+	smallcloud->createRegionGrid(1, 1);
+	smallcloud->assignRegionName("Smallcloud", sf::Vector2u(0, 0), 0);
+
+	TextureAtlas* mountain = tex_mag->getAtlas("Mountain");
+	mountain->createRegionGrid(1, 1);
+	mountain->assignRegionName("Mountain", sf::Vector2u(0, 0), 0);
+
+	TextureAtlas* foresttowerbg = tex_mag->getAtlas("Foresttowerbg");
+	foresttowerbg->createRegionGrid(1, 1);
+	foresttowerbg->assignRegionName("Foresttowerbg", sf::Vector2u(0, 0), 0);
+
+	TextureAtlas* cloudsbg = tex_mag->getAtlas("Cloudsbg");
+	cloudsbg->createRegionGrid(1, 1);
+	cloudsbg->assignRegionName("Cloudsbg", sf::Vector2u(0, 0), 0);
+
+	TextureAtlas* tree = tex_mag->getAtlas("Tree");
+	tree->createRegionGrid(1, 1);
+	tree->assignRegionName("Tree", sf::Vector2u(0, 0), 0);
+
+	TextureAtlas* hclouds = tex_mag->getAtlas("Highclouds");
+	hclouds->createRegionGrid(1, 1);
+	hclouds->assignRegionName("Highclouds", sf::Vector2u(0, 0), 0);
 
 	return tex_mag;
 }

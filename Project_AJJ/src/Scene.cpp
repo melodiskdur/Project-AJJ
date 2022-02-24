@@ -111,6 +111,8 @@ void Scene::updateSceneFrame()
 {
 	if(phys_mag != nullptr)
 		phys_mag->basicCollisionHandler(scene_camera->getCameraViewRect());
+	for (SceneLayer* L : this->scene_layers)
+		L->updateLayerObjects();
 }
 std::vector<sf::View> Scene::getLayerManipulatedViews()
 {

@@ -96,11 +96,18 @@ Scene* FirstScene::createScene()
 	Scene* first_scene = new Scene();
 	FirstScene::createWorldLayer(first_scene, "Dirt Tiles", world_map, 10, 35, sf::Vector2f(-50.0f, -350.0f), sf::Vector2f(80.0f, 80.0f));
 	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", bg_layer1, 10, 35, 1, 1.3f, 0.9f, sf::Vector2f(-50.0f, -350.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
-	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", bg_layer2, 13, 25, 2, 10.0f, 0.8f, sf::Vector2f(50.0f, -350.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
-	FirstScene::createBackgroundLayer(first_scene, "Boss", bg_layer_1_5, 10, 25, 3, 1.8f, 0.7f, sf::Vector2f(-50.0f, -350.0f), sf::Vector2f(200.0f, 200.0f), "Boss");
-	FirstScene::createStaticBackgroundLayer(first_scene, "Dirt Tiles", bg_layer3, 6, 6, 4, 1.f, 10.f, "Tile");
+	//FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", bg_layer2, 13, 25, 9, 45.0f, 0.8f, sf::Vector2f(50.0f, -350.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
+	FirstScene::createMountain(first_scene);
+	FirstScene::createForestbg(first_scene);
+	FirstScene::createCloudLayer(first_scene);
+	FirstScene::createCloudLayer2(first_scene);
+	FirstScene::createStaticCloudBG(first_scene);
+	FirstScene::createCloudLayer3(first_scene);
+	//FirstScene::createStaticBackgroundLayer(first_scene, "Dirt Tiles", bg_layer3, 6, 6, 9, 1.f, 10.f, "Tile");
 	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", fg_layer1, 10, 35, -1, 0.5f, 1.7f, sf::Vector2f(200.0f, -400.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
+	FirstScene::addTrees(first_scene);
 	
+
 
 	return first_scene;
 }
@@ -176,7 +183,7 @@ void FirstScene::createStaticBackgroundLayer(Scene* scene, sf::String texture_na
 	sf::Vector2f start_pos = {-500.f, -400.f};
 	sf::Vector2f object_size = {200.f, 200.f};
 
-	SceneLayer* layer = new StaticFixatedLayer(4, 10.f, sf::View({ 0.f, 0.f }, { 800.f, 600.f }));
+	SceneLayer* layer = new StaticFixatedLayer(layer_num, 10.f, sf::View({ 0.f, 0.f }, { 800.f, 600.f }));
 	scene->addSceneLayer(layer);
 
 	for (int i = 0; i < rows; i++)
@@ -198,5 +205,138 @@ void FirstScene::createStaticBackgroundLayer(Scene* scene, sf::String texture_na
 			tile->setCurrentFrame(tile_frame);
 			layer->addObject(tile);
 		}
+	}
+}
+
+void FirstScene::createCloudLayer(Scene* scene)
+{
+	DynamicFixatedLayer* cloud_layer = new DynamicFixatedLayer(8, 30.f, 2.7f);
+	cloud_layer->setAutoScrolling({50.3f, 0.f});
+	std::vector<sf::Vector2f> positions = { {-430.f, -150.f}, { -200.f, 80.f}, { 450.f, -400.f}, { 130.f, -350.f} };
+	scene->addSceneLayer(cloud_layer);
+	for (int i = 0; i < 4; i++)
+	{
+		Object* c = new Object(positions[i], sf::Vector2f(262.f, 128.f));
+		c->setTextureName("Bigcloud");
+		Frame frame;
+		frame.duration = 200;
+		frame.frame_index = 0;
+		frame.texture_id = TEXTURE_ID::NONE;
+		frame.region_name = "Bigcloud";
+		c->setCurrentFrame(frame);
+		cloud_layer->addObject(c);
+	}
+}
+
+void FirstScene::createCloudLayer2(Scene* scene)
+{
+	DynamicFixatedLayer* cloud_layer = new DynamicFixatedLayer(7, 30.f, 2.7f);
+	cloud_layer->setAutoScrolling({ 100.6f, 0.f });
+	std::vector<sf::Vector2f> positions = { {-30.f, -130.f}, { -230.f, -400.f}, { 450.f, -35.f}, { 130.f, -250.f} };
+	scene->addSceneLayer(cloud_layer);
+	for (int i = 0; i < 4; i++)
+	{
+		Object* c = new Object(positions[i], sf::Vector2f(262.f, 128.f));
+		c->setTextureName("Smallcloud");
+		Frame frame;
+		frame.duration = 200;
+		frame.frame_index = 0;
+		frame.texture_id = TEXTURE_ID::NONE;
+		frame.region_name = "Smallcloud";
+		c->setCurrentFrame(frame);
+		cloud_layer->addObject(c);
+	}
+}
+
+void FirstScene::createMountain(Scene* scene)
+{
+	StaticInteractiveLayer* L = new StaticInteractiveLayer(6, 1.f, 20.7f);
+	scene->addSceneLayer(L);
+	Object* c = new Object(sf::Vector2f(-300.f, -350.f), sf::Vector2f(4.f * 225.f, 4.f * 138.f));
+	c->setTextureName("Mountain");
+	Frame frame;
+	frame.duration = 200;
+	frame.frame_index = 0;
+	frame.texture_id = TEXTURE_ID::NONE;
+	frame.region_name = "Mountain";
+	c->setCurrentFrame(frame);
+	L->addObject(c);
+}
+
+void FirstScene::createCloudLayer3(Scene* scene)
+{
+	StaticInteractiveLayer* L = new StaticInteractiveLayer(9, 1.f, 50.f);
+	scene->addSceneLayer(L);
+	Object* c = new Object(sf::Vector2f(-500.f, -500.f), sf::Vector2f(4.f * 360.f, 4.f * 136.f));
+	c->setTextureName("Highclouds");
+	Frame frame;
+	frame.duration = 200;
+	frame.frame_index = 0;
+	frame.texture_id = TEXTURE_ID::NONE;
+	frame.region_name = "Highclouds";
+	c->setCurrentFrame(frame);
+	L->addObject(c);
+}
+
+void FirstScene::createForestbg(Scene* scene)
+{
+	StaticInteractiveLayer* L = new StaticInteractiveLayer(5, 1.f, 10.7f);
+	scene->addSceneLayer(L);
+	Object* c = new Object(sf::Vector2f(-600.f, -100.f), sf::Vector2f(4.f * 500.f, 4.f * 100.f));
+	c->setTextureName("Foresttowerbg");
+	Frame frame;
+	frame.duration = 200;
+	frame.frame_index = 0;
+	frame.texture_id = TEXTURE_ID::NONE;
+	frame.region_name = "Foresttowerbg";
+	c->setCurrentFrame(frame);
+	L->addObject(c);
+}
+
+void FirstScene::createStaticCloudBG(Scene* scene)
+{
+	SceneLayer* L = new StaticFixatedLayer(10, 1.f, sf::View({ 0.f, 0.f }, { 800.f, 600.f }));
+	scene->addSceneLayer(L);
+	Object* c = new Object(sf::Vector2f(-400.f, -400.f), sf::Vector2f(800.f, 800.f));
+	c->setTextureName("Cloudsbg");
+	Frame frame;
+	frame.duration = 200;
+	frame.frame_index = 0;
+	frame.texture_id = TEXTURE_ID::NONE;
+	frame.region_name = "Cloudsbg";
+	c->setCurrentFrame(frame);
+	L->addObject(c);
+}
+
+void FirstScene::addTrees(Scene* scene)
+{
+	StaticInteractiveLayer* L = new StaticInteractiveLayer(3, 1.f, 3.7f);
+	scene->addSceneLayer(L);
+	for (int i = 0; i < 50; i++)
+	{
+		Object* c = new Object(sf::Vector2f(-400.f + (float)i*200.f, 0.f), sf::Vector2f(4.f * 72.f, 4.f * 136.f));
+		c->setTextureName("Tree");
+		Frame frame;
+		frame.duration = 200;
+		frame.frame_index = 0;
+		frame.texture_id = TEXTURE_ID::NONE;
+		frame.region_name = "Tree";
+		c->setCurrentFrame(frame);
+		L->addObject(c);
+	}
+
+	L = new StaticInteractiveLayer(4, 1.f, 5.7f);
+	scene->addSceneLayer(L);
+	for (int i = 0; i < 50; i++)
+	{
+		Object* c = new Object(sf::Vector2f(-400.f + (float)i * 200.f, -50.f), sf::Vector2f(4.f * 72.f, 4.f * 136.f));
+		c->setTextureName("Tree");
+		Frame frame;
+		frame.duration = 200;
+		frame.frame_index = 0;
+		frame.texture_id = TEXTURE_ID::NONE;
+		frame.region_name = "Tree";
+		c->setCurrentFrame(frame);
+		L->addObject(c);
 	}
 }

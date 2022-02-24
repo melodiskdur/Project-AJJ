@@ -4,7 +4,7 @@
 #include "Object.h"
 #include "Scene.h"
 #include "PhysicsAttribute.h"
-#include "Hitbox.h"
+#include "CollisionHandler.h"
 #include <cmath>
 
 class QuadTree;

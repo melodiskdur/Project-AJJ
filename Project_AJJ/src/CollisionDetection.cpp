@@ -132,7 +132,7 @@ void CollisionDetection::handleCollisions()
 	for (int i = 0; i < this->collisions.size(); i++)
 	{
 		//Collision handling
-		Hitbox::separateHitboxes(collisions[i].obj_i, collisions[i].obj_j);
+		CollisionHandler::separateCollisionHandleres(collisions[i].obj_i, collisions[i].obj_j);
 		this->removeResolved();
 	}
 }
@@ -157,7 +157,7 @@ bool CollisionDetection::isCloseCall(Object* i, Object* j)
 	sf::Vector2f i_prox_size = i->getSize() * 2.5f;
 	sf::FloatRect i_prox_rect = {i_prox_topleft, i_prox_size};
 
-	// Close object hitbox.
+	// Close object CollisionHandler.
 	sf::FloatRect j_box = { j->getWorldPosition(), j->getSize() };
 	// Call to ColDet::areIntersecting.
 	return (CollisionDetection::areIntersecting(i_prox_rect, j_box));

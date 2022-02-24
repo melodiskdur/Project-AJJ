@@ -57,7 +57,7 @@
     <ClInclude Include="Project_AJJ.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="includes\Hitbox.h">
+    <ClInclude Include="includes\CollisionHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="includes\PhysicsManager.h">
@@ -82,6 +82,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="includes\SceneLayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\HitboxNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="includes\PropertyNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -125,7 +131,7 @@
     <ClCompile Include="src\TextureManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Hitbox.cpp">
+    <ClCompile Include="src\CollisionHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PhysicsManager.cpp">
@@ -152,6 +158,12 @@
     <ClCompile Include="src\SceneLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\HitboxNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PropertyNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\texture_atlas_test.png">
@@ -176,6 +188,27 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="assets\test_layout_block.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\Mountain.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\Foresttowerbg.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\bigcloud.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\smallcloud.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\cloudsbg.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\Tree.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\clouds.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
