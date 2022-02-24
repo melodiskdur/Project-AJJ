@@ -3,12 +3,12 @@
 #include "Object.h"
 #include <math.h>
 
-class Hitbox :
+class CollisionHandler :
     public PhysicsAttribute
 {
 public: 
-    Hitbox();
-    ~Hitbox();
+    CollisionHandler();
+    ~CollisionHandler();
 
     //Getters
 
@@ -17,14 +17,14 @@ public:
     //Others
     // Main function for separation. Calls the object seperation functions
     // below depending on if only one or both objects are moving.
-    static std::vector<ObjectData> separateHitboxes(Object* i, Object* j);
+    static std::vector<ObjectData> separateCollisionHandleres(Object* i, Object* j);
     // Resolves collisions with only one moving object.
     static ObjectData singleObjectSeparation(Object* moving, Object* other);
     // Resolves collisions where both objects are moving.
     static std::vector<ObjectData> dualObjectSeparation(Object*i, Object* j);
 
-    // "Last resort" function that unstucks (separates) the hitboxes of
-    // two objects (one moving, one still). Moves the moving.hitbox
+    // "Last resort" function that unstucks (separates) the CollisionHandleres of
+    // two objects (one moving, one still). Moves the moving.CollisionHandler
     // the shortest distance (along x or y) that resolves the collision.
     static std::vector<sf::Vector2f> unstuck(sf::FloatRect moving, sf::FloatRect other, sf::Vector2f moving_vel);
     

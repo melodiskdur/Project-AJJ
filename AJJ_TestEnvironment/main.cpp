@@ -38,7 +38,7 @@ int main()
 	robot->assignTextureId(TEXTURE_ID::ATTACK, sf::Vector2u(0, 3), sf::Vector2u(9, 3));
 	window.setTextureManager(tex_mag);
 
-	//------------------- Scene , Camera, PhysicsManager, CollisionDetection, Hitbox, Gravity, AirFriction --------------------
+	//------------------- Scene , Camera, PhysicsManager, CollisionDetection, CollisionHandler, Gravity, AirFriction --------------------
 
 	Scene* test_scene = FirstScene::createScene();
 	Camera scene_camera;
@@ -47,7 +47,7 @@ int main()
 	CollisionDetection* col_det = new CollisionDetection(test_scene->getSceneObjects());
 	CollisionGraph* col_graph = new CollisionGraph();
 	PhysicsManager* phys_mag = new PhysicsManager(test_scene->getSceneObjects());
-	//Hitbox* hitbox = new Hitbox();
+	//CollisionHandler* CollisionHandler = new CollisionHandler();
 	phys_mag->addAttribute(col_det);
 	phys_mag->addAttribute(gravity);
 	phys_mag->addAttribute(airfric);

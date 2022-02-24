@@ -1,19 +1,18 @@
-#include "Hitbox.h"
+#include "CollisionHandler.h"
 
-#define HITBOX_INFINITY 20000000.0f
+#define CollisionHandler_INFINITY 20000000.0f
 
-Hitbox::Hitbox():
-	PhysicsAttribute("Hitbox")
+CollisionHandler::CollisionHandler():
+	PhysicsAttribute("CollisionHandler")
 {
 
 }
 
-Hitbox::~Hitbox()
+CollisionHandler::~CollisionHandler()
 {
 
 }
-
-std::vector<ObjectData> Hitbox::separateHitboxes(Object* i, Object* j)
+std::vector<ObjectData> CollisionHandler::separateCollisionHandleres(Object* i, Object* j)
 {
 	sf::Vector2f wp_i = i->getWorldPosition();
 	sf::Vector2f wp_j = j->getWorldPosition();
@@ -35,11 +34,11 @@ std::vector<ObjectData> Hitbox::separateHitboxes(Object* i, Object* j)
 		if (i->getBehaviorType() == OBJECT_BEHAVIOR::STATIC && j->getBehaviorType() == OBJECT_BEHAVIOR::STATIC)
 			return wp_and_vel_re;
 		else if (i->getBehaviorType() == OBJECT_BEHAVIOR::STATIC && j->getBehaviorType() == OBJECT_BEHAVIOR::DYNAMIC)
-			wp_and_vel_re.push_back(Hitbox::singleObjectSeparation(j, i));
+			wp_and_vel_re.push_back(CollisionHandler::singleObjectSeparation(j, i));
 		else if (i->getBehaviorType() == OBJECT_BEHAVIOR::DYNAMIC && j->getBehaviorType() == OBJECT_BEHAVIOR::STATIC)
-			wp_and_vel_re.push_back(Hitbox::singleObjectSeparation(i, j));
+			wp_and_vel_re.push_back(CollisionHandler::singleObjectSeparation(i, j));
 		else if (i->getBehaviorType() == OBJECT_BEHAVIOR::DYNAMIC && j->getBehaviorType() == OBJECT_BEHAVIOR::DYNAMIC)
-			wp_and_vel_re = Hitbox::dualObjectSeparation(i, j);
+			wp_and_vel_re = CollisionHandler::dualObjectSeparation(i, j);
 		return wp_and_vel_re;
 	}
 
@@ -63,18 +62,18 @@ std::vector<ObjectData> Hitbox::separateHitboxes(Object* i, Object* j)
 		if ((abs_vel_i.x != 0 || abs_vel_i.y != 0)
 			&& abs_vel_j.x == 0 && abs_vel_j.y == 0)
 		{
-			 wp_and_vel_re.push_back(Hitbox::singleObjectSeparation(i, j));
+			 wp_and_vel_re.push_back(CollisionHandler::singleObjectSeparation(i, j));
 		}
 		// If j is moving and i is not.
 		else if ((abs_vel_j.x != 0 || abs_vel_j.y != 0)
 			&& abs_vel_i.x == 0 && abs_vel_i.y == 0)
 		{
-			wp_and_vel_re.push_back(Hitbox::singleObjectSeparation(j, i));
+			wp_and_vel_re.push_back(CollisionHandler::singleObjectSeparation(j, i));
 		}
 		// If both are moving.
 		else
 		{
-			wp_and_vel_re = Hitbox::dualObjectSeparation(j, i);
+			wp_and_vel_re = CollisionHandler::dualObjectSeparation(j, i);
 		}
 	}
 	// If no object is encapsulated within the other.
@@ -83,25 +82,24 @@ std::vector<ObjectData> Hitbox::separateHitboxes(Object* i, Object* j)
 		if ((abs_vel_i.x != 0 || abs_vel_i.y != 0)
 			&& abs_vel_j.x == 0 && abs_vel_j.y == 0)
 		{
-			wp_and_vel_re.push_back(Hitbox::singleObjectSeparation(i, j));
+			wp_and_vel_re.push_back(CollisionHandler::singleObjectSeparation(i, j));
 		}
 	// If j is moving and i is not.
 		else if ((abs_vel_j.x != 0 || abs_vel_j.y != 0)
 			&& abs_vel_i.x == 0 && abs_vel_i.y == 0)
 		{
-			wp_and_vel_re.push_back(Hitbox::singleObjectSeparation(j, i));
+			wp_and_vel_re.push_back(CollisionHandler::singleObjectSeparation(j, i));
 		}
 	// If both are moving.
 		else
 		{
-			wp_and_vel_re = Hitbox::dualObjectSeparation(i, j);
+			wp_and_vel_re = CollisionHandler::dualObjectSeparation(i, j);
 		}
 
 	// Return the collected data.
 	return wp_and_vel_re;
 }
-
-ObjectData Hitbox::singleObjectSeparation(Object* moving, Object* other)
+ObjectData CollisionHandler::singleObjectSeparation(Object* moving, Object* other)
 {
 	// Return value.
 	ObjectData data;
@@ -203,9 +201,9 @@ ObjectData Hitbox::singleObjectSeparation(Object* moving, Object* other)
 		// If something goes wrong. Do a simple unstuck-check.
 		else
 		{
-			sf::FloatRect moving_hitbox = sf::FloatRect(moving->getWorldPosition(), moving->getSize());
-			sf::FloatRect other_hitbox = sf::FloatRect(other->getWorldPosition(), other->getSize());
-			std::vector<sf::Vector2f> unstuck_resolves = Hitbox::unstuck(moving_hitbox, other_hitbox, vel);
+			sf::FloatRect moving_CollisionHandler = sf::FloatRect(moving->getWorldPosition(), moving->getSize());
+			sf::FloatRect other_CollisionHandler = sf::FloatRect(other->getWorldPosition(), other->getSize());
+			std::vector<sf::Vector2f> unstuck_resolves = CollisionHandler::unstuck(moving_CollisionHandler, other_CollisionHandler, vel);
 			new_vel = unstuck_resolves[1];
 			new_pos = unstuck_resolves[0];
 			// Set intersected side.
@@ -221,14 +219,14 @@ ObjectData Hitbox::singleObjectSeparation(Object* moving, Object* other)
 	}
 
 	// Add updated velocities and return ObjectData.
-	data.m_colliding_hitbox = sf::FloatRect(other->getWorldPosition(), other->getSize());
+	data.m_colliding_CollisionHandler = sf::FloatRect(other->getWorldPosition(), other->getSize());
 	data.m_vel = new_vel;
 	data.m_wp = new_pos;
 	data.m_intersect = intersect;
 	return data;
 }
 
-std::vector<ObjectData> Hitbox::dualObjectSeparation(Object* i, Object* j)
+std::vector<ObjectData> CollisionHandler::dualObjectSeparation(Object* i, Object* j)
 {
 	// Return value.
 	std::vector<ObjectData> data;
@@ -252,14 +250,14 @@ std::vector<ObjectData> Hitbox::dualObjectSeparation(Object* i, Object* j)
 	sf::Vector2f j_prev = j->getWorldPosition() - j->getVelocity();
 
 	// X, Y overlaps.
-	sf::Vector2f overlaps = Hitbox::getOverlaps(i, j);
+	sf::Vector2f overlaps = CollisionHandler::getOverlaps(i, j);
 
 	// Factors to move i and j by, 0.5 of the overlap for each direction initially.
 	float i_c = 0.5;
 	float j_c = 0.5;
 
 	// Check if i and j are travelling parallel along x.
-	if (Hitbox::sameXDirection(i, j))
+	if (CollisionHandler::sameXDirection(i, j))
 	{
 		// Only reposition i.
 		if (std::abs(i->getVelocity().x) > std::abs(j->getVelocity().x))
@@ -276,7 +274,7 @@ std::vector<ObjectData> Hitbox::dualObjectSeparation(Object* i, Object* j)
 	}
 
 	// Check if i and j are travelling parallel along y.
-	if (Hitbox::sameYDirection(i, j))
+	if (CollisionHandler::sameYDirection(i, j))
 	{
 		// Only reposition i.
 		if (i_prev.y < j_prev.y)
@@ -293,7 +291,7 @@ std::vector<ObjectData> Hitbox::dualObjectSeparation(Object* i, Object* j)
 	}
 
 	// Calculate the separation distance multipliers.
-	sf::Vector2f t = Hitbox::getT(i, j, overlaps);
+	sf::Vector2f t = CollisionHandler::getT(i, j, overlaps);
 
 	// If horizontal separation happens before vertical separation.
 	if (t.x < t.y)
@@ -345,14 +343,14 @@ std::vector<ObjectData> Hitbox::dualObjectSeparation(Object* i, Object* j)
 	i_data.m_vel = { ivel.x, ivel.y };
 	j_data.m_wp = jpos;
 	j_data.m_vel = { jvel.x, jvel.y };
-	i_data.m_colliding_hitbox = sf::FloatRect(j_data.m_wp, j->getSize());
-	j_data.m_colliding_hitbox = sf::FloatRect(i_data.m_wp, i->getSize());
+	i_data.m_colliding_CollisionHandler = sf::FloatRect(j_data.m_wp, j->getSize());
+	j_data.m_colliding_CollisionHandler = sf::FloatRect(i_data.m_wp, i->getSize());
 	data.push_back(i_data);
 	data.push_back(j_data);
 	return data;
 }
 
-sf::Vector2f Hitbox::getOverlaps(Object* i, Object* j)
+sf::Vector2f CollisionHandler::getOverlaps(Object* i, Object* j)
 {
 	sf::Vector2f overlaps;
 	sf::Vector2f sizes = i->getSize() + j->getSize();
@@ -384,7 +382,7 @@ sf::Vector2f Hitbox::getOverlaps(Object* i, Object* j)
 	return overlaps;
 }
 
-sf::Vector2f Hitbox::getOverlaps(sf::FloatRect i_rect, sf::FloatRect j_rect)
+sf::Vector2f CollisionHandler::getOverlaps(sf::FloatRect i_rect, sf::FloatRect j_rect)
 {
 	float overlap_x, overlap_y, total_x, total_y, diff_x, diff_y;
 	total_x = i_rect.width + j_rect.width;
@@ -401,7 +399,7 @@ sf::Vector2f Hitbox::getOverlaps(sf::FloatRect i_rect, sf::FloatRect j_rect)
 	return { overlap_x, overlap_y };
 }
 
-bool Hitbox::sameXDirection(Object* i, Object* j)
+bool CollisionHandler::sameXDirection(Object* i, Object* j)
 {
 	sf::Vector2f i_prev = i->getWorldPosition() - i->getVelocity();
 	sf::Vector2f j_prev = j->getWorldPosition() - j->getVelocity();
@@ -413,13 +411,13 @@ bool Hitbox::sameXDirection(Object* i, Object* j)
 	return false;
 }
 
-bool Hitbox::sameYDirection(Object* i, Object* j)
+bool CollisionHandler::sameYDirection(Object* i, Object* j)
 {
 	sf::Vector2f i_prev = i->getWorldPosition() - i->getVelocity();
 	sf::Vector2f j_prev = j->getWorldPosition() - j->getVelocity();
 	sf::FloatRect i_prev_rect = { i_prev, i->getSize() };
 	sf::FloatRect j_prev_rect = { j_prev, j->getSize() };
-	sf::Vector2f overlaps = Hitbox::getOverlaps(i_prev_rect, j_prev_rect);
+	sf::Vector2f overlaps = CollisionHandler::getOverlaps(i_prev_rect, j_prev_rect);
 	// Make sure that one of the object is behind the other.
 	if (overlaps.x >= overlaps.y)
 	{
@@ -428,7 +426,7 @@ bool Hitbox::sameYDirection(Object* i, Object* j)
 	return false;
 }
 
-sf::Vector2f Hitbox::getT(Object* i, Object* j, sf::Vector2f overlaps)
+sf::Vector2f CollisionHandler::getT(Object* i, Object* j, sf::Vector2f overlaps)
 {
 	// Get previous positions.
 	sf::Vector2f iprev = i->getWorldPosition() - i->getVelocity();
@@ -443,11 +441,11 @@ sf::Vector2f Hitbox::getT(Object* i, Object* j, sf::Vector2f overlaps)
 	return { t_x, t_y };
 }
 
-/* In case the axis-aligned repositioning in Hitbox::singeObjectSeparation() fails, this function is called
+/* In case the axis-aligned repositioning in CollisionHandler::singeObjectSeparation() fails, this function is called
 * to do a kind of "last resort" resolve of the moving object's position. It tests the distance (no attention
-* paid to velocity) from the moving object's current position to each of the sides of the other object's hitbox.
+* paid to velocity) from the moving object's current position to each of the sides of the other object's CollisionHandler.
   the side that produces to shortest distane will be the position to which the moving object will be resolved. */
-std::vector<sf::Vector2f> Hitbox::unstuck(sf::FloatRect moving, sf::FloatRect other, sf::Vector2f moving_vel)
+std::vector<sf::Vector2f> CollisionHandler::unstuck(sf::FloatRect moving, sf::FloatRect other, sf::Vector2f moving_vel)
 {
 	std::vector<sf::Vector2f> resolves =
 	{
@@ -465,7 +463,7 @@ std::vector<sf::Vector2f> Hitbox::unstuck(sf::FloatRect moving, sf::FloatRect ot
 		{ 0.f, moving_vel.y }								// Left.
 	};
 
-	float current_shortest = HITBOX_INFINITY;
+	float current_shortest = CollisionHandler_INFINITY;
 	int current_best_index = -1;
 
 	for (int i = 0; i < 4; i++)
@@ -487,7 +485,7 @@ std::vector<sf::Vector2f> Hitbox::unstuck(sf::FloatRect moving, sf::FloatRect ot
 /* Second version of unstuck without the parameter moving_vel. Compared to the previous
 *  version, this one only returns the new position.
 */
-sf::Vector2f Hitbox::unstuck(sf::FloatRect moving, sf::FloatRect other)
+sf::Vector2f CollisionHandler::unstuck(sf::FloatRect moving, sf::FloatRect other)
 {
 	std::vector<sf::Vector2f> resolves =
 	{
@@ -497,7 +495,7 @@ sf::Vector2f Hitbox::unstuck(sf::FloatRect moving, sf::FloatRect other)
 		{ other.left - moving.width, moving.top }			// Left.
 	};
 
-	float current_shortest = HITBOX_INFINITY;
+	float current_shortest = CollisionHandler_INFINITY;
 	int current_best_index = -1;
 
 	for (int i = 0; i < 4; i++)
@@ -516,7 +514,7 @@ sf::Vector2f Hitbox::unstuck(sf::FloatRect moving, sf::FloatRect other)
 	return resolves[current_best_index];
 }
 
-std::vector<sf::Vector2f> Hitbox::recalibrate(const ObjectData& odata, const sf::Vector2f& i_pos, const INTERSECTED_SIDE& adj_intersect, const sf::Vector2f& j_pos)
+std::vector<sf::Vector2f> CollisionHandler::recalibrate(const ObjectData& odata, const sf::Vector2f& i_pos, const INTERSECTED_SIDE& adj_intersect, const sf::Vector2f& j_pos)
 {
 	// Quick check to see if the collision is double-sided.
 	bool is_double = (adj_intersect != INTERSECTED_SIDE::ODATA_NONE);
@@ -528,7 +526,7 @@ std::vector<sf::Vector2f> Hitbox::recalibrate(const ObjectData& odata, const sf:
 
 	float i_c = is_double ? 0.5f : 1.f;
 	float j_c = 1.f - i_c;
-	sf::Vector2f overlaps = Hitbox::getOverlaps({ i_pos, i_size }, { j_pos, j_size });
+	sf::Vector2f overlaps = CollisionHandler::getOverlaps({ i_pos, i_size }, { j_pos, j_size });
 	
 	switch (odata.m_intersect)
 	{

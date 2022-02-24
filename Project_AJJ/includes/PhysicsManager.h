@@ -2,7 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "Object.h"
 #include "PhysicsAttribute.h"
-#include "Hitbox.h"
+#include "CollisionHandler.h"
 #include "CollisionDetection.h"
 #include "CollisionGraph.h"
 #include <math.h>

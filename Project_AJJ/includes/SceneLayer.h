@@ -132,18 +132,24 @@ class DynamicFixatedLayer : public SceneLayer
 {
 public:
 	DynamicFixatedLayer(int layer_num);
-	DynamicFixatedLayer(int layer_num, float scale, float depth);
+	DynamicFixatedLayer(int layer_num, float depth, float scale);
 	~DynamicFixatedLayer() override;
 	// Getters.
 	std::vector<Object*> getLayerObjectsWithinView(sf::FloatRect view_rect) override;
 	// Setters.
+	void setAutoScrolling(sf::Vector2f a_s) { this->auto_scrolling = a_s; };
 	// Others.
+	sf::View manipulateCameraView(const sf::View cam_v) override;
 	void addObject(Object* o) override;
 	void addObjects(std::vector<Object*> o_vec) override;
 	void updateLayerObjects() override;
 private:
 	bool repeat = true;
+	bool fixated_x = true;
+	bool fixated_y = false;
 	sf::Vector2f auto_scrolling = { 0.0f, 0.0f };
+
+	void checkForReset(Object* o, sf::FloatRect rect);
 };
 
 

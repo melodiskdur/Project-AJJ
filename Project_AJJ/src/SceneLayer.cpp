@@ -110,9 +110,74 @@ sf::View StaticInteractiveLayer::manipulateCameraView(const sf::View cam_v)
     return manip_v;
 }
 
-/* * * * * * * * * * * * *
- *  DynamicFixatedLayer  *
- * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                           DynamicFixatedLayer                             *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+DynamicFixatedLayer::DynamicFixatedLayer(int layer_num) : SceneLayer(layer_num) { }
+
+DynamicFixatedLayer::DynamicFixatedLayer(int layer_num, float depth, float scale) : SceneLayer(layer_num, depth, scale) { }
+
+DynamicFixatedLayer::~DynamicFixatedLayer() { }
+
+std::vector<Object*> DynamicFixatedLayer::getLayerObjectsWithinView(sf::FloatRect view_rect)
+{
+    // Manipulate rectangle.
+    sf::View v(view_rect);
+    v.zoom(this->depth * this->scale);
+    view_rect = { v.getCenter() - 0.5f * v.getSize(), v.getSize() };
+    for (Object* o : this->layer_objects)
+    {
+        o->setWorldPosition(o->getWorldPosition() + this->auto_scrolling);
+        if (this->repeat)
+        {
+            this->checkForReset(o, view_rect);
+        }
+    }
+    return this->layer_objects;
+}
+
+sf::View DynamicFixatedLayer::manipulateCameraView(const sf::View cam_v)
+{
+    sf::View v = cam_v;
+    v.zoom(this->depth * this->scale);
+    return v;
+}
+
+void DynamicFixatedLayer::addObject(Object* o)
+{
+    // Rescale and store.
+    o->setWorldPosition(this->depth * this->scale * o->getWorldPosition());
+    o->setSize(this->depth * this->scale * o->getSize());
+    this->layer_objects.push_back(o);
+}
+
+void DynamicFixatedLayer::addObjects(std::vector<Object*> o_vec) { for (Object* o : o_vec) this->addObject(o); }
+
+void DynamicFixatedLayer::updateLayerObjects()
+{
+    /* * * * * * * * * * *
+    *  INSERT STUFF HERE *
+    * * * * * * * * * * **/
+    // Autoscroll.
+    
+}
+
+void DynamicFixatedLayer::checkForReset(Object* o, sf::FloatRect rect)
+{
+    if (!rect.intersects(sf::FloatRect(o->getWorldPosition(), o->getSize())))
+    {
+        sf::Vector2f o_wp = o->getWorldPosition();
+        sf::Vector2f o_sz = o->getSize();
+        // Check for line intersections.
+        if (this->auto_scrolling.x > 0) o_wp.x = rect.left - o_sz.x + this->auto_scrolling.x;
+        else if (this->auto_scrolling.x < 0) o_wp.x = rect.left + rect.width + this->auto_scrolling.x;
+        else if (this->auto_scrolling.y > 0) o_wp.y = rect.top - o_sz.y + this->auto_scrolling.y;
+        else if (this->auto_scrolling.y < 0) o_wp.y = rect.top + rect.height + this->auto_scrolling.y;
+        o->setWorldPosition(o_wp);
+    }
+}
+
+
 
 /* * * * * * * * * * * * *
 * DynamicInteractiveLayer *
