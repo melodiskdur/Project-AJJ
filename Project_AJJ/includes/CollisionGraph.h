@@ -9,9 +9,6 @@
 #define REPOS_INFINITY 200000000.f
 
 enum class EDGE_STATUS { EDGE_ACTIVE, EDGE_RELAXED, EDGE_TRIGGERED, EDGE_UNRESOLVED };
-
-typedef struct _ObjectTuple ObjectTuple;
-typedef struct _CloseCallHolder CloseCallHolder;
 typedef struct _CollTuple CollTuple;
 typedef struct _CCHolder CCHolder;
 
@@ -33,6 +30,8 @@ typedef struct _CollisionEdge
 	bool m_is_relaxed = false;
 	bool m_is_visited = false;
 	int m_storage_index;
+	int oi_id;
+	int oj_id;
 } CollisionEdge;
 
 /* Represents an object that has been involved in
@@ -70,47 +69,33 @@ class CollisionGraph :
 public:
 	CollisionGraph();
 	~CollisionGraph();
-
 	// Main function of the graph. Attempts to relax all the edges
 	// of the graph and then store the resulting resolves for each CollisionNode.
 	void resolveTree();
-
 	// Helper-function to resolveTree().
 	void resolveCollision(CollisionEdge* e, CollisionNode* c);
-
 	// (WIP) Applies (onto object.worldPosition) all the calculated resolves from resolveTree().
 	void applyTreeResolution();
-
 	// Reads data from a vector of collision tuples and creates
 	// nodes and edges accordingly. Note that resolves are calculating as well.
-	void storeCollisions(std::vector<ObjectTuple> collision_tuples);
 	void storeCollisions(std::vector<CollTuple> collision_tuples);
-
 	// Looks for the CloseCallHolder.m_object node and stores the close calls
 	// as relaxed edges.
-	void storeCloseCalls(std::vector<CloseCallHolder>& close_calls);
 	void storeCloseCalls(std::vector<CCHolder>& cc);
-
 	// Creates and stores a CollisionNode for an Object instance. Returns
 	// the index of the node in vector node_storage.
-	int createNode(Object* object);
 	int createNode(HitboxNode* hb);
-
 	// Creates and stores a CollisionEdge for odata.m_object.
-	void createEdge(ObjectData& odata);
 	void createEdge(HBData& odata);
 	void createInvertedEdge(CollisionEdge* e);
-
 	// Adds a collision close call to 'node' by creating a CollisionEdge and setting it as relaxed. 
 	void createCloseCallEdge(CollisionNode* node, CollisionNode* adjacent);
-
 	// Debugging, treedrawer.
 	std::vector<sf::VertexArray> getTree();
 private:
 	// Node storage vector + index vectors.
 	std::vector<CollisionNode> node_storage;
 	std::vector<int> i_active_nodes;
-
 	// Edge storage vector + index vectors.
 	std::vector<CollisionEdge> edge_storage;
 	std::vector<int> i_active_edges;
@@ -122,54 +107,41 @@ private:
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	*       Updating / manipulating Nodes & Edges            *
 	* * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
-
 	// Applies e.proposed_resolve to e. Also marks the e.bonus_resolves-Edges as relaxed.
 	void updatePosition(CollisionNode* c, CollisionEdge* e);
-
 	// When a proposed resolve has been applied to a Node, this function checks the remaining
 	// Edges in c.primary to see if their proposed resolves need to be adjusted relative to the
 	// c.updated_pos.
 	void recalibrateResolves(CollisionNode* c);
-	void recalibrateResolvesV2(CollisionNode* c);
-
 	// Used within resolveCollision().
 	void handleTriggeredCollisions(CollisionNode* c, CollisionEdge* e, const std::vector<int>& i_triggered);
-
 	// Executes whenever a resolve triggers a (permittable) relaxed collision.
 	void collisionTriggered(CollisionEdge* r, CollisionEdge* e);
-
 	// Executes whenever a proposed resolve triggers a collision with a static object.
 	void markAsUnresolved(CollisionEdge* unres);
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	*                   Comparisons                          *
 	* * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
-
 	// Checks if two objects are colliding into each other.
 	bool collisionTwoSided(CollisionEdge* e);
 	// Check if an Edge e with a STATIC adjacent object triggers an Edge r with a STATIC object.
-	bool staticTriggersStatic(CollisionEdge* e, CollisionEdge* r);
-	bool staticTriggersStaticV2(CollisionEdge * e, CollisionEdge * r);
+	bool staticTriggersStatic(CollisionEdge * e, CollisionEdge * r);
 	// Checks if e->proposed_resolve also resolves the edge e_tocheck.
 	bool resolves(CollisionEdge* e, CollisionEdge* e_tocheck);
-	bool resolvesV2(CollisionEdge* e, CollisionEdge* e_tocheck);
 	// Checks for intersection between an active and a relaxed Edge.
 	bool intersects(CollisionEdge* e, CollisionEdge* r);
-	bool intersectsV2(CollisionEdge* e, CollisionEdge* r);
 	// Checks for intersection between two Collision Nodes.
-	bool intersects(CollisionNode* c, CollisionNode* c_adj);
-	bool intersectsV2(CollisionNode * c, CollisionNode * c_adj);
+	bool intersects(CollisionNode * c, CollisionNode * c_adj);
+
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	*                Finding Nodes and Edges.                *
 	* * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
-
 	// Checks a given parameter vector for an index of an Edge. That has node_storage[i_c] as Node
 	// and node_storage[i_adj] as adjacent.
 	int findEdgeIndex(int i_c, int i_adj, std::vector<int>& edge_vector);
 	int findNodeIndexIn(const int node_index, std::vector<int>& i_node_vector);
-
 	CollisionEdge* invertedEdge(CollisionEdge* e);
-
 	// Pointer (to node/edge_storage instances) returners, for cleaner code.
 	CollisionNode* findNode(Object* o);
 	CollisionNode* findNode(int node_index);
@@ -188,29 +160,12 @@ private:
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	*                Sorting-methods.                        *
 	* * * * * * * * * * * * * * * * * * * * * * * * * * * * **/
-
 	// Methods to switch index-integers between vectors.
 	void moveEdgeIndex(CollisionEdge* e, std::vector<int>& from, std::vector<int>& to);
 	void moveNodeIndex(CollisionNode* c, std::vector<int>& from, std::vector<int>& to);
-
-	// Sorts the primary edges in number
-	// of resolves that are created (one edge.proposed
-	// could for example solve 2 other collisions).
-	void sortEdges(CollisionNode* c);
-	// Runs sortEdges (see above) on each object of the primary_collisions vector.
-	// It runs correctly under the assumption that primary_collisions has been sorted beforehand.
-	void sortAllPrimaryEdges();
-	// Sorts the primary CollisionNode in
-	// descending order of collisions it's involved in.
-	void sortPrimaryCollisions();
 	// Sorts g.primary_edges by collision type. Double collisions are prioritized.
 	void sortPrimaryEdgesByType();
 	// Resets all the vectors.
 	void clearVectors();
-
-	// DEBUGGING.
-	CollisionNode* node1337 = nullptr;
-	// END DEBUGGING.
-
 };
 

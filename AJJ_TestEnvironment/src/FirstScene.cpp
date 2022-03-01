@@ -372,4 +372,12 @@ void FirstScene::createHitboxNodes(Scene* scene)
 	node = new HitboxNode();
 	node->connectTo(w);
 	node->setHitboxTotal(sf::FloatRect(0.f, 0.f, 14.f * 80.f, 3.f * 80.f));
+
+	// Subbox test.
+	Object* sbo = scene->getObjectWithId(40);
+	node = new HitboxNode();
+	node->connectTo(sbo);
+	node->setHitboxRatio(sf::Vector2f(0.f, -1.f), sf::Vector2f(6.f, 2.f));
+	std::vector<sf::Vector2f> pts{ {0.f, 1.f}, {0.5f, 0.f}, {1.f, 1.f} };
+	node->createSubBox(pts);
 }

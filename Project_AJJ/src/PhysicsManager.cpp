@@ -43,19 +43,12 @@ void PhysicsManager::basicCollisionHandler(sf::FloatRect view_rect)
 	// Run Collision check and retreive the tuples of colliding objects as well as close calls to each object.
 	// NOTE: CollisionDetection should maybe be moved to a higher instance (collisions could be used for more
 	// than just physics).
-	std::vector<ObjectTuple> collision_tuples = col_det->getCollisions(extra_view_rect);
-	std::vector<CloseCallHolder> close_calls = col_det->getCloseCallHolders();
-	
-	std::vector<CollTuple> ct_collision_tuples = col_det->getCollisions_CT(extra_view_rect);
+	std::vector<CollTuple> ct_collision_tuples = col_det->getCollisions(extra_view_rect);
 	std::vector<CCHolder> ct_close_calls = col_det->getCCHolders();
 
 	// Load all collisions and close calls into the Physics Manager's collision graph. It stores each
 	// Object in a CollisionNode and the collision between two Objects as a CollisionEdge between the
 	// corresponding nodes. Finally, relax the graph.
-	//this->col_graph->storeCollisions(collision_tuples);
-	//this->col_graph->storeCloseCalls(close_calls);
-	
-	
 	this->col_graph->storeCollisions(ct_collision_tuples);
 	this->col_graph->storeCloseCalls(ct_close_calls);
 	this->col_graph->resolveTree();

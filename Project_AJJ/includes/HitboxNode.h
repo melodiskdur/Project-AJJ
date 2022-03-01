@@ -2,6 +2,15 @@
 #include "PropertyNode.h"
 
 enum class HBOX { STATIC, DYNAMIC, HOLLOW, SEMI_STATIC, SEMI_DYNAMIC, SEMI_HOLLOW};
+enum class HBSPLINE { LINEAR, CUBIC, NONE };
+enum class RES_DIR { UP, RIGHT, DOWN, LEFT, ANY, HORI, VERT};
+typedef struct _SubBox
+{
+    std::vector<sf::Vector2f> b_pts;               // Box points (in order of connection).
+    HBSPLINE interpolation_type = HBSPLINE::NONE;  // Defines the curve inbetween points.
+    bool endpoints_connected = false;              // Determines whether the first and the last points of b_pts should connect.
+    RES_DIR push = RES_DIR::ANY;                   // Determines in which direction the colliding hitbox should be resolved
+} SubBox;
 
 /* HitboxNode
 *  Sub class to PropertyNode. Gives an easy way to attach a Hitbox to an Object, which is 
@@ -31,6 +40,9 @@ public:
     sf::Vector2f getLocalPos();
     sf::Vector2f getGlobalPos();
     sf::FloatRect getBB();
+    std::vector<sf::Vector2f> getSB_pts();
+    // Returns a SubBox with the b_pts translated to world coordinates.
+    SubBox getSB();
 
     // Setters.
     void setBehavior(HBOX b) { this->box_behavior = b; };
@@ -41,15 +53,18 @@ public:
 
     // Others.
     void updateObjectPos(sf::Vector2f hb_wp);
+    bool createSubBox(std::vector<sf::Vector2f> pts);
     //bool connectTo(Object* parent) override;
     //bool disconnectFrom(Object* parent) override;
 
+    // DEBUGGING.
     sf::VertexArray getDrawable();
+    // END DEBUGGING.
 private:
     sf::Vector2f bb_pos{ 0.f, 0.f };                      // Ratios.
     sf::Vector2f bb_size{ 0.f, 0.f };                     // Ratios.
     sf::FloatRect bounding_box{ 0.f, 0.f, 0.f, 0.f };     // The hitbox which contains all other hitboxes.
-    std::vector<sf::FloatRect> sub_boxes;                 // Hitboxes within the bounding_box. If size = 0, bounding_box is treated as a hitbox.
+    std::vector<SubBox> sub_boxes;                        // Hitboxes within the bounding_box. If size = 0, bounding_box is treated as the hitbox.
     HBOX box_behavior{ HBOX::STATIC };                    // How a hitbox is expected to behave upon collision.
     // Data related to transform.
     float angle{ 0.0f };

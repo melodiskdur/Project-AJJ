@@ -31,6 +31,7 @@ Object::~Object()
     Object::instance_counter--; 
     for (Action* a : this->object_actions) delete a; 
     for (Animation* a : this->object_animations) delete a;
+    for (auto& pn : this->property_nodes) delete pn;
 }
 
 /*Getters*/

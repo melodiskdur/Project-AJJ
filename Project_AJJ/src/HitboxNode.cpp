@@ -18,7 +18,6 @@ sf::Vector2f HitboxNode::getGlobalPos()
 	sf::Vector2f loc_pos = this->getLocalPos();
 	sf::Vector2f o_wp = this->parent_object->getWorldPosition();
 	return sf::Vector2f(loc_pos.x + o_wp.x, loc_pos.y + o_wp.y);
-
 }
 
 sf::FloatRect HitboxNode::getBB()
@@ -26,6 +25,24 @@ sf::FloatRect HitboxNode::getBB()
 	sf::Vector2f o_pos = this->parent_object->getWorldPosition();
 	sf::Vector2f o_sz = this->parent_object->getSize();
 	return sf::FloatRect(this->getGlobalPos(), { this->bb_size.x * o_sz.x, this->bb_size.y * o_sz.y} );
+}
+
+std::vector<sf::Vector2f> HitboxNode::getSB_pts()
+{
+	if (this->sub_boxes.size() == 0) return std::vector<sf::Vector2f>();
+	std::vector<sf::Vector2f> sb = this->sub_boxes[0].b_pts;
+	sf::FloatRect bb = this->getBB();
+	auto translate = [bb](const sf::Vector2f& rel_pos) -> sf::Vector2f
+	{ return sf::Vector2f(bb.left + rel_pos.x * bb.width, bb.top + rel_pos.y * bb.height); };
+	for (sf::Vector2f& pt : sb) pt = translate(pt);
+	return sb;
+}
+
+SubBox HitboxNode::getSB()
+{
+	SubBox sb = this->sub_boxes[0];
+	sb.b_pts = this->getSB_pts();
+	return sb;
 }
 
 void HitboxNode::setHitboxTotal(sf::Vector2f hb_center, sf::Vector2f hb_size)
@@ -64,22 +81,51 @@ void HitboxNode::updateObjectPos(sf::Vector2f hb_wp)
 	this->parent_object->setWorldPosition(o_wp);
 }
 
+bool HitboxNode::createSubBox(std::vector<sf::Vector2f> pts)
+{
+	if (this->parent_object == nullptr || this->box_behavior != HBOX::STATIC) return false;
+	SubBox new_sb;
+	new_sb.interpolation_type = HBSPLINE::LINEAR;
+	new_sb.b_pts = pts;
+	this->sub_boxes.push_back(new_sb);
+	return true;
+}
+
 sf::VertexArray HitboxNode::getDrawable()
 {
-	sf::VertexArray bb_drawable(sf::LineStrip, 5);
-	sf::FloatRect bb = this->getBB();
-	bb_drawable[0].position = { bb.left, bb.top };
-	bb_drawable[1].position = { bb.left + bb.width, bb.top };
-	bb_drawable[2].position = { bb.left + bb.width, bb.top + bb.height };
-	bb_drawable[3].position = { bb.left, bb.top + bb.height };
-	bb_drawable[4].position = { bb.left, bb.top };
 	sf::Color gc = sf::Color::Cyan;
-	bb_drawable[0].color = gc;
-	bb_drawable[1].color = gc;
-	bb_drawable[2].color = gc;
-	bb_drawable[3].color = gc;
-	bb_drawable[4].color = gc;
-	return bb_drawable;
-
-	
+	// Bounding box.
+	if (this->sub_boxes.size() == 0)
+	{
+		sf::VertexArray bb_drawable(sf::LineStrip, 5);
+		sf::FloatRect bb = this->getBB();
+		bb_drawable[0].position = { bb.left, bb.top };
+		bb_drawable[1].position = { bb.left + bb.width, bb.top };
+		bb_drawable[2].position = { bb.left + bb.width, bb.top + bb.height };
+		bb_drawable[3].position = { bb.left, bb.top + bb.height };
+		bb_drawable[4].position = { bb.left, bb.top };
+		bb_drawable[0].color = gc;
+		bb_drawable[1].color = gc;
+		bb_drawable[2].color = gc;
+		bb_drawable[3].color = gc;
+		bb_drawable[4].color = gc;
+		return bb_drawable;
+	}
+	// Sub boxes.
+	sf::FloatRect bb = this->getBB();
+	std::vector<sf::Vector2f> sb_points = this->sub_boxes[0].b_pts;
+	sf::VertexArray sb_drawable(sf::LineStrip, sb_points.size());
+	auto translate = [bb](const sf::Vector2f& rel_pos) -> sf::Vector2f
+	{
+		sf::Vector2f gpos = rel_pos;
+		gpos.x = bb.left + rel_pos.x * bb.width;
+		gpos.y = bb.top + rel_pos.y * bb.height;
+		return gpos;
+	};
+	for (int i = 0; i < sb_points.size(); i++)
+	{
+		sb_drawable[i].position = translate(sb_points[i]);
+		sb_drawable[i].color = gc;
+	}
+	return sb_drawable;
 }

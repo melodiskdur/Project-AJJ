@@ -59,7 +59,7 @@ int main()
 
 	//----------------------- Create Players & Lock View --------------------
 
-	TestObject* player_1 = new TestObject(sf::Vector2f(600.0f, 0.0f), sf::Vector2f(100.0f, 100.0f));
+	TestObject* player_1 = new TestObject(sf::Vector2f(1800.0f, 0.0f), sf::Vector2f(100.0f, 100.0f));
 	TestObject* player_2 = new TestObject(sf::Vector2f(400.0f, 100.0f), sf::Vector2f(100.0f, 100.0f));
 	player_1->setTextureName("Rogue");
 	player_2->setTextureName("Rogue");
@@ -69,6 +69,13 @@ int main()
 	test_scene->addSceneObject(player_2);
 	test_scene->getCamera()->lockOnObject(player_1);
 
+	// ------------------------ Create "NPCs" ----------------------------
+	TestObject* npc1 = new TestObject(sf::Vector2f(650.f, 0.f), sf::Vector2f(200.f, 200.f), true);
+	TestObject* npc2 = new TestObject(sf::Vector2f(650.f, 0.f), sf::Vector2f(200.f, 200.f), true);
+	npc1->setId(0001);
+	npc2->setId(0002);
+	test_scene->addSceneObject(npc1);
+	test_scene->addSceneObject(npc2);
 	//------------------------ Add Controls To Players --------------------
 
 	Controller contr_player_1;
@@ -210,5 +217,6 @@ void instanceCounts(std::string s)
 	std::cout << "SceneLayer" << s << ": " << SceneLayer::instanceCount() << "\n";
 	std::cout << "TextureAtlases" << s << ": " << TextureAtlas::instanceCount() << "\n";
 	std::cout << "TextureManagers" << s << ": " << TextureManager::instanceCount() << "\n";
+	std::cout << "PropertyNodes" << s << ": " << PropertyNode::instanceCount() << "\n";
 	std::cout << "\n========================================================\n";
 }

@@ -104,6 +104,11 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size, bool npc)
     npc_frame.region_name = sf::String("Boss");
     this->setCurrentFrame(npc_frame);
 
+
+    HitboxNode* hb = new HitboxNode();
+    hb->connectTo(this);
+    hb->setBehavior(HBOX::DYNAMIC);
+    hb->setHitboxRatio(sf::Vector2f(0.5, 0.5), sf::Vector2f(0.6, 0.8f));
 }
 
 TestObject::~TestObject()
