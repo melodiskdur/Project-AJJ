@@ -76,6 +76,11 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size)
     this->attributes.push_back("Gravity");
     this->attributes.push_back("Air Friction");
 
+    HitboxNode* hb = new HitboxNode();
+    hb->connectTo(this);
+    hb->setBehavior(HBOX::DYNAMIC);
+    hb->setHitboxRatio(sf::Vector2f(0.5, 0.6), sf::Vector2f(0.4, 0.8f));
+
     //--------------------------------------------
 }
 

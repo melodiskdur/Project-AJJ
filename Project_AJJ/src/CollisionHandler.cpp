@@ -99,6 +99,96 @@ std::vector<ObjectData> CollisionHandler::separateCollisionHandleres(Object* i, 
 	// Return the collected data.
 	return wp_and_vel_re;
 }
+
+std::vector<HBData> CollisionHandler::separateHitboxes(HitboxNode* i, HitboxNode* j)
+{
+
+	sf::Vector2f wp_i = i->getGlobalPos();
+	sf::Vector2f wp_j = j->getGlobalPos();
+
+	sf::FloatRect r_i = i->getBB();
+	sf::FloatRect r_j = j->getBB();
+
+	sf::Vector2f size_i = { r_i.width, r_i.height };
+	sf::Vector2f size_j = { r_j.width, r_j.height };
+
+	sf::Vector2f vel_i = i->getParentObject()->getVelocity();
+	sf::Vector2f vel_j = j->getParentObject()->getVelocity();
+
+	// Return values.
+	std::vector<HBData> wp_and_vel_re;
+
+	// Special case: If no objects are moving.
+	if (vel_i.x == 0 && vel_i.y == 0 && vel_j.x == 0 && vel_j.y == 0)
+	{
+		if (i->getBehavior() == HBOX::STATIC && j->getBehavior() == HBOX::STATIC)
+			return wp_and_vel_re;
+		else if (i->getBehavior() == HBOX::STATIC && j->getBehavior() == HBOX::DYNAMIC)
+			wp_and_vel_re.push_back(CollisionHandler::singleSeparation(j, i));
+		else if (i->getBehavior() == HBOX::DYNAMIC && j->getBehavior() == HBOX::STATIC)
+			wp_and_vel_re.push_back(CollisionHandler::singleSeparation(i, j));
+		else if (i->getBehavior() == HBOX::DYNAMIC && j->getBehavior() == HBOX::DYNAMIC)
+			wp_and_vel_re = CollisionHandler::dualSeparation(i, j);
+		return wp_and_vel_re;
+	}
+
+	sf::Vector2f abs_vel_i = sf::Vector2f(std::abs(vel_i.x), std::abs(vel_i.y));
+	sf::Vector2f abs_vel_j = sf::Vector2f(std::abs(vel_j.x), std::abs(vel_j.y));
+
+	// If i is inside j or if j is inside i.
+	if (    //i in j.
+		(r_j.contains(wp_i) &&												  //Upper left corner.
+			r_j.contains(sf::Vector2f(wp_i.x + size_i.x, wp_i.y)) &&			//Upper right corner.
+			r_j.contains(sf::Vector2f(wp_i.x, wp_i.y + size_i.y)) &&			//Lower left corner.
+			r_j.contains(sf::Vector2f(wp_i.x + size_i.x, wp_i.y + size_i.y)))   //Lower right corner.
+		||	//j in i.
+		(r_i.contains(wp_j) &&									            //Upper left corner.
+			r_i.contains(sf::Vector2f(wp_j.x + size_j.x, wp_j.y)) &&			//Upper right corner.
+			r_i.contains(sf::Vector2f(wp_j.x, wp_j.y + size_j.y)) &&			//Lower left corner.
+			r_i.contains(sf::Vector2f(wp_j.x + size_j.x, wp_j.y + size_j.y)))   //Lower right corner.
+		)
+	{
+		// If i is moving and j is not.
+		if ((abs_vel_i.x != 0 || abs_vel_i.y != 0)
+			&& abs_vel_j.x == 0 && abs_vel_j.y == 0)
+		{
+			wp_and_vel_re.push_back(CollisionHandler::singleSeparation(i, j));
+		}
+		// If j is moving and i is not.
+		else if ((abs_vel_j.x != 0 || abs_vel_j.y != 0)
+			&& abs_vel_i.x == 0 && abs_vel_i.y == 0)
+		{
+			wp_and_vel_re.push_back(CollisionHandler::singleSeparation(j, i));
+		}
+		// If both are moving.
+		else
+		{
+			wp_and_vel_re = CollisionHandler::dualSeparation(j, i);
+		}
+	}
+	// If no object is encapsulated within the other.
+	else
+		//if i is moving and j is not.
+		if ((abs_vel_i.x != 0 || abs_vel_i.y != 0)
+			&& abs_vel_j.x == 0 && abs_vel_j.y == 0)
+		{
+			wp_and_vel_re.push_back(CollisionHandler::singleSeparation(i, j));
+		}
+	// If j is moving and i is not.
+		else if ((abs_vel_j.x != 0 || abs_vel_j.y != 0)
+			&& abs_vel_i.x == 0 && abs_vel_i.y == 0)
+		{
+			wp_and_vel_re.push_back(CollisionHandler::singleSeparation(j, i));
+		}
+	// If both are moving.
+		else
+		{
+			wp_and_vel_re = CollisionHandler::dualSeparation(i, j);
+		}
+
+	// Return the collected data.
+	return wp_and_vel_re;
+}
 ObjectData CollisionHandler::singleObjectSeparation(Object* moving, Object* other)
 {
 	// Return value.
@@ -219,10 +309,122 @@ ObjectData CollisionHandler::singleObjectSeparation(Object* moving, Object* othe
 	}
 
 	// Add updated velocities and return ObjectData.
-	data.m_colliding_CollisionHandler = sf::FloatRect(other->getWorldPosition(), other->getSize());
+	data.m_colliding_hitbox = sf::FloatRect(other->getWorldPosition(), other->getSize());
 	data.m_vel = new_vel;
 	data.m_wp = new_pos;
 	data.m_intersect = intersect;
+	return data;
+}
+
+HBData CollisionHandler::singleSeparation(HitboxNode* moving, HitboxNode* still)
+{
+	// Return value.
+	HBData data;
+	data.m_this = moving;
+	data.m_other = still;
+	INTERSECTED_SIDE intersect = INTERSECTED_SIDE::ODATA_NONE;
+	sf::Vector2f vel = moving->getParentObject()->getVelocity();
+	sf::Vector2f prev_pos = moving->getGlobalPos() - vel;
+	sf::Vector2f ul = prev_pos;
+	sf::Vector2f ll = prev_pos + sf::Vector2f(0.0f, moving->getBB().height);
+	sf::Vector2f ur = prev_pos + sf::Vector2f(moving->getBB().width, 0.0f);
+	sf::Vector2f lr = prev_pos + sf::Vector2f(moving->getBB().width, moving->getBB().height);
+	sf::Vector2f new_pos = moving->getGlobalPos();
+	// Axis-aligned velocity.
+	if (vel.x == 0)
+	{
+		new_pos.y = vel.y < 0 ? still->getGlobalPos().y + still->getBB().height
+			: still->getGlobalPos().y - moving->getBB().height;
+		intersect = vel.y < 0 ? INTERSECTED_SIDE::ODATA_TOP : INTERSECTED_SIDE::ODATA_BOTTOM;
+	}
+	else if (vel.y == 0)
+	{
+		new_pos.x = vel.x < 0 ? still->getGlobalPos().x + still->getBB().width
+			: still->getGlobalPos().x - moving->getBB().width;
+		intersect = vel.x < 0 ? INTERSECTED_SIDE::ODATA_LEFT : INTERSECTED_SIDE::ODATA_RIGHT;
+	}
+	// Non-axis-aligned velocity.
+	else
+	{
+		float t_vert, t_hori;							//Vertical and horizontal parameters to calculate intersection points in the moving direction.
+		sf::Vector2f insec_vert[2];					    //Vertical corners of object Other.
+		sf::Vector2f insec_hori[2];					    //Horizontal corners of object Other.
+		sf::Vector2f moving_vert[2];					//Vertical corners of object Moving.
+		sf::Vector2f moving_hori[2];					//Horizontal corners of object Moving.
+
+		// Set vertical and horizontal t parameters.
+		t_vert = vel.x < 0 ? (still->getGlobalPos().x + still->getBB().width - ll.x) / vel.x	//Right side.
+			: (still->getGlobalPos().x - lr.x) / vel.x;										    //Left side.
+		t_hori = vel.y < 0 ? (still->getGlobalPos().y + still->getBB().height - ul.y) / vel.y   //Bottom side.
+			: (still->getGlobalPos().y - lr.y) / vel.y;									     	//Top side.
+
+		// Calculate intersection points.
+		if (vel.x < 0)
+		{
+			moving_vert[0] = ul;
+			moving_vert[1] = ll;
+			insec_vert[0] = sf::Vector2f(still->getGlobalPos().x + still->getBB().width, still->getGlobalPos().y);
+			insec_vert[1] = still->getGlobalPos() + sf::Vector2f(still->getBB().width, still->getBB().height);
+		}
+		else if (vel.x > 0)
+		{
+			moving_vert[0] = ur;
+			moving_vert[1] = lr;
+			insec_vert[0] = still->getGlobalPos();
+			insec_vert[1] = sf::Vector2f(still->getGlobalPos().x, still->getGlobalPos().y + still->getBB().height);
+		}
+		if (vel.y < 0)
+		{
+			moving_hori[0] = ul;
+			moving_hori[1] = ur;
+			insec_hori[0] = sf::Vector2f(still->getGlobalPos().x, still->getGlobalPos().y + still->getBB().height);
+			insec_hori[1] = still->getGlobalPos() + sf::Vector2f(still->getBB().width, still->getBB().height);
+		}
+		else if (vel.y > 0)
+		{
+			moving_hori[0] = ll;
+			moving_hori[1] = lr;
+			insec_hori[0] = still->getGlobalPos();
+			insec_hori[1] = sf::Vector2f(still->getGlobalPos().x + still->getBB().width, still->getGlobalPos().y);
+		}
+		// Vertical check + adjustment.
+		if ((moving_vert[0].y + t_vert * vel.y > insec_vert[0].y && moving_vert[0].y + t_vert * vel.y < insec_vert[1].y) ||
+			(moving_vert[1].y + t_vert * vel.y > insec_vert[0].y && moving_vert[1].y + t_vert * vel.y < insec_vert[1].y))
+		{
+			new_pos.x = vel.x < 0 ? still->getGlobalPos().x + still->getBB().width
+				: still->getGlobalPos().x - moving->getBB().width;
+			// Set intersected side.
+			intersect = vel.x < 0 ? INTERSECTED_SIDE::ODATA_LEFT : INTERSECTED_SIDE::ODATA_RIGHT;
+		}
+		// Horizontal check + adjustment.
+		else if ((moving_hori[0].x + t_hori * vel.x > insec_hori[0].x && moving_hori[0].x + t_hori * vel.x < insec_hori[1].x) ||
+			(moving_hori[1].x + t_hori * vel.x > insec_hori[0].x && moving_hori[1].x + t_hori * vel.x < insec_hori[1].x))
+		{
+			new_pos.y = vel.y < 0 ? still->getGlobalPos().y + still->getBB().height
+				: still->getGlobalPos().y - moving->getBB().height;
+			// Set intersected side.
+			intersect = vel.y < 0 ? INTERSECTED_SIDE::ODATA_TOP : INTERSECTED_SIDE::ODATA_BOTTOM;
+
+		}
+		// If something goes wrong. Do a simple unstuck-check.
+		else
+		{
+			std::vector<sf::Vector2f> unstuck_resolves = CollisionHandler::unstuck(moving->getBB(), still->getBB(), vel);
+			new_pos = unstuck_resolves[0];
+			// Set intersected side.
+			if (new_pos.x - moving->getGlobalPos().x > 0)
+				intersect = INTERSECTED_SIDE::ODATA_LEFT;
+			else if (new_pos.x - moving->getGlobalPos().x < 0)
+				intersect = INTERSECTED_SIDE::ODATA_RIGHT;
+			else if (new_pos.y - moving->getGlobalPos().y > 0)
+				intersect = INTERSECTED_SIDE::ODATA_TOP;
+			else if (new_pos.y - moving->getGlobalPos().y < 0)
+				intersect = INTERSECTED_SIDE::ODATA_BOTTOM;
+		}
+	}
+	// Add updated velocities and return ObjectData.
+	data.m_this_resolve = new_pos;
+	data.m_this_side = intersect;
 	return data;
 }
 
@@ -343,8 +545,123 @@ std::vector<ObjectData> CollisionHandler::dualObjectSeparation(Object* i, Object
 	i_data.m_vel = { ivel.x, ivel.y };
 	j_data.m_wp = jpos;
 	j_data.m_vel = { jvel.x, jvel.y };
-	i_data.m_colliding_CollisionHandler = sf::FloatRect(j_data.m_wp, j->getSize());
-	j_data.m_colliding_CollisionHandler = sf::FloatRect(i_data.m_wp, i->getSize());
+	i_data.m_colliding_hitbox = sf::FloatRect(j_data.m_wp, j->getSize());
+	j_data.m_colliding_hitbox = sf::FloatRect(i_data.m_wp, i->getSize());
+	data.push_back(i_data);
+	data.push_back(j_data);
+	return data;
+}
+
+std::vector<HBData> CollisionHandler::dualSeparation(HitboxNode* i, HitboxNode* j)
+{
+	// Return value.
+	std::vector<HBData> data;
+	HBData i_data;
+	HBData j_data;
+	i_data.m_this = i;
+	i_data.m_other = j;
+	j_data.m_this = j;
+	j_data.m_other = i;
+
+	// Positions.
+	sf::Vector2f ipos = i->getGlobalPos();
+	sf::Vector2f jpos = j->getGlobalPos();
+
+	// Velocities.
+	sf::Vector2f ivel = i->getParentObject()->getVelocity();
+	sf::Vector2f jvel = j->getParentObject()->getVelocity();
+
+	// Previous positions.
+	sf::Vector2f i_prev = ipos - ivel;
+	sf::Vector2f j_prev = jpos - jvel;
+
+	// X, Y overlaps.
+	sf::Vector2f overlaps = CollisionHandler::getOverlaps(i->getBB(), j->getBB());
+
+	// Factors to move i and j by, 0.5 of the overlap for each direction initially.
+	float i_c = 0.5;
+	float j_c = 0.5;
+
+	// Check if i and j are travelling parallel along x.
+	if (CollisionHandler::sameXDirection(i->getParentObject(), j->getParentObject()))
+	{
+		// Only reposition i.
+		if (std::abs(i->getParentObject()->getVelocity().x) > std::abs(j->getParentObject()->getVelocity().x))
+		{
+			i_c = 1;
+			j_c = 0;
+		}
+		// Only reposition j.
+		else
+		{
+			i_c = 0;
+			j_c = 1;
+		}
+	}
+
+	// Check if i and j are travelling parallel along y.
+	if (CollisionHandler::sameYDirection(i->getParentObject(), j->getParentObject()))
+	{
+		// Only reposition i.
+		if (i_prev.y < j_prev.y)
+		{
+			i_c = 1;
+			j_c = 0;
+		}
+		// Only reposition j.
+		else
+		{
+			i_c = 0;
+			j_c = 1;
+		}
+	}
+
+	// Calculate the separation distance multipliers.
+	sf::Vector2f t = CollisionHandler::getT(i, j, overlaps);
+
+	// If horizontal separation happens before vertical separation.
+	if (t.x < t.y)
+	{
+		if (i_prev.x < j_prev.x)
+		{
+			ipos.x -= i_c * overlaps.x;
+			jpos.x += j_c * overlaps.x;
+			// Intersected sides.
+			i_data.m_this_side = INTERSECTED_SIDE::ODATA_RIGHT;
+			j_data.m_this_side = INTERSECTED_SIDE::ODATA_LEFT;
+		}
+		else
+		{
+			ipos.x += i_c * overlaps.x;
+			jpos.x -= j_c * overlaps.x;
+			// Intersected sides.
+			i_data.m_this_side = INTERSECTED_SIDE::ODATA_LEFT;
+			j_data.m_this_side = INTERSECTED_SIDE::ODATA_RIGHT;
+		}
+	}
+	// If vertical spparation happens before horizontal separation.
+	else
+	{
+		if (i_prev.y > j_prev.y)
+		{
+			ipos.y += i_c * overlaps.y;
+			jpos.y -= j_c * overlaps.y;
+			// Intersected sides.
+			i_data.m_this_side = INTERSECTED_SIDE::ODATA_TOP;
+			j_data.m_this_side = INTERSECTED_SIDE::ODATA_BOTTOM;
+		}
+		else
+		{
+			ipos.y -= i_c * overlaps.y;
+			jpos.y += j_c * overlaps.y;
+			// Intersected sides.
+			i_data.m_this_side = INTERSECTED_SIDE::ODATA_BOTTOM;
+			j_data.m_this_side = INTERSECTED_SIDE::ODATA_TOP;
+		}
+	}
+	// Store data in the vector to be returned.
+	i_data.m_this_resolve = ipos;
+	j_data.m_this_resolve = jpos;
 	data.push_back(i_data);
 	data.push_back(j_data);
 	return data;
@@ -438,6 +755,15 @@ sf::Vector2f CollisionHandler::getT(Object* i, Object* j, sf::Vector2f overlaps)
 	// only divide by denom if it's larger than 1.
 	float t_x = denom_x < 1 ? overlaps.x : overlaps.x / denom_x;
 	float t_y = denom_y < 1 ? overlaps.y : overlaps.y / denom_y;
+	return { t_x, t_y };
+}
+
+sf::Vector2f CollisionHandler::getT(HitboxNode* i, HitboxNode* j, sf::Vector2f overlaps)
+{
+	sf::Vector2f denom = i->getParentObject()->getVelocity() - j->getParentObject()->getVelocity();
+	denom = { std::abs(denom.x), std::abs(denom.y) };
+	float t_x = denom.x < 1 ? overlaps.x : overlaps.x / denom.x;
+	float t_y = denom.y < 1 ? overlaps.y : overlaps.y / denom.y;
 	return { t_x, t_y };
 }
 
@@ -577,5 +903,70 @@ std::vector<sf::Vector2f> CollisionHandler::recalibrate(const ObjectData& odata,
 		}
 	}
 
+	return { i_updated, j_updated };
+}
+
+std::vector<sf::Vector2f> CollisionHandler::recalibrate(const HBData& odata, const sf::Vector2f& i_pos, const INTERSECTED_SIDE& adj_intersect, const sf::Vector2f& j_pos)
+{
+	// Quick check to see if the collision is double-sided.
+	bool is_double = (adj_intersect != INTERSECTED_SIDE::ODATA_NONE);
+
+	sf::Vector2f i_updated = i_pos;
+	sf::Vector2f j_updated = j_pos;
+	sf::Vector2f i_size = { odata.m_this->getBB().width, odata.m_this->getBB().height };
+	sf::Vector2f j_size = { odata.m_other->getBB().width, odata.m_other->getBB().height };
+
+	float i_c = is_double ? 0.5f : 1.f;
+	float j_c = 1.f - i_c;
+	sf::Vector2f overlaps = CollisionHandler::getOverlaps({ i_pos, i_size }, { j_pos, j_size });
+
+	switch (odata.m_this_side)
+	{
+	case INTERSECTED_SIDE::ODATA_TOP:
+	{
+
+		if (is_double)
+		{
+			i_updated.y += i_c * overlaps.y;
+			j_updated.y -= j_c * overlaps.y;
+		}
+		else
+			i_updated.y = j_updated.y + j_size.y;
+		break;
+	}
+	case INTERSECTED_SIDE::ODATA_RIGHT:
+	{
+		if (is_double)
+		{
+			i_updated.x -= i_c * overlaps.x;
+			j_updated.x += j_c * overlaps.x;
+		}
+		else
+			i_updated.x = j_updated.x - i_size.x;
+		break;
+	}
+	case INTERSECTED_SIDE::ODATA_BOTTOM:
+	{
+		if (is_double)
+		{
+			i_updated.y -= i_c * overlaps.y;
+			j_updated.y += j_c * overlaps.y;
+		}
+		else
+			i_updated.y = j_updated.y - i_size.y;
+		break;
+	}
+	case INTERSECTED_SIDE::ODATA_LEFT:
+	{
+		if (is_double)
+		{
+			i_updated.x += i_c * overlaps.x;
+			j_updated.x -= j_c * overlaps.x;
+		}
+		else
+			i_updated.x = j_updated.x + j_size.x;
+		break;
+	}
+	}
 	return { i_updated, j_updated };
 }

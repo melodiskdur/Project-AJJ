@@ -341,7 +341,7 @@ void ExtendedRenderWindow::drawLayers()
 // Debugging.
 void ExtendedRenderWindow::debugDraw()
 {
-	
+	/*
 	// COLLISIONDETECTION GRID LINES
 	if (this->active_scene != nullptr)
 	{
@@ -351,7 +351,7 @@ void ExtendedRenderWindow::debugDraw()
 			this->draw(grid[i]);
 		}
 	}
-	
+	*/
 	
 	/*
 	// COLLISIONGRAPH EDGES.
@@ -364,6 +364,16 @@ void ExtendedRenderWindow::debugDraw()
 		}
 	}
 	*/
+
+	// HITBOXNODES.
+	if (this->active_scene != nullptr)
+	{
+		std::vector<HitboxNode*> hitboxes = this->active_scene->getCollisionDetection()->getHitboxes();
+		for (int i = 0; i < hitboxes.size(); i++)
+		{
+			this->draw(hitboxes[i]->getDrawable());
+		}
+	}
 }
 
 void ExtendedRenderWindow::drawLayoutsDEBUG(Layout* parent_layout)

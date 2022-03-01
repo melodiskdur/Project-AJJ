@@ -4,10 +4,12 @@
 #include "Action.h"
 #include "Animation.h"
 #include "TextureIds.h"
+#include "PropertyNode.h"
 
 enum class OBJECT_BEHAVIOR { STATIC, DYNAMIC, HOLLOW };
 
 class Action;
+class PropertyNode;
 
 /* Object 
 Base class for all entities that exist within a scene. 
@@ -36,7 +38,8 @@ public:
 	std::vector<std::string> getPhysicsAttributes() { return this->attributes; };
 	OBJECT_BEHAVIOR getBehaviorType() { return this->behavior_type; };
 	sf::FloatRect getFloatRect();
-	int getNumActions() { return this->num_actions; }
+	int getNumActions() { return this->num_actions; };
+	std::vector<PropertyNode*> getPropertyNodes() { return this->property_nodes; };
 
 	//Setters
 	void setId(int id);
@@ -60,7 +63,7 @@ public:
 	//Called when the object is queried for an action. Looks through its vector for the action 
 	//with a name corresponding to std::string action_name.
 	void onActionRequest(std::string action_name);
-
+	void addPropertyNode(PropertyNode* n) { this->property_nodes.push_back(n); };
 	void addAction(Action* action) { this->object_actions.push_back(action); num_actions++;}
 
 	//DEBUGGING
@@ -82,6 +85,9 @@ protected:
 	sf::Vector2f size = sf::Vector2f(0.0f, 0.0f);				//Geo_shape size
 	int rotation = 0;											//Rotation value of the object
 
+	// Properties.
+	std::vector<PropertyNode*> property_nodes;
+	
 	//Actions
 	std::vector<Action*> object_actions;
 	int num_actions = 0;

@@ -15,7 +15,7 @@ typedef struct _ObjectData
 	sf::Vector2f m_wp;
 	sf::Vector2f m_vel;
 	sf::Vector2f m_acc;
-	sf::FloatRect m_colliding_CollisionHandler;
+	sf::FloatRect m_colliding_hitbox;
 	INTERSECTED_SIDE m_intersect = ODATA_NONE;
 } ObjectData;
 

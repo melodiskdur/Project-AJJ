@@ -14,7 +14,7 @@ Layout* TestLayout::createTestLayout()
 	test_layout->getLayouts()[0]->addLayout(sf::FloatRect(0, 0, 440, 40), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED);
 
 	//this layout will be fixed and adjustment to be in the users view
-	test_layout->setFixedToView(true);
+	test_layout->setFixedToView(false);
 
 	Frame new_frame;
 	new_frame.region_name = "LayoutBlock";

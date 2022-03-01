@@ -9,6 +9,8 @@ CollisionDetection::CollisionDetection(std::vector<Object*>& objects):
 	scene_objects = &objects;
 	root = new QuadTree();
 
+	hb_root = new QuadTree_Hitbox();
+
 	// Debugging
 	root->setGridVector(&this->grid_lines);
 ;}
@@ -75,6 +77,62 @@ std::vector<ObjectTuple> CollisionDetection::getCollisions(sf::FloatRect view_re
 	return this->collisions;
 }
 
+std::vector<CollTuple> CollisionDetection::getCollisions_CT(sf::FloatRect view_rect)
+{
+	std::vector<HitboxNode*> collision_candidates;
+	std::vector<HitboxNode*> rendered_objects;
+	this->cc_holders.clear();
+	this->coll_tuples.clear();
+	hb_root->clearTree();
+	hb_root->setRootBoundaries(view_rect);
+	for (HitboxNode* hbn : this->hitboxes)
+	{
+		//Collision detection only needs to be done for objects within the camera's view.
+		if (view_rect.intersects(hbn->getBB()))
+		{
+			rendered_objects.push_back(hbn);
+			hb_root->insertObject(hbn);
+		}
+	}
+
+	for (HitboxNode* hbn : rendered_objects)
+	{
+		// Skip STATIC objects such as ground, etc.
+		if (hbn->getBehavior() == HBOX::STATIC) continue;
+
+		// Create a CloseCallsHolder storage for close call objects to object i.
+		CCHolder i_holder;
+		i_holder.m_n = hbn;
+		i_holder.m_cc.clear();
+
+		collision_candidates.clear();
+		collision_candidates = hb_root->getCollisionCandidates(hbn);
+		sf::FloatRect object_i = hbn->getBB();		//Object i's collision box.
+		for (HitboxNode* hbn_cand : collision_candidates)
+		{
+			sf::FloatRect object_j = hbn_cand->getBB();  //Object j's collision box.
+			if (this->areIntersecting(object_i, object_j) &&																		//Intersection.
+				hbn != hbn_cand &&																	//Not the same object.
+				!this->tupleExistsX(hbn, hbn_cand))  												//Collision is not already registered in vector.
+			{
+				CollTuple new_collision;
+				new_collision.m_ni = hbn;
+				new_collision.m_nj = hbn_cand;
+				this->coll_tuples.push_back(new_collision);
+			}
+			// If no collision is done, we store the object in object i:s candidate holder.
+			else if (hbn != hbn_cand && this->isCloseCallX(hbn, hbn_cand) &&
+				!this->tupleExistsX(hbn, hbn_cand))
+			{
+				i_holder.m_cc.push_back(hbn_cand);
+			}
+		}
+		// Add object i:s close calls to vector.
+		if (i_holder.m_cc.size() > 0) this->cc_holders.push_back(i_holder);
+	}
+	return (this->coll_tuples);
+}
+
 void CollisionDetection::checkForCollisions(sf::FloatRect view_rect)
 {
 	std::vector<Object*> collision_candidates;
@@ -127,6 +185,16 @@ bool CollisionDetection::tupleExists(Object* o_i, Object* o_j)
 	return false;
 }
 
+bool CollisionDetection::tupleExistsX(HitboxNode* n_i, HitboxNode* n_j)
+{
+	std::vector<CollTuple>::iterator ct_it = std::find_if(this->coll_tuples.begin(), this->coll_tuples.end(),
+		[&](CollTuple ct) -> bool
+		{ 
+			return ((ct.m_ni == n_i && ct.m_nj == n_j) || (ct.m_ni == n_j && ct.m_nj == n_i));
+		});
+	return (ct_it != this->coll_tuples.end());
+}
+
 void CollisionDetection::handleCollisions()
 {
 	for (int i = 0; i < this->collisions.size(); i++)
@@ -163,6 +231,14 @@ bool CollisionDetection::isCloseCall(Object* i, Object* j)
 	return (CollisionDetection::areIntersecting(i_prox_rect, j_box));
 }
 
+bool CollisionDetection::isCloseCallX(HitboxNode* n_i, HitboxNode* n_j)
+{
+	sf::FloatRect bb_i = n_i->getBB();
+	sf::FloatRect bbcc_i = { {bb_i.left - 0.5f * bb_i.width, bb_i.top - 0.5f * bb_i.height}, {2.5f * bb_i.width, 2.5f * bb_i.height} };
+	sf::FloatRect bb_j = n_j->getBB();
+	return (CollisionDetection::areIntersecting(bbcc_i, bb_j));
+}
+
 void CollisionDetection::removeResolved()
 {
 	for (int i = 0; i < this->collisions.size(); i++)
@@ -173,6 +249,23 @@ void CollisionDetection::removeResolved()
 			collisions.erase(collisions.begin() + i);
 			i = 0;
 		}
+	}
+}
+
+void CollisionDetection::findHitboxes()
+{
+	// Exit if the Collision Detection instance isn't connected to a Scene.
+	if (this->scene_objects == nullptr) return;
+	// Search each Object for a HitboxNode.
+	for (Object* o : *(this->scene_objects))
+	{
+		std::vector<PropertyNode*> ns = o->getPropertyNodes();
+		// Search for the first HitboxNode-instance in the property_nodes-vector of o.
+		std::vector<PropertyNode*>::iterator ns_it = std::find_if(ns.begin(), ns.end(),
+			[](PropertyNode* pn) -> bool {return (pn->getPropertyName() == sf::String("Hitbox"));});
+		// If found: cast from PropertyNode to HitboxNode and store.
+		if (ns_it != ns.end())
+			this->hitboxes.push_back(static_cast<HitboxNode*>(*ns_it));
 	}
 }
 
@@ -407,6 +500,232 @@ void QuadTree::collisionCandidateSearch(std::vector<Object*>* candidates)
 }
 
 QuadTree* QuadTree::retreiveSubtreeOf(QuadTree* root, Object* o)
+{
+	int sub_index = this->objectIndex(o);
+	if (sub_index != SUBTREE::ROOT && this->has_sub_trees)
+		return this->sub_trees[sub_index]->retreiveSubtreeOf(this, o);
+	return this;
+}
+
+/************************************************************************
+**************************************************************************
+*************************************************************************
+************************************************************************
+**********************************************************************
+**************************************************************************
+*************************************************************************
+************************************************************************
+**********************************************************************
+**************************************************************************
+*************************************************************************
+************************************************************************
+**********************************************************************
+**************************************************************************
+*************************************************************************
+*************************************************************************/
+
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * *
+*					   QuadTree                    *
+ * * * * * * * * * * * * * * * * * * * * * * * * * */
+QuadTree_Hitbox::QuadTree_Hitbox()
+{
+	tree_level = 0;
+	sub_trees.resize(4);
+	for (int i = 0; i < 4; i++)
+		sub_trees[i] = new QuadTree_Hitbox(tree_level + 1);
+}
+
+QuadTree_Hitbox::QuadTree_Hitbox(int level)
+{
+	this->tree_level = level;
+	sub_trees.resize(4);
+	if (level == QuadTree_Hitbox::max_level - 1)
+	{
+		for (int i = 0; i < 4; i++)
+
+			sub_trees[i] = nullptr;
+		return;
+	}
+	for (int i = 0; i < 4; i++)
+		sub_trees[i] = new QuadTree_Hitbox(tree_level + 1);
+}
+
+QuadTree_Hitbox::QuadTree_Hitbox(int level, sf::FloatRect boundary)
+{
+	tree_level = level;
+	tree_boundary = boundary;
+	for (QuadTree_Hitbox* s : sub_trees)
+		s = nullptr;
+}
+
+QuadTree_Hitbox::~QuadTree_Hitbox()
+{
+	freeTree();
+}
+
+//Getters
+std::vector<sf::FloatRect> QuadTree_Hitbox::getSubTreeBoundaries()
+{
+	std::vector<sf::FloatRect> sub_tree_bounds;
+	float half_width = (this->tree_boundary.width / 2);
+	float half_height = (this->tree_boundary.height / 2);
+	float root_x = (this->tree_boundary.left);
+	float root_y = (this->tree_boundary.top);
+	sub_tree_bounds.resize(4);
+	sub_tree_bounds[SUBTREE::UPPERLEFT] = sf::FloatRect(root_x, root_y, half_width, half_height);
+	sub_tree_bounds[SUBTREE::UPPERRIGHT] = sf::FloatRect(root_x + half_width, root_y, half_width, half_height);
+	sub_tree_bounds[SUBTREE::LOWERRIGHT] = sf::FloatRect(root_x + half_width, root_y + half_height, half_width, half_height);
+	sub_tree_bounds[SUBTREE::LOWERLEFT] = sf::FloatRect(root_x, root_y + half_height, half_width, half_height);
+	return sub_tree_bounds;
+}
+
+std::vector<HitboxNode*> QuadTree_Hitbox::getCollisionCandidates(HitboxNode* current)
+{
+	std::vector<HitboxNode*> candidates;
+
+	// Can only be run from the actual root of the Quad Tree.
+	if (this->tree_level != 0)
+		return candidates;
+
+	// Find pointer to the subtree of which 'current' is an HitboxNode.
+	QuadTree_Hitbox* HitboxNodeSubTree = this->retreiveSubtreeOf(this, current);
+
+	// Insert all the HitboxNodes within the sub trees to HitboxNodeSubTree.
+	this->collisionCandidateSearch(&candidates);
+	return candidates;
+}
+
+//Setters
+void QuadTree_Hitbox::setRootBoundaries(sf::FloatRect boundaries)
+{
+	if (tree_level == 0)
+		tree_boundary = boundaries;
+}
+
+void QuadTree_Hitbox::setLevel(int level)
+{
+	this->tree_level = level;
+}
+
+void QuadTree_Hitbox::setBoundary(sf::FloatRect boundary)
+{
+	this->tree_boundary = boundary;
+}
+
+//Others
+void QuadTree_Hitbox::clearTree()
+{
+	this->tree_objects.clear();
+	for (int i = SUBTREE::UPPERLEFT; i < SUBTREE::LOWERLEFT + 1; i++)
+	{
+		if (this->sub_trees[i] != nullptr)
+			this->sub_trees[i]->clearTree();
+	}
+	this->has_sub_trees = false;
+}
+
+void QuadTree_Hitbox::splitTree()
+{
+	std::vector<sf::FloatRect> sub_tree_bounds = this->getSubTreeBoundaries();
+	sub_trees[SUBTREE::UPPERLEFT]->setBoundary(sub_tree_bounds[SUBTREE::UPPERLEFT]);
+	sub_trees[SUBTREE::UPPERRIGHT]->setBoundary(sub_tree_bounds[SUBTREE::UPPERRIGHT]);
+	sub_trees[SUBTREE::LOWERRIGHT]->setBoundary(sub_tree_bounds[SUBTREE::LOWERRIGHT]);
+	sub_trees[SUBTREE::LOWERLEFT]->setBoundary(sub_tree_bounds[SUBTREE::LOWERLEFT]);
+	this->has_sub_trees = true;
+}
+
+void QuadTree_Hitbox::insertObject(HitboxNode* object)
+{
+	int sub_index;
+	if (this->has_sub_trees)
+	{
+		sub_index = this->objectIndex(object);
+		if (sub_index != SUBTREE::ROOT)							//If object fits in one of this QuadTree_Hitbox's
+		{														//subtrees, add object to that subtree.
+			this->sub_trees[sub_index]->insertObject(object);
+			return;
+		}
+	}
+
+	this->tree_objects.push_back(object);						//Adds object to this QuadTree_Hitbox.
+	if (this->tree_objects.size() > QuadTree_Hitbox::max_objects &&
+		this->tree_level < QuadTree_Hitbox::max_level - 1)
+	{
+		if (!this->has_sub_trees)
+		{
+			this->splitTree();
+		}
+		for (int i = 0; i < this->tree_objects.size(); i++)
+		{
+			sub_index = this->objectIndex(this->tree_objects[i]);
+			if (sub_index != SUBTREE::ROOT)
+			{
+				this->sub_trees[sub_index]->insertObject(this->tree_objects[i]);
+				this->tree_objects.erase(this->tree_objects.begin() + i);
+				i = 0;
+			}
+		}
+	}
+}
+
+int QuadTree_Hitbox::objectIndex(HitboxNode* object)
+{
+	std::vector<sf::FloatRect> sub_tree_bounds = this->getSubTreeBoundaries();
+	sf::FloatRect o_bb = object->getBB();
+	sf::Vector2f object_upperleft = {o_bb.left, o_bb.top};												     //Upper left corner of object.
+	sf::Vector2f object_lowerright = { object_upperleft.x + o_bb.width, object_upperleft.y + o_bb.height };  //Lower right corner of object.
+	for (int i = SUBTREE::UPPERLEFT; i < SUBTREE::LOWERLEFT; i++)
+	{
+		if (sub_tree_bounds[i].contains(object_upperleft) &&		//Checks if an object rectangle fits within any of the subtrees' boundaries. 
+			sub_tree_bounds[i].contains(object_lowerright))
+			return i;
+	}
+	return (int)SUBTREE::ROOT;										//If the object doesn't fit within any of the subtrees
+}																	//it belongs to the root of the subtrees (this QuadTree_Hitbox basically).
+
+void QuadTree_Hitbox::freeTree()
+{
+	tree_objects.clear();
+	this->has_sub_trees = false;
+	for (int i = SUBTREE::UPPERLEFT; i < SUBTREE::LOWERLEFT + 1; i++)
+	{
+		if (sub_trees[i] != nullptr)
+		{
+			sub_trees[i]->freeTree();					//Recursively removes objects and frees Quad Tree memory.
+			delete sub_trees[i];
+			sub_trees[i] = nullptr;
+		}
+	}
+}
+
+// Debugging.
+void QuadTree_Hitbox::setGridVector(std::vector<sf::FloatRect>* grid)
+{
+	if (this->tree_level < this->max_level - 1)
+	{
+		for (int i = 0; i < 4; i++)
+			this->sub_trees[i]->setGridVector(grid);
+	}
+}
+// End debugging.
+
+void QuadTree_Hitbox::collisionCandidateSearch(std::vector<HitboxNode*>* candidates)
+{
+	// Insert the objects in the current tree node.
+	candidates->insert(candidates->end(), this->tree_objects.begin(), this->tree_objects.end());
+
+	// Insert the objects of the sub tree nodes.
+	if (this->has_sub_trees)
+	{
+		sub_trees[SUBTREE::UPPERLEFT]->collisionCandidateSearch(candidates);
+		sub_trees[SUBTREE::UPPERRIGHT]->collisionCandidateSearch(candidates);
+		sub_trees[SUBTREE::LOWERRIGHT]->collisionCandidateSearch(candidates);
+		sub_trees[SUBTREE::LOWERLEFT]->collisionCandidateSearch(candidates);
+	}
+}
+
+QuadTree_Hitbox* QuadTree_Hitbox::retreiveSubtreeOf(QuadTree_Hitbox* root, HitboxNode* o)
 {
 	int sub_index = this->objectIndex(o);
 	if (sub_index != SUBTREE::ROOT && this->has_sub_trees)

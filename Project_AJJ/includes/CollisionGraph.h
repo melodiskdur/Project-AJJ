@@ -12,6 +12,8 @@ enum class EDGE_STATUS { EDGE_ACTIVE, EDGE_RELAXED, EDGE_TRIGGERED, EDGE_UNRESOL
 
 typedef struct _ObjectTuple ObjectTuple;
 typedef struct _CloseCallHolder CloseCallHolder;
+typedef struct _CollTuple CollTuple;
+typedef struct _CCHolder CCHolder;
 
 /* Represents a collision between two objects. The struct
 * in itself is a directed edge between Collisios_Nodes,
@@ -45,7 +47,8 @@ typedef struct _CollisionEdge
 */
 typedef struct _CollisionNode
 {
-	Object* m_node_object;
+	Object* m_node_object = nullptr;
+	HitboxNode* m_hbox = nullptr;
 	sf::Vector2f m_frame_pos;
 	sf::Vector2f m_updated_pos;
 	std::vector<int> i_m_all;
@@ -81,17 +84,21 @@ public:
 	// Reads data from a vector of collision tuples and creates
 	// nodes and edges accordingly. Note that resolves are calculating as well.
 	void storeCollisions(std::vector<ObjectTuple> collision_tuples);
+	void storeCollisions(std::vector<CollTuple> collision_tuples);
 
 	// Looks for the CloseCallHolder.m_object node and stores the close calls
 	// as relaxed edges.
 	void storeCloseCalls(std::vector<CloseCallHolder>& close_calls);
+	void storeCloseCalls(std::vector<CCHolder>& cc);
 
 	// Creates and stores a CollisionNode for an Object instance. Returns
 	// the index of the node in vector node_storage.
 	int createNode(Object* object);
+	int createNode(HitboxNode* hb);
 
 	// Creates and stores a CollisionEdge for odata.m_object.
 	void createEdge(ObjectData& odata);
+	void createEdge(HBData& odata);
 	void createInvertedEdge(CollisionEdge* e);
 
 	// Adds a collision close call to 'node' by creating a CollisionEdge and setting it as relaxed. 
@@ -123,6 +130,7 @@ private:
 	// Edges in c.primary to see if their proposed resolves need to be adjusted relative to the
 	// c.updated_pos.
 	void recalibrateResolves(CollisionNode* c);
+	void recalibrateResolvesV2(CollisionNode* c);
 
 	// Used within resolveCollision().
 	void handleTriggeredCollisions(CollisionNode* c, CollisionEdge* e, const std::vector<int>& i_triggered);
@@ -141,13 +149,16 @@ private:
 	bool collisionTwoSided(CollisionEdge* e);
 	// Check if an Edge e with a STATIC adjacent object triggers an Edge r with a STATIC object.
 	bool staticTriggersStatic(CollisionEdge* e, CollisionEdge* r);
+	bool staticTriggersStaticV2(CollisionEdge * e, CollisionEdge * r);
 	// Checks if e->proposed_resolve also resolves the edge e_tocheck.
 	bool resolves(CollisionEdge* e, CollisionEdge* e_tocheck);
+	bool resolvesV2(CollisionEdge* e, CollisionEdge* e_tocheck);
 	// Checks for intersection between an active and a relaxed Edge.
 	bool intersects(CollisionEdge* e, CollisionEdge* r);
+	bool intersectsV2(CollisionEdge* e, CollisionEdge* r);
 	// Checks for intersection between two Collision Nodes.
 	bool intersects(CollisionNode* c, CollisionNode* c_adj);
-
+	bool intersectsV2(CollisionNode * c, CollisionNode * c_adj);
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	*                Finding Nodes and Edges.                *
 	* * * * * * * * * * * * * * * * * * * * * * * * * * * * **/

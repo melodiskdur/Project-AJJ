@@ -1,7 +1,17 @@
 #pragma once
 #include "PhysicsAttribute.h"
 #include "Object.h"
+#include "HitboxNode.h"
 #include <math.h>
+
+/* HitboxData */
+typedef struct _HBData
+{
+    HitboxNode* m_this = nullptr;
+    HitboxNode* m_other = nullptr;
+    sf::Vector2f m_this_resolve;
+    INTERSECTED_SIDE m_this_side = INTERSECTED_SIDE::ODATA_NONE;
+} HBData;
 
 class CollisionHandler :
     public PhysicsAttribute
@@ -18,10 +28,13 @@ public:
     // Main function for separation. Calls the object seperation functions
     // below depending on if only one or both objects are moving.
     static std::vector<ObjectData> separateCollisionHandleres(Object* i, Object* j);
+    static std::vector<HBData> separateHitboxes(HitboxNode* i, HitboxNode* j);
     // Resolves collisions with only one moving object.
     static ObjectData singleObjectSeparation(Object* moving, Object* other);
+    static HBData singleSeparation(HitboxNode* moving, HitboxNode* still);
     // Resolves collisions where both objects are moving.
     static std::vector<ObjectData> dualObjectSeparation(Object*i, Object* j);
+    static std::vector<HBData> dualSeparation(HitboxNode* i, HitboxNode* j);
 
     // "Last resort" function that unstucks (separates) the CollisionHandleres of
     // two objects (one moving, one still). Moves the moving.CollisionHandler
@@ -32,6 +45,7 @@ public:
     
     // NOTE: DESCRIPTION HERE.
     static std::vector<sf::Vector2f> recalibrate(const ObjectData& odata, const sf::Vector2f& i_pos, const INTERSECTED_SIDE& adj_intersect, const sf::Vector2f& j_pos);
+    static std::vector<sf::Vector2f> recalibrate(const HBData& odata, const sf::Vector2f& i_pos, const INTERSECTED_SIDE& adj_intersect, const sf::Vector2f& j_pos);
 private:
     // Returns how much the two objects are overlapping each other,
     // along both the x- and the y-axis. (Used in dualObjectSeparation).
@@ -45,5 +59,6 @@ private:
     // x- and y-velocities must be multiplied by to undo the x- and y-
     // overlaps. (Used in dualObjectSeparation).
     static sf::Vector2f getT(Object* i, Object* j, sf::Vector2f overlaps);
+    static sf::Vector2f getT(HitboxNode* i, HitboxNode* j, sf::Vector2f overlaps);
 };
 
