@@ -64,7 +64,7 @@ private:
 	void drawLayers();
 
 	// Debugging.
-	bool debugger_mode = false;
+	bool debugger_mode = true;
 	void debugDraw();
 	// End debugging.
 

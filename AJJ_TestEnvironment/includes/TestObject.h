@@ -2,6 +2,7 @@
 #include "Object.h"
 #include "Action.h"
 #include "Animation.h"
+#include "HitboxNode.h"
 
 class TestObject :
     public Object

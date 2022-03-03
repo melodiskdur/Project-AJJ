@@ -7,134 +7,81 @@ CollisionDetection::CollisionDetection(std::vector<Object*>& objects):
 	PhysicsAttribute("Collision Detection")
 {
 	scene_objects = &objects;
-	root = new QuadTree();
+
+	hb_root = new QuadTree();
 
 	// Debugging
-	root->setGridVector(&this->grid_lines);
+	hb_root->setGridVector(&this->grid_lines);
 ;}
 
 CollisionDetection::~CollisionDetection()
 {
-	delete root;
+	delete hb_root;
 }
 
-std::vector<ObjectTuple> CollisionDetection::getCollisions(sf::FloatRect view_rect)
+std::vector<CollTuple> CollisionDetection::getCollisions(sf::FloatRect view_rect)
 {
-	std::vector<Object*> collision_candidates;
-	std::vector<Object*> rendered_objects;
-	this->holders.clear();
-	this->collisions.clear();
-	this->collisions.resize(0);
-	root->clearTree();
-	root->setRootBoundaries(view_rect);
-	for (int i = 0; i < scene_objects->size(); i++)
+	std::vector<HitboxNode*> collision_candidates;
+	std::vector<HitboxNode*> rendered_objects;
+	this->cc_holders.clear();
+	this->coll_tuples.clear();
+	hb_root->clearTree();
+	hb_root->setRootBoundaries(view_rect);
+	for (HitboxNode* hbn : this->hitboxes)
 	{
 		//Collision detection only needs to be done for objects within the camera's view.
-		if (view_rect.contains(scene_objects->at(i)->getWorldPosition()))
+		if (view_rect.intersects(hbn->getBB()))
 		{
-			rendered_objects.push_back(scene_objects->at(i));
-			root->insertObject(scene_objects->at(i));
+			rendered_objects.push_back(hbn);
+			hb_root->insertObject(hbn);
 		}
 	}
 
-	for (int i = 0; i < rendered_objects.size(); i++)
+	for (HitboxNode* hbn : rendered_objects)
 	{
-		//Collision detection only needs to be done for objects within the camera's view.
-		if (rendered_objects[i]->getBehaviorType() == OBJECT_BEHAVIOR::STATIC) continue;
+		// Skip STATIC objects such as ground, etc.
+		if (hbn->getBehavior() == HBOX::STATIC) continue;
 
 		// Create a CloseCallsHolder storage for close call objects to object i.
-		CloseCallHolder i_holder;
-		i_holder.m_object = rendered_objects[i];
-		i_holder.m_close_calls.clear();
+		CCHolder i_holder;
+		i_holder.m_n = hbn;
+		i_holder.m_cc.clear();
 
 		collision_candidates.clear();
-		collision_candidates = root->getCollisionCandidates(rendered_objects.at(i));
-		sf::FloatRect object_i = sf::FloatRect(rendered_objects.at(i)->getWorldPosition(), rendered_objects.at(i)->getSize());		//Object i's collision box.
-		for (int j = 0; j < collision_candidates.size(); j++)
+		collision_candidates = hb_root->getCollisionCandidates(hbn);
+		// Check each collision candidat for bounding box intersection.
+		for (HitboxNode* hbn_cand : collision_candidates)
 		{
-			sf::FloatRect object_j = sf::FloatRect(rendered_objects.at(j)->getWorldPosition(), rendered_objects.at(j)->getSize());  //Object j's collision box.
-			if ( this->areIntersecting(object_i, object_j) &&																		//Intersection.
-				rendered_objects.at(i) != rendered_objects.at(j) &&																	//Not the same object.
-				!this->tupleExists(rendered_objects.at(i), rendered_objects.at(j)) )  												//Collision is not already registered in vector.
+			if (CollisionHandler::bb_intersects(hbn, hbn_cand) &&					      		// Bounding box-intersection.
+				hbn != hbn_cand &&																// Not the same object.
+				!this->tupleExists(hbn, hbn_cand))  											// Collision is not already registered in vector.
 			{
-				ObjectTuple new_collision;
-				new_collision.obj_i = rendered_objects.at(i);
-				new_collision.obj_j = rendered_objects.at(j);
-				this->collisions.push_back(new_collision);
+				CollTuple new_collision;
+				new_collision.m_ni = hbn;
+				new_collision.m_nj = hbn_cand;
+				this->coll_tuples.push_back(new_collision);
 			}
 			// If no collision is done, we store the object in object i:s candidate holder.
-			else if (rendered_objects.at(i) != rendered_objects.at(j) && this->isCloseCall(rendered_objects.at(i), rendered_objects.at(j)) &&
-				    !this->tupleExists(rendered_objects.at(i), rendered_objects.at(j)))
+			else if (hbn != hbn_cand && this->isCloseCall(hbn, hbn_cand) &&
+				!this->tupleExists(hbn, hbn_cand))
 			{
-				i_holder.m_close_calls.push_back(rendered_objects.at(j));
+				i_holder.m_cc.push_back(hbn_cand);
 			}
 		}
 		// Add object i:s close calls to vector.
-		if (i_holder.m_close_calls.size() > 0) this->holders.push_back(i_holder);
+		if (i_holder.m_cc.size() > 0) this->cc_holders.push_back(i_holder);
 	}
-	return this->collisions;
+	return (this->coll_tuples);
 }
 
-void CollisionDetection::checkForCollisions(sf::FloatRect view_rect)
+bool CollisionDetection::tupleExists(HitboxNode* n_i, HitboxNode* n_j)
 {
-	std::vector<Object*> collision_candidates;
-	std::vector<Object*> rendered_objects;
-	this->collisions.clear();
-	this->collisions.resize(0);
-	root->clearTree();
-	root->setRootBoundaries(view_rect);
-	for (int i = 0; i < scene_objects->size(); i++)
-	{
-		//Collision detection only needs to be done for objects within the camera's view.
-		if (view_rect.contains(scene_objects->at(i)->getWorldPosition()))
-		{
-			rendered_objects.push_back(scene_objects->at(i));
-			root->insertObject(scene_objects->at(i));
-		}
-	}
-
-	for (int i = 0; i < rendered_objects.size(); i++)
-	{
-		collision_candidates.clear();
-		collision_candidates = root->getCollisionCandidates(rendered_objects.at(i));
-		sf::FloatRect object_i = sf::FloatRect(rendered_objects.at(i)->getWorldPosition(), rendered_objects.at(i)->getSize());		//Object i's collision box.
-		for (int j = 0; j < collision_candidates.size(); j++)
-		{
-			sf::FloatRect object_j = sf::FloatRect(rendered_objects.at(j)->getWorldPosition(), rendered_objects.at(j)->getSize());  //Object j's collision box.
-			if (this->areIntersecting(object_i, object_j) &&																		//Intersection.
-				rendered_objects.at(i) != rendered_objects.at(j) &&																	//Not the same object.
-				!this->tupleExists(rendered_objects.at(i), rendered_objects.at(j)) &&												//Collision is not already registered in vector.
-				this->atLeastOneMoving(rendered_objects.at(i), rendered_objects.at(j)))											//At least one object is moving.
-			{
-				ObjectTuple new_collision;
-				new_collision.obj_i = rendered_objects.at(i);
-				new_collision.obj_j = rendered_objects.at(j);
-				this->collisions.push_back(new_collision);
-			}
-		}
-	}
-	this->handleCollisions();
-}
-
-bool CollisionDetection::tupleExists(Object* o_i, Object* o_j)
-{
-	for (int i = 0; i < this->collisions.size(); i++)
-	{
-		if ((collisions[i].obj_i == o_i && collisions[i].obj_j == o_j) ||
-			(collisions[i].obj_i == o_j && collisions[i].obj_j == o_i))
-			return true;
-	}
-	return false;
-}
-
-void CollisionDetection::handleCollisions()
-{
-	for (int i = 0; i < this->collisions.size(); i++)
-	{
-		//Collision handling
-		CollisionHandler::separateCollisionHandleres(collisions[i].obj_i, collisions[i].obj_j);
-		this->removeResolved();
-	}
+	std::vector<CollTuple>::iterator ct_it = std::find_if(this->coll_tuples.begin(), this->coll_tuples.end(),
+		[&](CollTuple ct) -> bool
+		{ 
+			return ((ct.m_ni == n_i && ct.m_nj == n_j) || (ct.m_ni == n_j && ct.m_nj == n_i));
+		});
+	return (ct_it != this->coll_tuples.end());
 }
 
 bool CollisionDetection::atLeastOneMoving(Object* i, Object* j)
@@ -145,34 +92,28 @@ bool CollisionDetection::atLeastOneMoving(Object* i, Object* j)
 	return (ivel.x != 0 || ivel.y != 0 || jvel.x != 0 || jvel.y != 0);
 }
 
-bool CollisionDetection::areIntersecting(sf::FloatRect ibox, sf::FloatRect jbox)
+bool CollisionDetection::isCloseCall(HitboxNode* n_i, HitboxNode* n_j)
 {
-	return (ibox.intersects(jbox) || jbox.intersects(ibox));
+	sf::FloatRect bb_i = n_i->getBB();
+	sf::FloatRect bbcc_i = { {bb_i.left - 0.5f * bb_i.width, bb_i.top - 0.5f * bb_i.height}, {2.5f * bb_i.width, 2.5f * bb_i.height} };
+	sf::FloatRect bb_j = n_j->getBB();
+	return (CollisionHandler::bb_intersects(bbcc_i, bb_j));
 }
 
-bool CollisionDetection::isCloseCall(Object* i, Object* j)
+void CollisionDetection::findHitboxes()
 {
-	// Define a FloatRect representing the proximity of i.
-	sf::Vector2f i_prox_topleft = i->getWorldPosition() - 0.5f * i->getSize();
-	sf::Vector2f i_prox_size = i->getSize() * 2.5f;
-	sf::FloatRect i_prox_rect = {i_prox_topleft, i_prox_size};
-
-	// Close object CollisionHandler.
-	sf::FloatRect j_box = { j->getWorldPosition(), j->getSize() };
-	// Call to ColDet::areIntersecting.
-	return (CollisionDetection::areIntersecting(i_prox_rect, j_box));
-}
-
-void CollisionDetection::removeResolved()
-{
-	for (int i = 0; i < this->collisions.size(); i++)
+	// Exit if the Collision Detection instance isn't connected to a Scene.
+	if (this->scene_objects == nullptr) return;
+	// Search each Object for a HitboxNode.
+	for (Object* o : *(this->scene_objects))
 	{
-		if ( !areIntersecting(sf::FloatRect(collisions[i].obj_i->getWorldPosition(), collisions[i].obj_i->getSize()),
-			sf::FloatRect(collisions[i].obj_j->getWorldPosition(), collisions[i].obj_j->getSize())) )
-		{
-			collisions.erase(collisions.begin() + i);
-			i = 0;
-		}
+		std::vector<PropertyNode*> ns = o->getPropertyNodes();
+		// Search for the first HitboxNode-instance in the property_nodes-vector of o.
+		std::vector<PropertyNode*>::iterator ns_it = std::find_if(ns.begin(), ns.end(),
+			[](PropertyNode* pn) -> bool {return (pn->getPropertyName() == sf::String("Hitbox"));});
+		// If found: cast from PropertyNode to HitboxNode and store.
+		if (ns_it != ns.end())
+			this->hitboxes.push_back(static_cast<HitboxNode*>(*ns_it));
 	}
 }
 
@@ -253,18 +194,18 @@ std::vector<sf::FloatRect> QuadTree::getSubTreeBoundaries()
 	return sub_tree_bounds;
 }
 
-std::vector<Object*> QuadTree::getCollisionCandidates(Object* current)
+std::vector<HitboxNode*> QuadTree::getCollisionCandidates(HitboxNode* current)
 {
-	std::vector<Object*> candidates;
+	std::vector<HitboxNode*> candidates;
 
 	// Can only be run from the actual root of the Quad Tree.
 	if (this->tree_level != 0)
 		return candidates;
 
-	// Find pointer to the subtree of which 'current' is an Object.
-	QuadTree* objectSubTree = this->retreiveSubtreeOf(this, current);
+	// Find pointer to the subtree of which 'current' is an HitboxNode.
+	QuadTree* HitboxNodeSubTree = this->retreiveSubtreeOf(this, current);
 
-	// Insert all the objects within the sub trees to objectSubTree.
+	// Insert all the HitboxNodes within the sub trees to HitboxNodeSubTree.
 	this->collisionCandidateSearch(&candidates);
 	return candidates;
 }
@@ -296,10 +237,6 @@ void QuadTree::clearTree()
 			this->sub_trees[i]->clearTree();
 	}
 	this->has_sub_trees = false;
-
-	// Debugging.
-	if (this->tree_level == 0)
-		this->grid_lines->clear();
 }
 
 void QuadTree::splitTree()
@@ -310,13 +247,9 @@ void QuadTree::splitTree()
 	sub_trees[SUBTREE::LOWERRIGHT]->setBoundary(sub_tree_bounds[SUBTREE::LOWERRIGHT]);
 	sub_trees[SUBTREE::LOWERLEFT]->setBoundary(sub_tree_bounds[SUBTREE::LOWERLEFT]);
 	this->has_sub_trees = true;
-
-	// Debugging.
-	for (int i = 0; i < 4; i++)
-		this->grid_lines->push_back(sub_tree_bounds[i]);
 }
 
-void QuadTree::insertObject(Object* object)
+void QuadTree::insertObject(HitboxNode* object)
 {
 	int sub_index;
 	if (this->has_sub_trees)
@@ -324,13 +257,13 @@ void QuadTree::insertObject(Object* object)
 		sub_index = this->objectIndex(object);
 		if (sub_index != SUBTREE::ROOT)							//If object fits in one of this QuadTree's
 		{														//subtrees, add object to that subtree.
-			this->sub_trees[sub_index]->insertObject(object);			
+			this->sub_trees[sub_index]->insertObject(object);
 			return;
 		}
 	}
-	
+
 	this->tree_objects.push_back(object);						//Adds object to this QuadTree.
-	if (this->tree_objects.size() > QuadTree::max_objects &&	
+	if (this->tree_objects.size() > QuadTree::max_objects &&
 		this->tree_level < QuadTree::max_level - 1)
 	{
 		if (!this->has_sub_trees)
@@ -350,15 +283,16 @@ void QuadTree::insertObject(Object* object)
 	}
 }
 
-int QuadTree::objectIndex(Object* object)
+int QuadTree::objectIndex(HitboxNode* object)
 {
 	std::vector<sf::FloatRect> sub_tree_bounds = this->getSubTreeBoundaries();
-	sf::Vector2f object_upperleft = object->getWorldPosition();				//Upper left corner of object.
-	sf::Vector2f object_lowerright = object_upperleft + object->getSize();  //Lower right corner of object.
+	sf::FloatRect o_bb = object->getBB();
+	sf::Vector2f object_upperleft = {o_bb.left, o_bb.top};												     //Upper left corner of object.
+	sf::Vector2f object_lowerright = { object_upperleft.x + o_bb.width, object_upperleft.y + o_bb.height };  //Lower right corner of object.
 	for (int i = SUBTREE::UPPERLEFT; i < SUBTREE::LOWERLEFT; i++)
 	{
 		if (sub_tree_bounds[i].contains(object_upperleft) &&		//Checks if an object rectangle fits within any of the subtrees' boundaries. 
-			sub_tree_bounds[i].contains(object_lowerright))			
+			sub_tree_bounds[i].contains(object_lowerright))
 			return i;
 	}
 	return (int)SUBTREE::ROOT;										//If the object doesn't fit within any of the subtrees
@@ -387,11 +321,10 @@ void QuadTree::setGridVector(std::vector<sf::FloatRect>* grid)
 		for (int i = 0; i < 4; i++)
 			this->sub_trees[i]->setGridVector(grid);
 	}
-	this->grid_lines = grid;
 }
 // End debugging.
 
-void QuadTree::collisionCandidateSearch(std::vector<Object*>* candidates)
+void QuadTree::collisionCandidateSearch(std::vector<HitboxNode*>* candidates)
 {
 	// Insert the objects in the current tree node.
 	candidates->insert(candidates->end(), this->tree_objects.begin(), this->tree_objects.end());
@@ -406,7 +339,7 @@ void QuadTree::collisionCandidateSearch(std::vector<Object*>* candidates)
 	}
 }
 
-QuadTree* QuadTree::retreiveSubtreeOf(QuadTree* root, Object* o)
+QuadTree* QuadTree::retreiveSubtreeOf(QuadTree* root, HitboxNode* o)
 {
 	int sub_index = this->objectIndex(o);
 	if (sub_index != SUBTREE::ROOT && this->has_sub_trees)

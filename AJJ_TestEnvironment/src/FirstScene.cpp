@@ -108,6 +108,8 @@ Scene* FirstScene::createScene()
 	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", fg_layer1, 10, 35, -1, 0.5f, 1.7f, sf::Vector2f(200.0f, -400.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
 	FirstScene::addTrees(first_scene);
 	
+	// Create HitboxNodes and add to relevant tiles.
+	FirstScene::createHitboxNodes(first_scene);
 	SceneLayer* layout_test1 = new SceneLayer(-2, 1.f, 0);
 	layout_test1->addLayout(TestLayout::createTestLayout(false));
 	first_scene->addSceneLayer(layout_test1);
@@ -134,7 +136,7 @@ void FirstScene::createWorldLayer(Scene* scene, sf::String texture_name, std::ve
 		{
 			if (map[i * cols + j] == -1)
 				continue;
-			
+
 			current_x = start_pos.x + j * object_size.x;
 			current_y = start_pos.y + i * object_size.y;
 			Object* tile = new Object(sf::Vector2f(current_x, current_y), object_size);
@@ -142,6 +144,10 @@ void FirstScene::createWorldLayer(Scene* scene, sf::String texture_name, std::ve
 			tile->setId(counter);
 			Frame tile_frame;
 			tile_frame.duration = 200;
+			if (i == 7 && j == 8) std::cout << "x: " << counter << "\n";
+			else if (i == 2 && j == 0) std::cout << "y: " << counter << "\n";
+			else if (i == 7 && j == 0) std::cout << "z: " << counter << "\n";
+			else if (i == 7 && j == 21) std::cout << "w: " << counter << "\n";
 			tile_frame.frame_index = map[i * cols + j];
 			tile_frame.texture_id = TEXTURE_ID::NONE;
 			tile_frame.region_name = "Tile";
@@ -347,4 +353,40 @@ void FirstScene::addTrees(Scene* scene)
 		c->setCurrentFrame(frame);
 		L->addObject(c);
 	}
+}
+
+void FirstScene::createHitboxNodes(Scene* scene)
+{
+	
+	// y.
+	Object* y = scene->getObjectWithId(0);
+	HitboxNode* node = new HitboxNode();
+	node->connectTo(y);
+	node->setHitboxTotal(sf::FloatRect(0.f, 0.f, 3.f * 80.f, 5.f * 80.f));
+
+	// z.
+	Object* z = scene->getObjectWithId(15);
+	node = new HitboxNode();
+	node->connectTo(z);
+	node->setHitboxTotal(sf::FloatRect(0.f, 0.f, 7.f * 80.f, 3.f * 80.f));
+
+	// x. 
+	Object* x = scene->getObjectWithId(22);
+	node = new HitboxNode();
+	node->connectTo(x);
+	node->setHitboxTotal(sf::FloatRect(0.f, 0.f, 11.f * 80.f, 3.f * 80.f));
+
+	// w.
+	Object* w = scene->getObjectWithId(33);
+	node = new HitboxNode();
+	node->connectTo(w);
+	node->setHitboxTotal(sf::FloatRect(0.f, 0.f, 14.f * 80.f, 3.f * 80.f));
+
+	// Subbox test.
+	Object* sbo = scene->getObjectWithId(40);
+	node = new HitboxNode();
+	node->connectTo(sbo);
+	node->setHitboxRatio(sf::Vector2f(0.f, -1.f), sf::Vector2f(6.f, 2.f));
+	std::vector<sf::Vector2f> pts{ {0.f, 1.f}, {0.5f, 0.f}, {1.f, 1.f} };
+	node->createSubBox(pts);
 }

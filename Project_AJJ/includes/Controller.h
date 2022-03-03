@@ -9,7 +9,6 @@
 /* Controller
 Base class for controlling the object ingame.
 */
-
 struct ActionNode
 {
 	std::vector<sf::Keyboard::Key> keys;		//the key or key-combination that trigger the action

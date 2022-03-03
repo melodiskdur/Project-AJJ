@@ -17,8 +17,10 @@ void CollisionGraph::resolveTree()
 	this->sortPrimaryEdgesByType();
 	for (CollisionEdge* e : this->findEdgesByVector(this->i_primary_edges))
 	{
+		if (e->m_is_relaxed) continue;
 		CollisionNode* c = this->findNode(e->m_i_node);
 		this->resolveCollision(e, c);
+		if (this->collisionTwoSided(e)) this->resolveCollision(this->invertedEdge(e), this->findNode(e->m_i_adjacent));
 	}
 	while (this->i_triggered_edges.size() > 0)
 	{
@@ -30,7 +32,7 @@ void CollisionGraph::resolveTree()
 			this->resolveCollision(e, c);
 		}
 	}
-	/*
+	
 	// Check for intersects.
 	for (CollisionEdge* e : findEdgesByVector(this->i_active_edges))
 	{
@@ -38,12 +40,13 @@ void CollisionGraph::resolveTree()
 		CollisionNode* c_adj = this->findNode(e->m_i_adjacent);
 		if (this->intersects(c, c_adj))
 		{
+			/*
 			std::cout << "REMAINING INTERSECT (" << c->m_node_object->getId() << ", "
 				<< c_adj->m_node_object->getId() << ") [ " << std::string(this->intersectString(e->m_side))
 				<< " ] [ " << e->m_is_visited << " ]\n";
+		    */
 		}
 	}
-	*/
 }
 
 void CollisionGraph::resolveCollision(CollisionEdge* e, CollisionNode* c)
@@ -85,40 +88,40 @@ void CollisionGraph::applyTreeResolution()
 {
 	for (CollisionNode& node : this->node_storage)
 	{
-		node.m_node_object->setWorldPosition(node.m_updated_pos);
+		node.m_hbox->updateObjectPos(node.m_updated_pos);
 		// DEBUGGING
 		// THIS SHOULD PERHAPS NOT BE HERE.
 		sf::Vector2f o_velocity = node.m_node_object->getVelocity();
-		if (node.m_horizontal_collision) o_velocity.x = 0.0f;
+		//if (node.m_horizontal_collision) o_velocity.x = 0.0f;
 		if (node.m_vertical_collision) o_velocity.y = 0.0f;
 		node.m_node_object->setVelocity(o_velocity);
 		// END DEBUGGING.
 	}
 }
 
-void CollisionGraph::storeCollisions(std::vector<ObjectTuple> collision_tuples)
+void CollisionGraph::storeCollisions(std::vector<CollTuple> collision_tuples)
 {
 	this->clearVectors();
-	for (ObjectTuple tuple : collision_tuples)
+	for (CollTuple tuple : collision_tuples)
 	{
-		this->createNode(tuple.obj_i);
-		this->createNode(tuple.obj_j);
+		this->createNode(tuple.m_ni);
+		this->createNode(tuple.m_nj);
 		// Calculate CollisionHandler resolves and create the corresponding CollisionEdges.
-		std::vector<ObjectData> v_odata = CollisionHandler::separateCollisionHandleres(tuple.obj_i, tuple.obj_j);
-		for (ObjectData odata : v_odata)
+		std::vector<HBData> v_odata = CollisionHandler::separateHitboxes(tuple.m_ni, tuple.m_nj);
+		for (HBData odata : v_odata)
 		{
 			this->createEdge(odata);
 		}
 	}
 }
 
-void CollisionGraph::storeCloseCalls(std::vector<CloseCallHolder>& close_calls)
+void CollisionGraph::storeCloseCalls(std::vector<CCHolder>& close_calls)
 {
-	for (CloseCallHolder holder : close_calls)
+	for (CCHolder holder : close_calls)
 	{
-		int c_index= this->createNode(holder.m_object);
+		int c_index = this->createNode(holder.m_n);
 		// Create Nodes, as well as Edges from holder.m_object to each close call object.
-		for (Object* cc : holder.m_close_calls)
+		for (HitboxNode* cc : holder.m_cc)
 		{
 			int cc_index = this->createNode(cc);
 			this->createCloseCallEdge(this->findNode(c_index), this->findNode(cc_index));
@@ -126,18 +129,17 @@ void CollisionGraph::storeCloseCalls(std::vector<CloseCallHolder>& close_calls)
 	}
 }
 
-int CollisionGraph::createNode(Object* object)
+int CollisionGraph::createNode(HitboxNode* hb)
 {
 	// Double check that the Node doesn't already exist.
-	if (this->findNode(object) != nullptr) return this->findNode(object)->m_storage_index;
-
+	if (this->findNode(hb->getParentObject()) != nullptr) return this->findNode(hb->getParentObject())->m_storage_index;
 	// Set up and store Node.
 	CollisionNode new_node;
-	new_node.m_node_object = object;
-	new_node.m_frame_pos = object->getWorldPosition();
+	new_node.m_node_object = hb->getParentObject();
+	new_node.m_hbox = hb;
+	new_node.m_frame_pos = hb->getGlobalPos();
 	new_node.m_updated_pos = new_node.m_frame_pos;
 	new_node.m_storage_index = static_cast<int>(this->node_storage.size());
-
 	// Node storage.
 	this->node_storage.push_back(new_node);
 	// Node index storage for later use.
@@ -145,19 +147,24 @@ int CollisionGraph::createNode(Object* object)
 	return new_node.m_storage_index;
 }
 
-void CollisionGraph::createEdge(ObjectData& odata)
+void CollisionGraph::createEdge(HBData& odata)
 {
-	CollisionNode* c_i = this->findNode(odata.m_object);
-	CollisionNode* c_j = this->findNode(odata.m_colliding_object);
+	CollisionNode* c_i = this->findNode(odata.m_this->getParentObject());
+	CollisionNode* c_j = this->findNode(odata.m_other->getParentObject());
 	// Exit if at least one Node is missing.
 	if (c_i == nullptr || c_j == nullptr) return;
 	// Setting up the new Edge.
 	CollisionEdge new_edge;
 	new_edge.m_i_node = c_i->m_storage_index;
 	new_edge.m_i_adjacent = c_j->m_storage_index;
-	new_edge.m_proposed_resolve = odata.m_wp;
+	new_edge.m_proposed_resolve = odata.m_this_resolve;
 	new_edge.m_storage_index = static_cast<int>(this->edge_storage.size());
-	new_edge.m_side = odata.m_intersect;
+	new_edge.m_side = odata.m_this_side;
+
+	// DEBUGGING.
+	new_edge.oi_id = c_i->m_node_object->getId();
+	new_edge.oj_id = c_j->m_node_object->getId();
+	// DEBUGGING.
 
 	// Store Edge and add index to the storage to object's Node.primary.
 	this->edge_storage.push_back(new_edge);
@@ -187,6 +194,11 @@ void CollisionGraph::createCloseCallEdge(CollisionNode* node, CollisionNode* adj
 	// Set edge as relaxed.
 	new_edge.m_is_relaxed = true;
 
+	// DEBUGGING.
+	new_edge.oi_id = node->m_node_object->getId();
+	new_edge.oj_id = adjacent->m_node_object->getId();
+	// DEBUGGING.
+
 	// Store Edge and add index to the storage to object's Node.relaxed.
 	this->edge_storage.push_back(new_edge);
 	this->i_active_edges.push_back(new_edge.m_storage_index);
@@ -203,10 +215,9 @@ void CollisionGraph::updatePosition(CollisionNode* c, CollisionEdge* e)
 	e->m_is_relaxed = true;
 	// PRINT
 	//std::cout << "RESOLVED (" << c->m_node_object->getId() << ", " << this->findNode(e->m_i_adjacent)->m_node_object->getId() << ") [ "
-	//
 	//	<< std::string(this->intersectString(e->m_side)) << " ]\n";
 	// /PRINT
-	if (this->findNode(e->m_i_adjacent)->m_node_object->getBehaviorType() == OBJECT_BEHAVIOR::STATIC)
+	if (this->findNode(e->m_i_adjacent)->m_hbox->getBehavior() == HBOX::STATIC)
 		e->m_is_visited = true;
 	this->moveEdgeIndex(e, c->i_m_primary, c->i_m_relaxed);
 	this->moveEdgeIndex(e, this->i_primary_edges, this->i_relaxed_edges);
@@ -237,11 +248,13 @@ void CollisionGraph::recalibrateResolves(CollisionNode* c)
 	for (CollisionEdge* e : this->findOutgoingEdges(c))
 	{
 		// No recalibration needed if if an Edge is relaxed.
+		HitboxNode* adj = this->findNode(e->m_i_adjacent)->m_hbox;
 		if (e->m_is_relaxed) continue;
-		ObjectData temp_data;
-		temp_data.m_object = c->m_node_object;
-		temp_data.m_colliding_object = this->findNode(e->m_i_adjacent)->m_node_object;
-		temp_data.m_intersect = e->m_side;
+		if (adj->getSB_pts().size() > 0) continue;
+		HBData temp_data;
+		temp_data.m_this = c->m_hbox;
+		temp_data.m_other = adj;
+		temp_data.m_this_side = e->m_side;
 		// Recalibrations. Look for the inverted Edge to determine if there's a double collision at hand. If
 		// there is a double collision but the inverted Edge is visited (it's been triggered in a collision
 		// chain originating from a STATIC object), we proceed as if this is a single collision (only moving c.object.)
@@ -289,7 +302,7 @@ void CollisionGraph::collisionTriggered(CollisionEdge* r, CollisionEdge* e)
 	if (r->m_side == INTERSECTED_SIDE::ODATA_NONE)
 		r->m_side = this->oppositeSide(e->m_side);
 
-	if (r_adj->m_node_object->getBehaviorType() == OBJECT_BEHAVIOR::STATIC)
+	if (r_adj->m_hbox->getBehavior() == HBOX::STATIC)
 		chain_case = true;
 	else
 	{
@@ -364,8 +377,8 @@ bool CollisionGraph::staticTriggersStatic(CollisionEdge* e, CollisionEdge* r)
 {
 	CollisionNode* e_adj = this->findNode(e->m_i_adjacent);
 	CollisionNode* r_adj = this->findNode(r->m_i_adjacent);
-	return (e_adj->m_node_object->getBehaviorType() == OBJECT_BEHAVIOR::STATIC &&
-		    r_adj->m_node_object->getBehaviorType() == OBJECT_BEHAVIOR::STATIC);
+	return (e_adj->m_hbox->getBehavior() == HBOX::STATIC &&
+		r_adj->m_hbox->getBehavior() == HBOX::STATIC);
 }
 
 bool CollisionGraph::resolves(CollisionEdge* e, CollisionEdge* e_tocheck)
@@ -373,7 +386,9 @@ bool CollisionGraph::resolves(CollisionEdge* e, CollisionEdge* e_tocheck)
 	// First, check that they're intersecting before moving.
 	CollisionNode* c = this->findNode(e->m_i_node);
 	CollisionNode* adj = this->findNode(e_tocheck->m_i_adjacent);
-	if (CollisionDetection::areIntersecting({c->m_updated_pos, c->m_node_object->getSize()}, {adj->m_updated_pos, adj->m_node_object->getSize()}))
+	sf::Vector2f sz_c = { c->m_hbox->getBB().width, c->m_hbox->getBB().height };
+	sf::Vector2f sz_adj = { adj->m_hbox->getBB().width, adj->m_hbox->getBB().height };
+	if (CollisionHandler::bb_intersects({ c->m_updated_pos, sz_c }, { adj->m_updated_pos, sz_adj }))
 	{
 		return !(this->intersects(e, e_tocheck));
 	}
@@ -387,13 +402,20 @@ bool CollisionGraph::intersects(CollisionEdge* e, CollisionEdge* r)
 	if (c == nullptr || adj == nullptr) return false;
 	// Proposed resolve.
 	sf::Vector2f proposed = c->m_updated_pos + (e->m_proposed_resolve - c->m_updated_pos);
-	if (CollisionDetection::areIntersecting({ proposed, c->m_node_object->getSize() }, { adj->m_updated_pos, adj->m_node_object->getSize() }))
+	// Sizes.
+	sf::Vector2f sz_c = { c->m_hbox->getBB().width, c->m_hbox->getBB().height };
+	sf::Vector2f sz_adj = { adj->m_hbox->getBB().width, adj->m_hbox->getBB().height };
+	if (CollisionHandler::bb_intersects({ proposed, sz_c }, {adj->m_updated_pos, sz_adj}))
 		return true;
 	return false;
 }
 
-bool CollisionGraph::intersects(CollisionNode* c, CollisionNode* c_adj)
-{ return CollisionDetection::areIntersecting({ c->m_updated_pos, c->m_node_object->getSize() }, { c_adj->m_updated_pos, c_adj->m_node_object->getSize() }); }
+bool CollisionGraph::intersects(CollisionNode * c, CollisionNode* c_adj)
+{
+	sf::Vector2f sz_c = { c->m_hbox->getBB().width, c->m_hbox->getBB().height };
+	sf::Vector2f sz_adj = { c_adj->m_hbox->getBB().width, c_adj->m_hbox->getBB().height };
+	return CollisionHandler::bb_intersects({ c->m_updated_pos, sz_c }, { c_adj->m_updated_pos, sz_adj });
+}
 
 int CollisionGraph::findEdgeIndex(int i_c, int i_adj, std::vector<int>& edge_vector)
 {
@@ -572,82 +594,6 @@ void CollisionGraph::moveNodeIndex(CollisionNode* c, std::vector<int>& from, std
 	}
 }
 
-void CollisionGraph::sortEdges(CollisionNode* c)
-{
-	// Calculate and store the bonus resolves for each CollisionEdge.
-	for (CollisionEdge* e : this->findOutgoingEdges(c))
-	{
-		for (CollisionEdge* e_tocheck : this->findOutgoingEdges(c))
-		{
-			// Skip if e == e_tocheck.
-			if (e->m_storage_index == e_tocheck->m_storage_index) continue;
-			// Check for resolvability of e for e_tocheck. Store e_tocheck in e.bonus if True.
-			if (this->resolves(e, e_tocheck))
-			{
-				e->i_m_bonus_resolves.push_back(e_tocheck->m_storage_index);
-			}
-		}
-	}
-	
-	// Sorting part, with a simple bubble sort implementation. The Edges are sorted in descending order
-	// of bonus resolves.
-	for (int i = 0; i < c->i_m_primary.size() - 1; i++)
-	{
-		for (int j = 0; j < c->i_m_primary.size() - i - 1; j++)
-		{
-			int current_index = c->i_m_primary[j];
-			int current_size = static_cast<int>(this->edge_storage[current_index].i_m_bonus_resolves.size());
-			int comparison_index = c->i_m_primary[j + 1];
-			int comparison_size = static_cast<int>(this->edge_storage[comparison_index].i_m_bonus_resolves.size());
-			if (current_size < comparison_size)
-			{
-				c->i_m_primary[j] = comparison_index;
-				c->i_m_primary[j + 1] = current_index;
-			}
-		}
-	}
-}
-
-void CollisionGraph::sortAllPrimaryEdges()
-{
-	// For each Node, sort the Edges in descending order of bonus resolves.
-	// Works correctly under assumption that sortPrimaryCollisions() have been run
-	// before this.
-	for (int index: this->i_active_nodes)
-	{
-		// Exit function when the rest of the Nodes have < 2 Edges.
-		if (this->node_storage[index].i_m_primary.size() < 2) return;
-		this->sortEdges(&this->node_storage[index]);
-	}
-}
-
-void CollisionGraph::sortPrimaryCollisions()
-{
-	// A simple insertion sort is executed below.
-	for (int i = 1; i < this->i_active_nodes.size(); i++)
-	{
-		int current_index = this->i_active_nodes[i];
-		int i_current_size = static_cast<int>(this->node_storage[current_index].i_m_primary.size());
-
-		for (int j = i - 1; j > -2; j--)
-		{
-			if (j == -1)
-			{
-				this->i_active_nodes[0] = current_index;
-				break;
-			}
-			int comparison_index = this->i_active_nodes[j];
-			int i_comparison_size = static_cast<int>(this->node_storage[comparison_index].i_m_primary.size());
-			if (i_current_size < i_comparison_size)
-			{
-				this->i_active_nodes[j + 1] = current_index;
-				break;
-			}
-			this->i_active_nodes[j + 1] = comparison_index;
-		}
-	}
-}
-
 void CollisionGraph::sortPrimaryEdgesByType()
 {
 	std::vector<int> temp;
@@ -657,8 +603,8 @@ void CollisionGraph::sortPrimaryEdgesByType()
 		CollisionEdge* e = this->findEdge(index);
 		CollisionNode* c = this->findNode(e->m_i_node);
 		CollisionNode* adj = this->findNode(e->m_i_adjacent);
-		if (c->m_node_object->getBehaviorType() == OBJECT_BEHAVIOR::DYNAMIC &&
-			adj->m_node_object->getBehaviorType() == OBJECT_BEHAVIOR::DYNAMIC)
+		if (c->m_hbox->getBehavior() == HBOX::DYNAMIC &&
+			adj->m_hbox->getBehavior() == HBOX::DYNAMIC)
 			temp.insert(temp.begin(), e->m_storage_index);
 		else temp.insert(temp.end(), e->m_storage_index);
 	}

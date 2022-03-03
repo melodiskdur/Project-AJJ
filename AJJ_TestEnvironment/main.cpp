@@ -59,8 +59,8 @@ int main()
 
 	//----------------------- Create Players & Lock View --------------------
 
-	TestObject* player_1 = new TestObject(sf::Vector2f(600.0f, 0.0f), sf::Vector2f(100.0f, 100.0f));
-	TestObject* player_2 = new TestObject(sf::Vector2f(500.0f, 100.0f), sf::Vector2f(100.0f, 100.0f));
+	TestObject* player_1 = new TestObject(sf::Vector2f(1800.0f, 0.0f), sf::Vector2f(100.0f, 100.0f));
+	TestObject* player_2 = new TestObject(sf::Vector2f(400.0f, 100.0f), sf::Vector2f(100.0f, 100.0f));
 	player_1->setTextureName("Rogue");
 	player_2->setTextureName("Rogue");
 	player_1->setId(1337);
@@ -69,38 +69,13 @@ int main()
 	test_scene->addSceneObject(player_2);
 	test_scene->getCamera()->lockOnObject(player_1);
 
-	// ---------------------- Some NPC Objects --------------------------
-	TestObject* npc_1 = new TestObject(sf::Vector2f(700.f, 110.f), sf::Vector2f(100.f, 100.f), true);
-	TestObject* npc_2 = new TestObject(sf::Vector2f(700.f, 10.f), sf::Vector2f(100.f, 100.f), true);
-	TestObject* npc_3 = new TestObject(sf::Vector2f(1000.f, 110.f), sf::Vector2f(100.f, 100.f), true);
-	TestObject* npc_4 = new TestObject(sf::Vector2f(1050.f, 10.f), sf::Vector2f(100.f, 100.f), true);
-	TestObject* npc_5 = new TestObject(sf::Vector2f(1100.f, -90.f), sf::Vector2f(100.f, 100.f), true);
-	TestObject* npc_6 = new TestObject(sf::Vector2f(1150.f, -190.f), sf::Vector2f(100.f, 100.f), true);
-
-	TestObject* npc_7 = new TestObject(sf::Vector2f(1400.f, -320.f), sf::Vector2f(50.f, 430.f), true);
-	TestObject* npc_8 = new TestObject(sf::Vector2f(1400.f, -370.f), sf::Vector2f(500.f, 50.f), true);
-
-	TestObject* npc_9 = new TestObject(sf::Vector2f(1800.f, -470.f), sf::Vector2f(100.f, 100.f), true);
-
-	npc_1->setId(1001);
-	npc_2->setId(1002);
-	npc_3->setId(1003);
-	npc_4->setId(1004);
-	npc_5->setId(1005);
-	npc_6->setId(1006);
-	npc_7->setId(1007);
-	npc_8->setId(1008);
-	npc_9->setId(1009);
-	test_scene->addSceneObject(npc_1);
-	test_scene->addSceneObject(npc_2);
-	test_scene->addSceneObject(npc_3);
-	test_scene->addSceneObject(npc_4);
-	test_scene->addSceneObject(npc_5);
-	test_scene->addSceneObject(npc_6);
-	test_scene->addSceneObject(npc_7);
-	test_scene->addSceneObject(npc_8);
-	test_scene->addSceneObject(npc_9);
-
+	// ------------------------ Create "NPCs" ----------------------------
+	TestObject* npc1 = new TestObject(sf::Vector2f(650.f, 0.f), sf::Vector2f(200.f, 200.f), true);
+	TestObject* npc2 = new TestObject(sf::Vector2f(650.f, 0.f), sf::Vector2f(200.f, 200.f), true);
+	npc1->setId(0001);
+	npc2->setId(0002);
+	test_scene->addSceneObject(npc1);
+	test_scene->addSceneObject(npc2);
 	//------------------------ Add Controls To Players --------------------
 
 	Controller contr_player_1;
@@ -183,6 +158,10 @@ int main()
 	test_scene->addSceneObject(main_contr_obj);
 	
 	instanceCounts(" created");
+
+	// Call to store Hitboxes.
+	col_det->findHitboxes();
+
 	//---------------------------------- Game Loop -----------------------------------------
 	
 	while (window.isOpen())
@@ -258,5 +237,6 @@ void instanceCounts(std::string s)
 	std::cout << "SceneLayer" << s << ": " << SceneLayer::instanceCount() << "\n";
 	std::cout << "TextureAtlases" << s << ": " << TextureAtlas::instanceCount() << "\n";
 	std::cout << "TextureManagers" << s << ": " << TextureManager::instanceCount() << "\n";
+	std::cout << "PropertyNodes" << s << ": " << PropertyNode::instanceCount() << "\n";
 	std::cout << "\n========================================================\n";
 }

@@ -2,6 +2,8 @@
 #include "Project_AJJ.h"
 #include "Scene.h"
 #include "SceneLayer.h"
+#include "PropertyNode.h"
+#include "HitboxNode.h"
 #include "Object.h"
 
 namespace FirstScene
@@ -20,5 +22,6 @@ namespace FirstScene
 	void createForestbg(Scene* scene);
 	void createStaticCloudBG(Scene* scene);
 	void addTrees(Scene* scene);
+	void createHitboxNodes(Scene* scene);
 }
 

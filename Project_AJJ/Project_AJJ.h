@@ -14,5 +14,7 @@
 #include "Gravity.h"
 #include "AirFriction.h"
 #include "PhysicsManager.h"
+#include "PropertyNode.h"
+#include "HitboxNode.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/System/Time.hpp>

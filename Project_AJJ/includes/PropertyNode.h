@@ -1,6 +1,8 @@
 #pragma once
 #include "Object.h"
 
+class Object;
+
 /* PropertyNode
 *  An abstract base class for a set of classes that are meant to connect
 *  Objects to different properties such as rendering, controls (?), actions (?),
