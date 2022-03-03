@@ -4,6 +4,16 @@ unsigned int Action::instance_counter = 0;
 
 Action::Action() { Action::instance_counter++; }
 
+Action::Action(sf::String action_name, ACTIONTYPE action_type, float parameter_manipulation, float action_duration)
+{
+	this->action_name = action_name;
+	this->action_type = action_type;
+	this->parameter_manipulation = parameter_manipulation;
+	this->action_duration = action_duration;
+
+	Action::instance_counter++;
+}
+
 Action::~Action() { Action::instance_counter--; }
 
 //Getters
@@ -62,21 +72,21 @@ void Action::triggerAction()
 	sf::Vector2f set_vel = this->parent_object->getVelocity();
 	
 	//horizontal movement
-	if (this->action_type == ACTIONTYPE::AT_MOVE_LEFT || this->action_type == ACTIONTYPE::AT_MOVE_RIGHT)
+	if (this->action_type == ACTIONTYPE::MOVE_LEFT || this->action_type == ACTIONTYPE::MOVE_RIGHT)
 	{
 		set_vel.x += this->parameter_manipulation;
 	}
 	//vertical movement
-	else if (this->action_type == ACTIONTYPE::AT_MOVE_UP || this->action_type == ACTIONTYPE::AT_MOVE_DOWN)
+	else if (this->action_type == ACTIONTYPE::MOVE_UP || this->action_type == ACTIONTYPE::MOVE_DOWN)
 	{
 		set_vel.y += this->parameter_manipulation;
 	}
 
-	else if (this->action_type == ACTIONTYPE::AT_ATTACK)
+	else if (this->action_type == ACTIONTYPE::ATTACK)
 	{
 		//DO SOMETHING
 	}
-	else if (this->action_type == ACTIONTYPE::AT_IDLE)
+	else if (this->action_type == ACTIONTYPE::IDLE)
 	{
 		//DO SOMETHING
 		//If an object has any actions other than Idle, Idle should also be added

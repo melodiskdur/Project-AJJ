@@ -53,6 +53,7 @@ void ExtendedRenderWindow::setTextureManager(TextureManager* tex_mag)
 	this->texture_manager = tex_mag;
 }
 
+
 //Others
 void ExtendedRenderWindow::drawActiveScene()
 {
@@ -74,11 +75,7 @@ void ExtendedRenderWindow::drawActiveScene()
 
 		// Debugging.
 		if (this->debugger_mode)
-			this->debugDraw();
-
-		//draw oall of the available layouts
-		for(auto& l : this->layouts)
-			this->drawLayouts(l);
+			this->debugDraw();	
 	
 		// end the current frame. Display all changes
 		this->display();
@@ -87,7 +84,6 @@ void ExtendedRenderWindow::drawActiveScene()
 	else
 	{
 		
-
 		if (active_scene == nullptr) return;
 		
 		//DEBUGGING
@@ -113,7 +109,7 @@ void ExtendedRenderWindow::drawActiveScene()
 	}
 }
 
-void ExtendedRenderWindow::drawLayoutObject(Object* obj)
+void ExtendedRenderWindow::drawLayoutObject(Object* obj, sf::RenderTexture* render_texture)
 {
 	//BUTTON
 	if (obj->getClassId() == "button")
@@ -130,17 +126,17 @@ void ExtendedRenderWindow::drawLayoutObject(Object* obj)
 		btn_sprite = this->texture_manager->getAtlas(button->getTextureName())->getSprite(btn_cur_frm.texture_id, btn_cur_frm.region_name, btn_cur_frm.frame_index);
 		
 		//adjust its position and scaling to fit inside of the object
-		btn_sprite.setPosition(button->getWorldPosition());
+		btn_sprite.setPosition({ button->getWorldPosition().x ,button->getWorldPosition().y });
 		btn_sprite.setScale(button->getSize().x / btn_sprite.getLocalBounds().width, button->getSize().y / btn_sprite.getLocalBounds().height);
 
 		//at last, draw the sprite
-		this->draw(btn_sprite);
+		render_texture->draw(btn_sprite);
 
 		//center the text
 		button->centerText();
 
 		//draw the text
-		this->draw(button->getText());
+		render_texture->draw(button->getText());
 	}
 	//DEFAULT OBJECT
 	else if (obj->getClassId() == "default")
@@ -154,40 +150,39 @@ void ExtendedRenderWindow::drawObject(Object* obj)
 
 }
 
-void ExtendedRenderWindow::drawLayouts(Layout* parent_layout)
+void ExtendedRenderWindow::drawLayouts(Layout* parent_layout, sf::RenderTexture * render_texture)
 {
 	//check if we need to adjust its position depending on the camera view
 	if (parent_layout->getfixedToView() == true)
 	{
 		//get the viewRect of the camera
 		sf::FloatRect cam_rect = this->getActiveScene()->getCamera()->getCameraViewRect();
-
 		//update the position for the parent_layout and all of its children
 		//the parent_layout will be centered and everything else will be adjusted accordingly
 		parent_layout->setPositionForAll({ cam_rect.left + (cam_rect.width / 2) - (parent_layout->getRect().width / 2),
-							cam_rect.top + (cam_rect.height / 2) - (parent_layout->getRect().height / 2) });
-
+										   cam_rect.top + (cam_rect.height / 2) - (parent_layout->getRect().height / 2) });
 	}
 
-	//draw the layout
-	drawLayout(parent_layout);
+	//draw the layout if its enabled
+	if(parent_layout->getEnabled())
+		drawLayout(parent_layout, render_texture);
 
 	//check if we have any objects in the layout
 	for(auto& layout_obj : parent_layout->getObjects())
 	{
 		//draw a button
-		this->drawLayoutObject(layout_obj);
+		this->drawLayoutObject(layout_obj, render_texture);
 	}
 
 	//loop all child-layouts
 	for (auto& child_layout : parent_layout->getLayouts())
 	{
 		//recursion(draw the child-layout's children, grandchildren etc.)
-		this->drawLayouts(child_layout);
+		this->drawLayouts(child_layout, render_texture);
 	}
 }
 
-void ExtendedRenderWindow::drawLayout(Layout* layout)
+void ExtendedRenderWindow::drawLayout(Layout* layout, sf::RenderTexture * render_texture)
 {
 	sf::Sprite layout_sprite;
 	float bsw = layout->getBorderSize().x / 2;														//border set width
@@ -245,7 +240,6 @@ void ExtendedRenderWindow::drawLayout(Layout* layout)
 				set_pos.x = l_pos.x + bsw + (j - 1) * set_size.x;
 			}
 
-
 			//set position
 			layout_sprite.setPosition(set_pos);
 
@@ -253,10 +247,12 @@ void ExtendedRenderWindow::drawLayout(Layout* layout)
 			layout_sprite.setScale(set_size.x / layout_sprite.getLocalBounds().width, set_size.y / layout_sprite.getLocalBounds().height);
 
 			//draw the sprite
-			this->draw(layout_sprite);
+			render_texture->draw(layout_sprite);
+
 		}
 	}
 }
+
 
 //Private functions.
 
@@ -270,12 +266,23 @@ void ExtendedRenderWindow::clearSceneLayerTextures()
 void ExtendedRenderWindow::drawLayers()
 {
 	std::vector<int> layer_nums = this->active_scene->getLayerNums();
+
 	// Get the layer-manipulated views of Camera.view.
 	std::vector<sf::View> layer_views = this->active_scene->getLayerManipulatedViews();
+
 	for (int i = 0; i < this->scene_layer_textures.size(); i++)
 	{
 		// Clears each RenderTexture in preparation for rendering.
 		this->scene_layer_textures[i]->clear(sf::Color::Transparent);
+
+		//DEBUGGING
+		//IF STATIC LAYER
+		if (layer_nums[i] == -3)
+		{
+			layer_views[i].setCenter(this->getSize().x / 2, this->getSize().y / 2);
+		}
+		//END DEBUGGING
+		
 		// Set RenderTexture view to that of the corresponding layer.
 		this->scene_layer_textures[i]->setView(layer_views[i]);
 
@@ -294,10 +301,11 @@ void ExtendedRenderWindow::drawLayers()
 			sf::FloatRect sprite_r = obj_sprite.getLocalBounds();
 			//Scaling to fit within object boundaries.
 			obj_sprite.scale((obj_gs[1].position.x - obj_gs[0].position.x) / (sprite_r.width), (obj_gs[2].position.y - obj_gs[1].position.y) / (sprite_r.height));
-
+		
 			if (layer_nums[i] == 0)
 			{
 				//Draws object directly onto RenderWindow if main scene layer.
+
 				/*
 				//DEBUGGING
 				this->draw(obj_gs);
@@ -307,15 +315,25 @@ void ExtendedRenderWindow::drawLayers()
 				this->draw(o->vel_vec[3]);
 				//END DEBUGGING
 				*/
+
 				this->draw(obj_sprite);
 			}
 			else
 			{
 				//Draws object to RenderTexture if any other layer.
-				this->scene_layer_textures[i]->draw(obj_sprite);
+				this->scene_layer_textures[i]->draw(obj_sprite);		
 			}
 		}
 
+		
+
+		for (Layout* l : this->active_scene->getLayer(layer_nums[i])->getLayouts())
+		{
+			l->resetMarginSpaces();
+			l->placeLayouts();
+			this->drawLayouts(l, this->scene_layer_textures[i]);
+		}
+		
 		//Converts all layer textures (except main scene layer (0) ) to sprites and draws them onto RenderWindow.
 		if (layer_nums[i] != 0)
 		{
@@ -419,7 +437,7 @@ void ExtendedRenderWindow::drawLayoutsDEBUG(Layout* parent_layout)
 		//recursion
 		//THIS STEP FAILS. NEED TO PASS RENDERTARGET https://stackoverflow.com/questions/54719752/c-sfml-printing-convex-shapes-to-the-screen-using-two-recursive-calls-only 
 		//AND MAYBE THE RECT TO BE DRAWN??
-		this->drawLayouts(l);
+		//this->drawLayouts(l);
 		//if (index == 1) { break; }
 		index++;
 	}

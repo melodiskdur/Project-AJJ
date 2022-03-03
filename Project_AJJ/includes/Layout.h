@@ -17,17 +17,17 @@
 //placement of the layout in relation to the window or parent-layout
 enum class LAYOUT_PLACEMENT
 {
-	LP_TOP_CENTERED,
-	LP_BOTTOM_CENTERED,
-	LP_CENTERED_LEFT,
-	LP_CENTERED_RIGHT,
-	LP_TOP_LEFT,
-	LP_TOP_RIGHT,
-	LP_BOTTOM_LEFT,
-	LP_BOTTOM_RIGHT,
-	LP_CENTERED,
-	LP_CUSTOM,
-	LP_NONE
+	TOP_CENTERED,
+	BOTTOM_CENTERED,
+	CENTERED_LEFT,
+	CENTERED_RIGHT,
+	TOP_LEFT,
+	TOP_RIGHT,
+	BOTTOM_LEFT,
+	BOTTOM_RIGHT,
+	CENTERED,
+	CUSTOM,
+	NONE
 };
 
 class Layout
@@ -83,6 +83,7 @@ public:
 	int getNumLayouts() { return this->num_layouts; }
 	int getNumObjects() { return this->num_objects; }
 	int getNumButtons() { return this->num_buttons; }
+	bool getEnabled() { return this->enabled; }
 
 
 	/*Setters*/
@@ -99,13 +100,15 @@ public:
 	void setTextureName(sf::String name) { this->texture_name = name; };
 	void setTextureNameForAll(sf::String name);
 	void setCurrentFrame(Frame frame) { this->current_frame = frame; };
-	void setFrameForAll(Frame frame);
+	void setCurrentFrameForAll(Frame frame);
 	void setParentLayout(Layout* parent_layout) { this->parent_layout = parent_layout; }
 	void setFixedToView(bool state) { this->fixed_to_view = state; }
 	void setBorderSize(sf::Vector2f border_size);
 	void setBorderSizeForAll(sf::Vector2f new_border_size);
 	void setLayoutPlacement(LAYOUT_PLACEMENT lyt_plc) { this->objects_placement = lyt_plc; }
 	void setObjectsPlacement(LAYOUT_PLACEMENT objs_plc) { this->objects_placement = objs_plc; }
+	void setEnabled(bool state) { this->enabled = state; }
+	void setEnabledForAll(bool state);
 
 	/*Others*/
 	//add a another layout inside of this one i.e. add it to the Layout*-vector
@@ -176,13 +179,14 @@ protected:
 	std::vector<sf::FloatRect> margin_spaces;		//used to check the remaining space of the layout (top,bottom,left,right margin space)
 
 	bool fixed_to_view = false;						//if the layout is fixed to the users view. If false, no adjustment is needed (rect.x and rect.y specify its location)
+	bool enabled = true;							//if we want to draw the layout or not
 
 	//Textures
 	sf::String texture_name = "";					//Name of the texture atlas that we want to draw frames of this object from.
 	Frame current_frame;							//the current frame for this layout. includes information about texture id, region, frameindex, duration
 
-	LAYOUT_PLACEMENT layout_placement = LAYOUT_PLACEMENT::LP_NONE;			//placement of the layout in relation to the window or parent-layout
-	LAYOUT_PLACEMENT objects_placement = LAYOUT_PLACEMENT::LP_TOP_LEFT;		//placement of the objects inside of the layout
+	LAYOUT_PLACEMENT layout_placement = LAYOUT_PLACEMENT::NONE;			//placement of the layout in relation to the window or parent-layout
+	LAYOUT_PLACEMENT objects_placement = LAYOUT_PLACEMENT::TOP_LEFT;	//placement of the objects inside of the layout
 	static unsigned int instance_counter;
 };
 

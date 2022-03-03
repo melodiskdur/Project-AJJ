@@ -1,4 +1,5 @@
 #include "../includes/FirstScene.h"
+#include "../includes/TestLayout.h"
 
 using namespace FirstScene;
 
@@ -107,11 +108,18 @@ Scene* FirstScene::createScene()
 	FirstScene::createBackgroundLayer(first_scene, "Dirt Tiles", fg_layer1, 10, 35, -1, 0.5f, 1.7f, sf::Vector2f(200.0f, -400.0f), sf::Vector2f(80.0f, 80.0f), "Tile");
 	FirstScene::addTrees(first_scene);
 	
+	SceneLayer* layout_test1 = new SceneLayer(-2, 1.f, 0);
+	layout_test1->addLayout(TestLayout::createTestLayout(false));
+	first_scene->addSceneLayer(layout_test1);
+
+	SceneLayer* layout_test2 = new StaticFixatedLayer(-3, 1.f, sf::View({ 0.f, 0.f }, { 800.f, 600.f }));
+	layout_test2->addLayout(TestLayout::createTestLayout(true));
+
+	first_scene->addSceneLayer(layout_test2);
 
 
 	return first_scene;
 }
-
 
 
 void FirstScene::createWorldLayer(Scene* scene, sf::String texture_name, std::vector<int> map, int rows,

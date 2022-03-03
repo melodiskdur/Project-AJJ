@@ -19,30 +19,30 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size)
 
     idle->setActionName("Idle");
     idle->setParentObject(this);
-    idle->setActionType(ACTIONTYPE::AT_IDLE);
+    idle->setActionType(ACTIONTYPE::IDLE);
 
     actionUp->setActionName("Up");
     actionUp->setParentObject(this);
-    actionUp->setActionType(ACTIONTYPE::AT_MOVE_UP);
+    actionUp->setActionType(ACTIONTYPE::MOVE_UP);
     actionUp->setParameterManipulation(-velocity_inc);
 
     actionDown->setActionName("Down");
-    actionDown->setActionType(ACTIONTYPE::AT_MOVE_DOWN);
+    actionDown->setActionType(ACTIONTYPE::MOVE_DOWN);
     actionDown->setParameterManipulation(velocity_inc);
     actionDown->setParentObject(this);
 
     actionLeft->setActionName("Left");
-    actionLeft->setActionType(ACTIONTYPE::AT_MOVE_LEFT);
+    actionLeft->setActionType(ACTIONTYPE::MOVE_LEFT);
     actionLeft->setParameterManipulation(-velocity_inc);
     actionLeft->setParentObject(this);
 
     actionRight->setActionName("Right");
-    actionRight->setActionType(ACTIONTYPE::AT_MOVE_RIGHT);
+    actionRight->setActionType(ACTIONTYPE::MOVE_RIGHT);
     actionRight->setParameterManipulation(velocity_inc);
     actionRight->setParentObject(this);
 
     attack->setActionName("Attack");
-    attack->setActionType(ACTIONTYPE::AT_ATTACK);
+    attack->setActionType(ACTIONTYPE::ATTACK);
     attack->setParentObject(this);
 
     //---------------Animation test---------------

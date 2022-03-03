@@ -52,13 +52,17 @@ public:
 	bool sameActionnode(ActionNode actionnode_1, ActionNode actionnode_2);
 
 	//returns true or false if the cursor is over the rect
-	bool cursorHover(sf::FloatRect rect);
+	bool cursorHover(sf::FloatRect rect, bool on_fixated_layer);
 	//returns a vector of rects that the cursor is hovering from a set of rects
 	std::vector<sf::FloatRect> cursorHoverRects(std::vector<sf::FloatRect> rects);
 
 	/*Setters*/
 	void setWindow(ExtendedRenderWindow* scene);
 	void setObject(Object* obj);
+	void setMousePressed(bool state) { this->mouse_pressed = state; }
+	void setLastCursorPress(sf::Vector2f pos) { this->last_cursor_press_pos = pos; }
+	void setLastCursorRelease(sf::Vector2f pos) { this->last_cursor_release_pos = pos; }
+	
 
 	/*Getters*/
 	bool getControllerState() { return this->controller_state; };
@@ -66,18 +70,25 @@ public:
 	std::vector<ActionNode> getActiveActionnodes() { return this->active_actionnodes; };
 	int getNumActiveActionnodes() { return this->num_active_actionnodes; };
 	int getNumActionnodes() { return this->num_actionnodes; };
+	bool getMousePressed() { return this->mouse_pressed; }
+	sf::Vector2f getLastCursorPress() { return this->last_cursor_press_pos; }
+	sf::Vector2f getLastCursorRelease() { return this->last_cursor_release_pos; }
 
 	static unsigned int instanceCount() { return instance_counter; };
 protected:
 	Object * obj = nullptr;						//the object connected to the controller
 
-	std::vector<ActionNode> actionnodes;			//all action+keys combinations
-	int num_actionnodes = 0;						//the number of actionnodes
+	std::vector<ActionNode> actionnodes;		//all action+keys combinations
+	int num_actionnodes = 0;					//the number of actionnodes
 
 	std::vector<ActionNode> active_actionnodes;	//actionnodes currently activated by user
 	int num_active_actionnodes = 0;				//the number of active actions
 
 	bool controller_state = true;				//activated/deactivated i.e. in use or not in use
+
+	sf::Vector2f last_cursor_press_pos;			//the position of the last cursor press (press + relase = click)
+	sf::Vector2f last_cursor_release_pos;		//the position of the last cursor release (press + relase = click)
+	bool mouse_pressed = false;					//if the mouse is currently pressed
 
 	sf::Vector2f original_view_size;			//the original view_size
 	ExtendedRenderWindow* window = nullptr;		//the main exteneded render window

@@ -25,8 +25,8 @@ int main()
 
 	//---------------------------- Layout test -------------------------------
 
-	Layout* test_layout = TestLayout::createTestLayout();
-	window.addLayout(test_layout);
+	//Layout* test_layout = TestLayout::createTestLayout();
+	//window.addLayout(test_layout);
 
 	//------------------------- TextureAtlas test ----------------------------
 
@@ -152,12 +152,32 @@ int main()
 	main_contr.bindActionToKey(main_contr_obj->getActions()[5], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::L });			//PLAY
 	main_contr.bindActionToKey(main_contr_obj->getActions()[6], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Down });		//MENU_MOVE_DOWN
 	main_contr.bindActionToKey(main_contr_obj->getActions()[7], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Up });		//MENU_MOVE_UP
-	//main_contr.bindActionToKey(main_contr_obj->getActions()[8], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Enter });		//MENU_CHOOSE_ALTERNATIVE
+	//main_contr.bindActionToKey(main_contr_obj->getActions()[8], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Enter });	//MENU_CHOOSE_ALTERNATIVE
 	//main_contr.bindActionToKey(main_contr_obj->getActions()[9], { sf::Keyboard::Key::LControl, sf::Keyboard::Key::Delete });	//EXIT_TO_MENU
 	
 	//bind a button to the left mouse button
-	main_contr.bindActionToMouseButton(test_layout->getLayouts()[0]->getLayouts()[0]->getButtons()[0]->getActions()[0], test_layout->getLayouts()[0]->getLayouts()[0]->getButtons()[0], sf::Mouse::Button::Left);		//LAYOUT BUTTON TEST
-	main_contr.bindActionToMouseButton(test_layout->getLayouts()[0]->getLayouts()[0]->getButtons()[1]->getActions()[0], test_layout->getLayouts()[0]->getLayouts()[0]->getButtons()[1], sf::Mouse::Button::Left);		//LAYOUT BUTTON TEST
+
+	//DEBUGGING
+
+	int in_world_layout = -2;
+	for (auto& l : test_scene->getLayer(in_world_layout)->getLayouts()[0]->getLayouts())
+	{
+		for (auto obj : l->getObjects())
+		{
+			main_contr.bindActionToMouseButton(obj->getActions()[0], obj, sf::Mouse::Button::Left);		//LAYOUT BUTTON TEST
+		}
+	}
+
+	int static_layout = -3;
+	for (auto& l : test_scene->getLayer(static_layout)->getLayouts()[0]->getLayouts())
+	{
+		for (auto obj : l->getObjects())
+		{
+			main_contr.bindActionToMouseButton(obj->getActions()[0], obj, sf::Mouse::Button::Left);		//LAYOUT BUTTON TEST
+		}
+	}
+
+	//END DEBUGGING
 
 	//last, add the main_controller_object to the scene
 	test_scene->addSceneObject(main_contr_obj);
@@ -211,7 +231,7 @@ int main()
 	delete col_graph;
 	delete airfric;
 	delete gravity;
-	delete test_layout;
+	//delete test_layout;
 	delete tex_mag;
 	window.~ExtendedRenderWindow();
 	scene_camera.~Camera();

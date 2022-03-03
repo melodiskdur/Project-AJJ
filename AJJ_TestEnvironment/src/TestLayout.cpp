@@ -1,20 +1,34 @@
 #include "../includes/TestLayout.h"
+#include "../includes/TestButton.h"
 
 
 
-Layout* TestLayout::createTestLayout()
+Layout* TestLayout::createTestLayout(bool on_fixated_layer)
 {
+	/*/////////////----ADD LAYOUTS---//////////////*/
+
 	//baselayout (base)
-	Layout* test_layout = new Layout(sf::FloatRect(300, -400, 500, 400), sf::Vector2f(0, 0), sf::Vector2f(0, 0), LAYOUT_PLACEMENT::LP_NONE);
+	Layout* test_layout = new Layout(sf::FloatRect(0, 0, 180, 310), sf::Vector2f(0, 0), sf::Vector2f(0, 0), LAYOUT_PLACEMENT::NONE);
 
 	//base->children
-	test_layout->addLayout(sf::FloatRect(0, 0, 460, 60), sf::Vector2f(0, 0), sf::Vector2f(20, 20), LAYOUT_PLACEMENT::LP_TOP_CENTERED);
+	int num_children = 6;
+	int osc = 1;
+	for (int i = 0; i < num_children; i++)
+	{
+		test_layout->addLayout(sf::FloatRect(0, 0, 160, 40), sf::Vector2f(0, 0), sf::Vector2f(0, 10*osc), LAYOUT_PLACEMENT::TOP_CENTERED);
+		osc = osc == 1 ? 0 : 1;
+	}
 
-	//base->children[0]->children
-	test_layout->getLayouts()[0]->addLayout(sf::FloatRect(0, 0, 440, 40), sf::Vector2f(0, 0), sf::Vector2f(10, 10), LAYOUT_PLACEMENT::LP_CENTERED);
+	/*/////////////----OPTIONAL----//////////////*/
 
-	//this layout will be fixed and adjustment to be in the users view
-	test_layout->setFixedToView(true);
+	//test_layout->setFixedToView(true);
+	//test_layout->setBorderSizeForAll({ 10,10 });
+	for (Layout* l : test_layout->getLayouts())
+	{
+		//l->setEnabled(false);
+	}
+
+	/*/////////////----FRAMES----//////////////*/
 
 	Frame new_frame;
 	new_frame.region_name = "LayoutBlock";
@@ -22,70 +36,47 @@ Layout* TestLayout::createTestLayout()
 	new_frame.frame_index = 0;
 	new_frame.duration = 0;
 
-	test_layout->setFrameForAll(new_frame);
+	test_layout->setCurrentFrameForAll(new_frame);
 	test_layout->setTextureNameForAll("LayoutBlock");
 
-	//test_layout->setBorderSizeForAll({ 10,10 });
+	/*/////////////----ACTIONS AND BUTTONS----//////////////*/
 
-	//add a test-button
-	Button* btn = new Button({ 300,-100 }, { 80,40 });
-	Button* btn2 = new Button({ 300,-70 }, { 80,40 });
+	Action* zoom_in = new Action("BtnZoomIn", ACTIONTYPE::ZOOM_IN, -0.01f, 0);
+	Action* zoom_out = new Action("BtnZoomOut", ACTIONTYPE::ZOOM_OUT, 0.01f, 0);
+	Action* pause = new Action("BtnPause", ACTIONTYPE::PAUSE, 0, 0);
+	Action* play = new Action("BtnPlay", ACTIONTYPE::PLAY, 0, 0);
+	Action* switch_camera_obj = new Action("BtnSwitchCameraObj", ACTIONTYPE::SWITCH_CAMERA_LOCKED_OBJECT, 0, 0);
+	Action* hide_layout = new Action("BtnHideLayout", ACTIONTYPE::HIDE_LAYOUT, 0, 0);
 
-	Frame def_btn;
-	def_btn.texture_id = TEXTURE_ID::IDLE;
-	def_btn.region_name = "MenuButtons";
-	def_btn.frame_index = 0;
-
-	Frame hov_btn;
-	hov_btn.texture_id = TEXTURE_ID::HOVER;
-	hov_btn.region_name = "MenuButtons";
-	hov_btn.frame_index = 1;
-
-	Frame prs_btn;
-	prs_btn.texture_id = TEXTURE_ID::PRESSED;
-	prs_btn.region_name = "MenuButtons";
-	prs_btn.frame_index = 2;
-
-	btn->setCurrentFrame(def_btn);
-	btn->setDefaultFrame(def_btn);
-	btn->setHoverFrame(hov_btn);
-	btn->setPressedFrame(prs_btn);
-
-	btn->setTextureName("MenuButtons");
-
-	btn2->setCurrentFrame(def_btn);
-	btn2->setDefaultFrame(def_btn);
-	btn2->setHoverFrame(hov_btn);
-	btn2->setPressedFrame(prs_btn);
-
-	btn2->setTextureName("MenuButtons");
-
-	Action* btn_prs = new Action;
-	btn_prs->setParameterManipulation(-0.01f);
-	btn_prs->setActionName("ButtonPause");
-	btn_prs->setParentObject(btn);
-	btn_prs->setActionType(ACTIONTYPE::AT_ZOOM_IN);
-
-	Action* btn_prs2 = new Action;
-	btn_prs2->setParameterManipulation(0.01f);
-	btn_prs2->setActionName("ButtonPlay");
-	btn_prs2->setParentObject(btn);
-	btn_prs2->setActionType(ACTIONTYPE::AT_ZOOM_OUT);
-
-
-	btn->addAction(btn_prs);
-	btn2->addAction(btn_prs2);
-
-	btn->loadFont("../Project_AJJ/assets/ayar_takhu.ttf");
-	btn2->loadFont("../Project_AJJ/assets/ayar_takhu.ttf");
-	btn->setText(btn->getSize().x / 8, sf::Text::Style::Bold, sf::Color::White, "ZOOM IN");
-	btn2->setText(btn2->getSize().x / 8, sf::Text::Style::Bold, sf::Color::White, "ZOOM OUT");
+	Button* btn1 = TestButton::createTestButton({ 80,40 }, zoom_in, on_fixated_layer, "ZOOM IN");
+	zoom_in->setParentObject(btn1);
 	
-	test_layout->getLayouts()[0]->getLayouts()[0]->addObject(btn);
-	test_layout->getLayouts()[0]->getLayouts()[0]->addObject(btn2);
+	Button* btn2 = TestButton::createTestButton({ 80,40 }, zoom_out, on_fixated_layer, "ZOOM OUT");
+	zoom_out->setParentObject(btn2);
 
+	Button* btn3 = TestButton::createTestButton({ 80,40 }, pause, on_fixated_layer, "PAUSE");
+	pause->setParentObject(btn3);
 
-	//place them all
+	Button* btn4 = TestButton::createTestButton({ 80,40 }, play, on_fixated_layer, "PLAY");
+	play->setParentObject(btn4);
+
+	Button* btn5 = TestButton::createTestButton({ 80,40 }, switch_camera_obj, on_fixated_layer, "SWITCH");
+	switch_camera_obj->setParentObject(btn5);
+
+	Button* btn6 = TestButton::createTestButton({ 80,40 }, hide_layout, on_fixated_layer, "HIDE");
+	hide_layout->setParentObject(btn6);
+
+	/*/////////////----ADD OBJECTS----//////////////*/
+
+	test_layout->getLayouts()[0]->addObject(btn1);
+	test_layout->getLayouts()[0]->addObject(btn2);
+	test_layout->getLayouts()[1]->addObject(btn3);
+	test_layout->getLayouts()[1]->addObject(btn4);
+	test_layout->getLayouts()[2]->addObject(btn5);
+	test_layout->getLayouts()[2]->addObject(btn6);
+
+	/*/////////////----PLACE/ORGANIZE LAYOUTS----//////////////*/
+
 	test_layout->placeLayouts();
 
 	return test_layout;

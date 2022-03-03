@@ -67,16 +67,22 @@ void Controller::bindActionToMouseButton(Action* action, Object* obj, sf::Mouse:
 }
 
 /*Cursor related*/
-bool Controller::cursorHover(sf::FloatRect rect)
+bool Controller::cursorHover(sf::FloatRect rect, bool on_fixated_layer)
 {
 	//get the cursors position relative to the window
 	sf::Vector2i cursor_pos = sf::Mouse::getPosition(*this->window);
+	sf::Vector2f point = (sf::Vector2f)cursor_pos;
 
 	//map the coordinates to the current view
-	sf::Vector2f real_world_pos = this->window->mapPixelToCoords(cursor_pos);
-
+	if (!on_fixated_layer)
+	{
+		//map cursor-position to real-world coordinates
+		point = this->window->mapPixelToCoords(cursor_pos);
+	}
+	
+	//std::cout << "real_world_pos: " << cursor_pos.x << ", " << cursor_pos.y << std::endl;
 	//return true or false depending on if the cursor is contained in the rect
-	return (rect.contains(real_world_pos) ? true : false);
+	return (rect.contains(point) ? true : false);
 }
 
 std::vector<sf::FloatRect> Controller::cursorHoverRects(std::vector<sf::FloatRect> rects)
@@ -87,7 +93,7 @@ std::vector<sf::FloatRect> Controller::cursorHoverRects(std::vector<sf::FloatRec
 	for (auto& rect : rects)
 	{
 		//if the cursor hovers the rect
-		if (cursorHover(rect))
+		if (cursorHover(rect,true))
 		{
 			//push it to the vector to be returned
 			hovered_rects.push_back(rect);
@@ -111,35 +117,56 @@ std::vector<ActionNode> Controller::constructActiveActions()
 		 *-----------------Check if assumption is true---------------------*
 		 *******************************************************************/
 		
-		//check if we have an object to relate to
+		//check if we have an object to relate the action to
 		if (a_node.obj != nullptr)
 		{	
-			//if it's a button and its not pressed
-			if (a_node.obj->getClassId() == "button" && 
-				!(sf::Mouse::isButtonPressed(a_node.mouse_button) && cursorHover(a_node.obj->getFloatRect())))
+			//BUTTONS
+			if (a_node.obj->getClassId() == "button")
 			{
-				//the assumption is wrong.
-				action_state = false;
-
-				//if the cursor is only hovering the button
-				if (cursorHover(a_node.obj->getFloatRect()) && !sf::Mouse::isButtonPressed(a_node.mouse_button))
-				{
-					Button* btn = (Button*)a_node.obj;
-					a_node.obj->setCurrentFrame(btn->getHoverFrame());
-				}
-				else
-				{
-					Button* btn = (Button*)a_node.obj;
-					a_node.obj->setCurrentFrame(btn->getDefaultFrame());
-				}
-			}
-			//if it's a button and its not  pressed or hovered
-			else if(a_node.obj->getClassId() == "button")
-			{
+				//cast as a button
 				Button* btn = (Button*)a_node.obj;
-				a_node.obj->setCurrentFrame(btn->getPressedFrame());
+
+				bool btn_hovered = cursorHover(btn->getFloatRect(), btn->getOnFixatedLayer());
+				bool btn_pressed = sf::Mouse::isButtonPressed(a_node.mouse_button) && btn_hovered;
+
+				TRIGGER_TYPE btn_trigger = btn->getTriggerType();
+
+				switch (btn_trigger) 
+				{
+				case TRIGGER_TYPE::CLICKED:
+
+					break;
+				case TRIGGER_TYPE::PRESSED:
+		
+					break;
+				case TRIGGER_TYPE::HOVERED:
+	
+					break;
+				case TRIGGER_TYPE::RELEASED:
+				
+					break;
+				case TRIGGER_TYPE::PRESSED_HOVER:
+
+					break;
+				default:
+					std::cout << "ERROR: std::vector<ActionNode> Controller::constructActiveActions(), something went wrong." << std::endl;
+				}
+
+				if (!btn_pressed)
+				{
+					//the assumption is wrong. The action will not be activated
+					action_state = false;
+				}
+					
+				//std::cout << "btn_pressed: " << btn_pressed << ", btn_hovered: " << btn_hovered << std::endl;
+				btn->updateFrame(btn_pressed, btn_hovered);
 			}
-			
+
+			//SCROLLBAR
+
+			//SLIDER
+
+			//ETC
 		}		
 
 		for (int j = 0; j < a_node.keys.size(); j++)
@@ -236,7 +263,7 @@ void Controller::triggerActiveActions()
 		ACTIONTYPE type = this->active_actionnodes[i].action->getActionType();		//current actiontype
 
 		//if we want to move horizontally
-		if (type == ACTIONTYPE::AT_MOVE_LEFT || type == ACTIONTYPE::AT_MOVE_RIGHT)
+		if (type == ACTIONTYPE::MOVE_LEFT || type == ACTIONTYPE::MOVE_RIGHT)
 		{
 			//if we have moved horizontally already
 			if (hori_move != 0)
@@ -249,7 +276,7 @@ void Controller::triggerActiveActions()
 		}
 
 		//if we want to move vertically
-		else if (type == ACTIONTYPE::AT_MOVE_UP || type == ACTIONTYPE::AT_MOVE_DOWN)
+		else if (type == ACTIONTYPE::MOVE_UP || type == ACTIONTYPE::MOVE_DOWN)
 		{
 			//if we have moved vertically already
 			if (vert_move != 0)
@@ -268,10 +295,6 @@ void Controller::triggerActiveActions()
 		}
 
 	}
-
-	//break object movement in vert/hori direction if no actions were triggered in those directions
-	//!!!!!!!!!!FIX THIS-only a fast solution. Should be implemented as a physics attribute ( friction or airresistance )!!!!!!!!!!!!!!!!
-	//breakMovement(hori_move, vert_move, 2);
 
 	//correct horizontal movement to not overstep velocity-ellipsiod
 	correctMovement();

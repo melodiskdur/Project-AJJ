@@ -24,6 +24,13 @@ std::vector<Object*> Scene::getObjectsWithinCamera(signed int layer_num)
 			return layer->getLayerObjectsWithinView(this->scene_camera->getCameraViewRect());
 }
 
+std::vector<Layout*> Scene::getLayoutsWithinCamera(signed int layer_num)
+{
+	for (SceneLayer* layer : this->scene_layers)
+		if (layer->getLayerNum() == layer_num)
+			return layer->getLayerLayoutsWithinView(this->scene_camera->getCameraViewRect());
+}
+
 Object* Scene::getObjectWithId(int id)
 {
 	for (auto& obj : this->scene_objects)
@@ -43,6 +50,17 @@ CollisionDetection* Scene::getCollisionDetection()
 	return this->col_det;
 }
 
+SceneLayer* Scene::getLayer(int layer_num)
+{
+	for (SceneLayer* sl : this->scene_layers)
+	{
+		if (sl->getLayerNum() == layer_num) return sl;
+	}
+
+	std::cout << "ERROR: SceneLayer* Scene::getLayer(int layer_num), no scene_layer with num = " << layer_num << " in this scene." << std::endl;
+
+	return nullptr;
+}
 
 //Setters
 void Scene::setCamera(Camera* camera)

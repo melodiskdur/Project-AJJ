@@ -29,6 +29,7 @@ std::vector<Object*> SceneLayer::getLayerObjectsWithinView(sf::FloatRect view_re
     return viewable_objects;
 }
 
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
@@ -40,9 +41,23 @@ StaticFixatedLayer::StaticFixatedLayer(int layer_num) : SceneLayer(layer_num) { 
 StaticFixatedLayer::StaticFixatedLayer(int layer_num, float scale, sf::View cam_v) : SceneLayer(layer_num, 1.f, scale) 
 {
     // Set up the static view. Point to (0,0).
-    this->static_view = cam_v; this->static_view.setCenter({ 0.f, 0.f });
+    this->static_view = cam_v; 
+    this->static_view.setCenter({ 0.f, 0.f });
+
     // Set up the view rect accordingly.
     this->static_rect = { this->static_view.getCenter() - 0.5f * this->static_view.getSize(), this->static_view.getSize() };
+}
+
+std::vector<Layout*> StaticFixatedLayer::getLayerLayoutsWithinView(sf::FloatRect view_rect)
+{
+    std::vector<Layout*> viewable_layouts;
+    // Scale view_rect in accordance to the SceneLayer depth and scale values.
+    for (Layout* l : this->layouts)
+    {
+        sf::FloatRect layout_rect = l->getRect();
+        if (view_rect.intersects(layout_rect)) viewable_layouts.push_back(l);
+    }
+    return viewable_layouts;
 }
 
 StaticFixatedLayer::~StaticFixatedLayer() {}

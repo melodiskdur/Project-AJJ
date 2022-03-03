@@ -77,3 +77,30 @@ void Button::centerText()
 	sf::FloatRect bounds = this->button_text.getLocalBounds();
 	this->button_text.setPosition(sf::Vector2f(this->world_position.x - ((bounds.width - this->size.x) / 2) , this->world_position.y + ((this->size.y - 1.7f*bounds.height) / 2)));
 }
+
+void Button::updateFrame(bool btn_pressed, bool btn_hovered)
+{
+	/*Changes to the correct frame*/
+
+	if (!btn_pressed)
+	{
+		//change to HOVERED-frame
+		if (btn_hovered)
+		{
+			//std::cout << "HOVERED\n";
+			this->current_frame = this->hover_frame;
+		}
+		//change to DEFAULT-frame
+		else
+		{
+			//std::cout << "DEFAULT\n";
+			this->current_frame = this->default_frame;
+		}
+	}
+	//change to PRESSED-frame
+	else if (btn_pressed)
+	{
+		//std::cout << "PRESSED\n";
+		this->current_frame = this->pressed_frame;
+	}
+}

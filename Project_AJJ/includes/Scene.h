@@ -12,6 +12,7 @@
 class CollisionDetection;
 class PhysicsManager;
 class SceneLayer;
+class Layout;
 
 //denotation of the scene i.e. name/class/defintion
 enum SCENE_DENOTATION
@@ -43,7 +44,9 @@ public:
 	std::vector<Object*>& getSceneObjects() { return this->scene_objects; };
 	// Sorts through the Objects of a SceneLayer corresponding to the layer_num parameter.
 	std::vector<Object*> getObjectsWithinCamera(signed int layer_num);
+	std::vector<Layout*> getLayoutsWithinCamera(signed int layer_num);
 	std::vector<SceneLayer*>& getSceneLayers() { return this->scene_layers;};
+	SceneLayer* getLayer(int layer_num);
 	Object* getObjectWithId(int id);
 	CollisionDetection* getCollisionDetection();
 	PhysicsManager* getPhysicsManager() { return this->phys_mag; };

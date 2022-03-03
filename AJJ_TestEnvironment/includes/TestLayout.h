@@ -3,5 +3,5 @@
 
 namespace TestLayout
 {
-	Layout * createTestLayout();
+	Layout * createTestLayout(bool on_fixated_layer);
 }

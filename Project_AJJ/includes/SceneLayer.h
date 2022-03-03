@@ -38,7 +38,9 @@ public:
 	float getAngle() { return this->angle; };
 	signed int getLayerNum() { return this->layer_num; };
 	std::vector<Object*> getLayerObjects() { return this->layer_objects; };
+	std::vector<Layout*> getLayouts() { return this->layouts; }
 	virtual std::vector<Object*> getLayerObjectsWithinView(sf::FloatRect view_rect);
+	virtual std::vector<Layout*> getLayerLayoutsWithinView(sf::FloatRect view_rect) { return layouts; }
 
 	// Setters.
 	void setDepth(float depth) { if (depth > MIN_LAYER_DEPTH && depth < MAX_LAYER_DEPTH) this->depth = depth; };
@@ -53,19 +55,25 @@ public:
 	virtual void addObjects(std::vector<Object*> o_vec) { this->layer_objects.insert(this->layer_objects.end(), o_vec.begin(), o_vec.end()); };
 	virtual void updateLayerObjects() {};
 
+	//adds a layout to the vector of layouts in the window
+	void addLayout(Layout* new_layout) { this->layouts.push_back(new_layout); }
+
 	static unsigned int instanceCount() { return instance_counter; };
+
 
 protected:
 	std::vector<Object*> layer_objects;	// The contents of the SceneLayer.		
+	std::vector<Layout*> layouts;		//Windows layouts(main_menu,side_menus,messages,etc.)
 	float depth = 1.f;					// How fast the layer should scroll in relation to the main layer. x > 1 slower. 0 < x < 1 faster. 
 	float scale = 1.f;					// How the contents should be rescaled in relation to how they would appear in the main layer.
 	float angle = 0.0f;					// The rotation of the layer in degrees.
 	bool enabled = true;				// Decides whether the layer is enabled for drawing/rendering or not.
 
+
 private:
 	signed int layer_num = 1;			// Rendering order. x = 0: Main layer (reserved). x > 0 background, x < 0 : foreground.
-
 	static unsigned int instance_counter;
+	
 };
 
 
@@ -85,6 +93,7 @@ public:
 	~StaticFixatedLayer() override;
 	// Getters.
 	std::vector<Object*> getLayerObjectsWithinView(sf::FloatRect view_rect) override { return this->obj_within_view; };
+	std::vector<Layout*> getLayerLayoutsWithinView(sf::FloatRect view_rect) override;
 	// Setters.
 	// Others.
 	sf::View manipulateCameraView(const sf::View cam_v) override { return this->static_view; };

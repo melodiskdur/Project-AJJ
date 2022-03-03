@@ -22,7 +22,6 @@ public:
 	Scene* getActiveScene();
 	TextureManager* getTextureManager();
 	bool getWindowState() { return this->window_state; }
-	std::vector<Layout*> getLayouts() { return this->layouts; }
 	std::vector<Scene*> getScenes() { return this->scenes; }
 	Scene* getSceneFromDenotation(SCENE_DENOTATION scene_denotation);
 
@@ -35,18 +34,15 @@ public:
 	//Draws a frame of the active Scene-object.
 	void drawActiveScene();
 	//draw a button on the screen
-	void drawLayoutObject(Object * obj);
+	void drawLayoutObject(Object * obj, sf::RenderTexture* render_texture);
 	//draw an object on the screen
 	void drawObject(Object* obj);
 	//draw the layouts and all of the layouts contained inside
-	void drawLayouts(Layout* parent_layout);
+	void drawLayouts(Layout* layout, sf::RenderTexture* render_texture);
 	//draw a specific layout
-	void drawLayout(Layout* layout);
+	void drawLayout(Layout* layout, sf::RenderTexture* render_texture);
 	//debug view for the layout. Draws the layout and the contained margin_spaces
 	void drawLayoutsDEBUG(Layout* layout);
-
-	//adds a layout to the vector of layouts in the window
-	void addLayout(Layout* new_layout) { this->layouts.push_back(new_layout); }
 
 	//deactivates the window
 	void deactivateWindow() { this->window_state = false; }
@@ -54,16 +50,13 @@ public:
 	void activateWindow() { this->window_state = true; }
 	
 	static unsigned int instanceCount() { return instance_counter; };
+
 private:
 	Scene* active_scene = nullptr;							//Active Scene-object.
 	std::vector<Scene*> scenes;								//All of the available scenes
 	TextureManager* texture_manager = nullptr;				//TextureManager-object.
 	std::vector<sf::RenderTexture*> scene_layer_textures;	//Off-screen rendering of the active scene's layers.
 	bool window_state = true;								//Activated/deactivated
-	std::vector<Layout*> layouts;							//Windows layouts(main_menu,side_menus,messages,etc.)
-
-	sf::Vector2f last_cursor_press_pos;						//the position of the last cursor press (press + relase = click)
-	sf::Vector2f last_cursor_release_pos;					//the position of the last cursor release (press + relase = click)
 
 	//Used internally to clear all RenderTextures in preparation for the next frame draw.
 	void clearSceneLayerTextures();

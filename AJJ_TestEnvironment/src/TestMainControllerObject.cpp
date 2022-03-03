@@ -25,47 +25,47 @@ TestMainControllerObject::TestMainControllerObject()
 
 	idle->setActionName("Idle");
 	idle->setParentObject(this);
-	idle->setActionType(ACTIONTYPE::AT_IDLE);
+	idle->setActionType(ACTIONTYPE::IDLE);
 
 	zoom_in->setActionName("ZoomIn");
 	zoom_in->setParameterManipulation(-0.01f);
 	zoom_in->setParentObject(this);
-	zoom_in->setActionType(ACTIONTYPE::AT_ZOOM_IN);
+	zoom_in->setActionType(ACTIONTYPE::ZOOM_IN);
 
 	zoom_out->setActionName("ZoomOut");
 	zoom_out->setParameterManipulation(0.01f);
 	zoom_out->setParentObject(this);
-	zoom_out->setActionType(ACTIONTYPE::AT_ZOOM_OUT);
+	zoom_out->setActionType(ACTIONTYPE::ZOOM_OUT);
 
 	switch_camera_locked_object->setActionName("SwitchCameraLockedObject");
 	switch_camera_locked_object->setParentObject(this);
-	switch_camera_locked_object->setActionType(ACTIONTYPE::AT_SWITCH_CAMERA_LOCKED_OBJECT);
+	switch_camera_locked_object->setActionType(ACTIONTYPE::SWITCH_CAMERA_LOCKED_OBJECT);
 
 	pause->setActionName("Pause");
 	pause->setParentObject(this);
-	pause->setActionType(ACTIONTYPE::AT_PAUSE);
+	pause->setActionType(ACTIONTYPE::PAUSE);
 
 	play->setActionName("Play");
 	play->setParentObject(this);
-	play->setActionType(ACTIONTYPE::AT_PLAY);
+	play->setActionType(ACTIONTYPE::PLAY);
 
 	menu_move_down->setActionName("MenuMoveDown");
 	menu_move_down->setParameterManipulation(1);	//increment on y-axis i.e. down
 	menu_move_down->setParentObject(this);
-	menu_move_down->setActionType(ACTIONTYPE::AT_MENU_MOVE_DOWN);
+	menu_move_down->setActionType(ACTIONTYPE::MENU_MOVE_DOWN);
 
 	menu_move_up->setActionName("MenuMoveUp");
 	menu_move_up->setParameterManipulation(-1);		//reduction on y-axis i.e. up
 	menu_move_up->setParentObject(this);
-	menu_move_up->setActionType(ACTIONTYPE::AT_MENU_MOVE_UP);
+	menu_move_up->setActionType(ACTIONTYPE::MENU_MOVE_UP);
 
 	menu_choose_alternative->setActionName("MenuChooseAlternative");
 	menu_choose_alternative->setParentObject(this);
-	menu_choose_alternative->setActionType(ACTIONTYPE::AT_MENU_CHOOSE_ALTERNATIVE);
+	menu_choose_alternative->setActionType(ACTIONTYPE::MENU_CHOOSE_ALTERNATIVE);
 
 	exit_to_menu->setActionName("ExitToMenu");
 	exit_to_menu->setParentObject(this);
-	exit_to_menu->setActionType(ACTIONTYPE::AT_EXIT_TO_MENU);
+	exit_to_menu->setActionType(ACTIONTYPE::EXIT_TO_MENU);
 
 	object_actions.push_back(idle);
 	object_actions.push_back(zoom_in);

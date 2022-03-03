@@ -11,7 +11,7 @@
 //PRESSED = the button is pressed, no release neccessary. The trigger occur on the press
 //HOVERED = the button is hovered. No press or release necessary. The trigger occur on the hover
 //RELEASED = the release occur on the button. No press necessary. The trigger occur on the release
-//PRESSED_HOVER = swoijjjjjjjjjjjjjge
+//PRESSED_HOVER = something
 enum class TRIGGER_TYPE
 {
 	CLICKED,
@@ -37,6 +37,8 @@ public:
 	Frame getDefaultFrame() { return this->default_frame; }
 	Frame getHoverFrame() { return this->hover_frame; }
 	Frame getPressedFrame() { return this->pressed_frame; }
+	bool getOnFixatedLayer() { return this->on_fixated_layer; }
+	TRIGGER_TYPE getTriggerType() { return this->trigger_type; }
 
 	/*Setters*/
 	//set the sf::Text for this button
@@ -52,15 +54,17 @@ public:
 	void setHoverFrame(Frame hover_frame) { this->hover_frame = hover_frame; }
 	//set the frame that will occur when the button is pressed
 	void setPressedFrame(Frame pressed_frame) { this->pressed_frame = pressed_frame; }
+	void setOnFixatedLayer(bool b) { this->on_fixated_layer = b; }
+	void setTriggerType(TRIGGER_TYPE trigger_type) { this->trigger_type = trigger_type; }
 
 	/*Others*/
 	//Centers the text on the button
 	void centerText();
+	void updateFrame(bool btn_pressed, bool btn_hovered);
 	
 	/*Temporary*/
 	//TEMPORARY (resource/textloader/something will be added)
 	void loadFont(std::string file_path);
-	
 
 private:
 	//Parameters	
@@ -72,5 +76,6 @@ private:
 	Frame pressed_frame;									//the frame when the button is pressed
 
 	TRIGGER_TYPE trigger_type = TRIGGER_TYPE::CLICKED;		//the type of trigger that this button will respond to
+	bool on_fixated_layer = false;							//if the button is in the real world or on a view-fixated layer
 
 };

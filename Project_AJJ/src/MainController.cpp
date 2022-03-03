@@ -28,8 +28,8 @@ void MainController::addController(Controller* new_controller)
 
 void MainController::triggerAction(int index)
 {
-
 	ACTIONTYPE type = this->active_actionnodes[index].action->getActionType();		//the current actions type
+	ActionNode action_node = this->active_actionnodes[index];							//
 	Camera* camera = this->window->getActiveScene()->getCamera();					//the window camera
 	bool window_active = this->window->getWindowState();							//if the window is active or not
 	Scene* active_scene = this->window->getActiveScene();							//the windows active scene
@@ -38,7 +38,7 @@ void MainController::triggerAction(int index)
 	if (active_scene->getSceneDenotation() == SCENE_DENOTATION::TEST_GAME)
 	{
 		//PAUSE
-		if (type == ACTIONTYPE::AT_PAUSE && window_active)
+		if (type == ACTIONTYPE::PAUSE && window_active)
 		{
 			for (auto& contr : this->controllers)
 			{
@@ -46,17 +46,8 @@ void MainController::triggerAction(int index)
 			}
 			this->window->deactivateWindow();
 		}
-		/*
-		else if (type == ACTIONTYPE::AT_PAUSE && !window_active)
-		{
-			for (auto& contr : this->controllers)
-			{
-				contr->Controller::activateController();
-			}
-			this->window->activateWindow();
-		}*/
 		//PLAY
-		if (type == ACTIONTYPE::AT_PLAY && !window_active)
+		if (type == ACTIONTYPE::PLAY && !window_active)
 		{
 			for (auto& contr : this->controllers)
 			{
@@ -65,7 +56,7 @@ void MainController::triggerAction(int index)
 			this->window->activateWindow();
 		}
 		//ZOOM IN/OUT
-		if ((type == ACTIONTYPE::AT_ZOOM_IN || type == ACTIONTYPE::AT_ZOOM_OUT) && window_active)
+		if ((type == ACTIONTYPE::ZOOM_IN || type == ACTIONTYPE::ZOOM_OUT) && window_active)
 		{
 			//get the current zoom_factor
 			float cur_zoom = camera->getCameraZoom();
@@ -75,7 +66,7 @@ void MainController::triggerAction(int index)
 			camera->setCameraZoom(cur_zoom + this->active_actionnodes[index].action->getParameterManipulation());
 		}
 		//SWITCH CAMERA OBJECT
-		if (type == ACTIONTYPE::AT_SWITCH_CAMERA_LOCKED_OBJECT && window_active)
+		if (type == ACTIONTYPE::SWITCH_CAMERA_LOCKED_OBJECT && window_active)
 		{
 			//get the id of the object that the camera is currently locked on
 			int locked_obj_id = camera->getTargetObject()->getId();
@@ -106,10 +97,26 @@ void MainController::triggerAction(int index)
 				}
 			}
 		}
-		//EXIT TO MAIN MENU
-		if (type == ACTIONTYPE::AT_EXIT_TO_MENU)
+		//HIDE LAYOUT
+		if (type == ACTIONTYPE::HIDE_LAYOUT && window_active)
 		{
+			for (auto& l : this->window->getActiveScene()->getLayer(-3)->getLayouts())
+			{
+				if (l->getEnabled())
+				{
+					l->setEnabledForAll(false);
+				}
+				else
+				{
+					l->setEnabledForAll(true);
+				}
 
+			}
+		}
+		//EXIT TO MAIN MENU
+		if (type == ACTIONTYPE::EXIT_TO_MENU)
+		{
+			
 		}
 	}
 
@@ -117,12 +124,12 @@ void MainController::triggerAction(int index)
 	if (active_scene->getSceneDenotation() == SCENE_DENOTATION::MAIN_MENU && window_active)
 	{
 		//MOVE UP/DOWN IN THE MENU
-		if (type == ACTIONTYPE::AT_MENU_MOVE_DOWN || type == ACTIONTYPE::AT_MENU_MOVE_UP)
+		if (type == ACTIONTYPE::MENU_MOVE_DOWN || type == ACTIONTYPE::MENU_MOVE_UP)
 		{
 
 		}
 		//CHOOSE MENU ALTERNATIVE
-		if (type == ACTIONTYPE::AT_MENU_CHOOSE_ALTERNATIVE)
+		if (type == ACTIONTYPE::MENU_CHOOSE_ALTERNATIVE)
 		{
 
 		}
@@ -130,11 +137,11 @@ void MainController::triggerAction(int index)
 	}
 
 	//TO BE CONTINUED.....
-	if (type == ACTIONTYPE::AT_STEP_FORWARD)
+	if (type == ACTIONTYPE::STEP_FORWARD)
 	{
 
 	}
-	if (type == ACTIONTYPE::AT_STEP_BACK)
+	if (type == ACTIONTYPE::STEP_BACK)
 	{
 
 	}
@@ -151,6 +158,22 @@ void MainController::triggerActiveActions()
 
 void MainController::processUserInput()
 {
+	//DEBUGGING
+	//update cursor specific parameters
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && !getMousePressed())
+	{
+		setLastCursorPress(this->window->mapPixelToCoords(sf::Mouse::getPosition()));
+		std::cout << "\nlast_cursor_press_pos: " << last_cursor_press_pos.x << ", " << last_cursor_press_pos.y << std::endl;
+		this->setMousePressed(true);
+	}
+	else if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && getMousePressed())
+	{
+		setLastCursorRelease(last_cursor_release_pos = this->window->mapPixelToCoords(sf::Mouse::getPosition()));
+		std::cout << "last_cursor_release_pos: " << last_cursor_release_pos.x << ", " << last_cursor_release_pos.y << std::endl;
+		this->setMousePressed(false);
+	}
+	//END DEBUGGING
+
 	//add to active_actions vector
 	Controller::constructActiveActions();
 

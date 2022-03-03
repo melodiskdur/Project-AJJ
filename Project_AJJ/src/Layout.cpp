@@ -48,7 +48,7 @@ std::vector<Button*> Layout::getButtons()
 	//return vector
 	if (no_buttons)
 	{
-		std::cout << "ERROR:(std::vector<Button*> Layout::getButtons()), no buttons in the layout" << std::endl;
+		//std::cout << "ERROR:(std::vector<Button*> Layout::getButtons()), no buttons in the layout" << std::endl;
 	}
 	return buttons;
 }
@@ -162,7 +162,7 @@ void Layout::setTextureNameForAll(sf::String name)
 	}
 }
 
-void Layout::setFrameForAll(Frame frame)
+void Layout::setCurrentFrameForAll(Frame frame)
 {
 	setCurrentFrame(frame);
 
@@ -171,8 +171,24 @@ void Layout::setFrameForAll(Frame frame)
 
 	for (auto& l : this->layouts)
 	{
-		l->setFrameForAll(frame);
+		l->setCurrentFrameForAll(frame);
 	}
+}
+
+void Layout::setEnabledForAll(bool state)
+{
+	//set state for this layout
+	this->setEnabled(state);
+
+	//loop all of the child-layouts
+	for (Layout* child_layout : this->getLayouts())
+	{
+		//recursion
+		child_layout->setEnabledForAll(state);
+	}
+
+	//stop the recursion
+	return;
 }
 
 
@@ -272,50 +288,50 @@ void Layout::setLayoutIdealPosition()
 	sf::FloatRect pl_rect = this->parent_layout->getRect();			//the rect for the parent_layout
 
 	//TOP
-	if (this->layout_placement == LAYOUT_PLACEMENT::LP_TOP_CENTERED)
+	if (this->layout_placement == LAYOUT_PLACEMENT::TOP_CENTERED)
 	{
 		this->setPosition({ pl_rect.left + (pl_rect.width / 2) - (this->rect.width / 2), pl_rect.top });
 	}
-	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_TOP_LEFT)
+	else if (this->layout_placement == LAYOUT_PLACEMENT::TOP_LEFT)
 	{
 		this->setPosition({ pl_rect.left,pl_rect.top });
 	}
-	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_TOP_RIGHT)
+	else if (this->layout_placement == LAYOUT_PLACEMENT::TOP_RIGHT)
 	{
 		this->setPosition({ pl_rect.left + pl_rect.width - this->rect.width , pl_rect.top });
 	}
 	//BOTTOM
-	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_BOTTOM_CENTERED)
+	else if (this->layout_placement == LAYOUT_PLACEMENT::BOTTOM_CENTERED)
 	{
 		this->setPosition({ pl_rect.left + (pl_rect.width / 2) - (this->rect.width / 2) , pl_rect.top + pl_rect.height - this->rect.height });
 	}
-	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_BOTTOM_LEFT)
+	else if (this->layout_placement == LAYOUT_PLACEMENT::BOTTOM_LEFT)
 	{
 		this->setPosition({ pl_rect.left , pl_rect.top + pl_rect.height - this->rect.height });
 	}
-	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_BOTTOM_RIGHT)
+	else if (this->layout_placement == LAYOUT_PLACEMENT::BOTTOM_RIGHT)
 	{
 		this->setPosition({ pl_rect.left + pl_rect.width - this->rect.width , pl_rect.top + pl_rect.height - this->rect.height });
 	}
 	//CENTERED
-	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_CENTERED_LEFT)
+	else if (this->layout_placement == LAYOUT_PLACEMENT::CENTERED_LEFT)
 	{
 		this->setPosition({ pl_rect.left , pl_rect.top + (pl_rect.height / 2) - (this->rect.height / 2) });
 	}
-	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_CENTERED_RIGHT)
+	else if (this->layout_placement == LAYOUT_PLACEMENT::CENTERED_RIGHT)
 	{
 		this->setPosition({ pl_rect.left + pl_rect.width - this->rect.width , pl_rect.top + (pl_rect.height / 2) - (this->rect.height / 2) });
 	}
-	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_CENTERED)
+	else if (this->layout_placement == LAYOUT_PLACEMENT::CENTERED)
 	{
 		this->setPosition({ pl_rect.left + (pl_rect.width / 2) - (this->rect.width / 2) , pl_rect.top + (pl_rect.height / 2) - (this->rect.height / 2) });
 	}
 	//CUSTOM and NONE
-	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_CUSTOM)
+	else if (this->layout_placement == LAYOUT_PLACEMENT::CUSTOM)
 	{
 		//continue with the given position
 	}
-	else if (this->layout_placement == LAYOUT_PLACEMENT::LP_NONE)
+	else if (this->layout_placement == LAYOUT_PLACEMENT::NONE)
 	{
 		//no position ha been given
 		//could be useful when implementing a drag and drop i.e. in hand/not placed
@@ -330,50 +346,50 @@ void Layout::setObjectIdealPosition(Object * obj)
 	sf::FloatRect obj_rect = obj->getFloatRect();
 
 	//TOP
-	if (this->objects_placement == LAYOUT_PLACEMENT::LP_TOP_CENTERED)
+	if (this->objects_placement == LAYOUT_PLACEMENT::TOP_CENTERED)
 	{
 		obj->setWorldPosition({ pl_rect.left + (pl_rect.width / 2) - (obj_rect.width / 2), pl_rect.top });
 	}
-	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_TOP_LEFT)
+	else if (this->objects_placement == LAYOUT_PLACEMENT::TOP_LEFT)
 	{
 		obj->setWorldPosition({ pl_rect.left,pl_rect.top });
 	}
-	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_TOP_RIGHT)
+	else if (this->objects_placement == LAYOUT_PLACEMENT::TOP_RIGHT)
 	{
 		obj->setWorldPosition({ pl_rect.left + pl_rect.width - obj_rect.width , pl_rect.top });
 	}
 	//BOTTOM
-	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_BOTTOM_CENTERED)
+	else if (this->objects_placement == LAYOUT_PLACEMENT::BOTTOM_CENTERED)
 	{
 		obj->setWorldPosition({ pl_rect.left + (pl_rect.width / 2) - (obj_rect.width / 2) , pl_rect.top + pl_rect.height - obj_rect.height });
 	}
-	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_BOTTOM_LEFT)
+	else if (this->objects_placement == LAYOUT_PLACEMENT::BOTTOM_LEFT)
 	{
 		obj->setWorldPosition({ pl_rect.left , pl_rect.top + pl_rect.height - this->rect.height });
 	}
-	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_BOTTOM_RIGHT)
+	else if (this->objects_placement == LAYOUT_PLACEMENT::BOTTOM_RIGHT)
 	{
 		obj->setWorldPosition({ pl_rect.left + pl_rect.width - obj_rect.width , pl_rect.top + pl_rect.height - obj_rect.height });
 	}
 	//CENTERED
-	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_CENTERED_LEFT)
+	else if (this->objects_placement == LAYOUT_PLACEMENT::CENTERED_LEFT)
 	{
 		obj->setWorldPosition({ pl_rect.left , pl_rect.top + (pl_rect.height / 2) - (obj_rect.height / 2) });
 	}
-	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_CENTERED_RIGHT)
+	else if (this->objects_placement == LAYOUT_PLACEMENT::CENTERED_RIGHT)
 	{
 		obj->setWorldPosition({ pl_rect.left + pl_rect.width - obj_rect.width , pl_rect.top + (pl_rect.height / 2) - (obj_rect.height / 2) });
 	}
-	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_CENTERED)
+	else if (this->objects_placement == LAYOUT_PLACEMENT::CENTERED)
 	{
 		obj->setWorldPosition({ pl_rect.left + (pl_rect.width / 2) - (obj_rect.width / 2) , pl_rect.top + (pl_rect.height / 2) - (obj_rect.height / 2) });
 	}
 	//CUSTOM and NONE
-	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_CUSTOM)
+	else if (this->objects_placement == LAYOUT_PLACEMENT::CUSTOM)
 	{
 		//continue with the given position
 	}
-	else if (this->objects_placement == LAYOUT_PLACEMENT::LP_NONE)
+	else if (this->objects_placement == LAYOUT_PLACEMENT::NONE)
 	{
 		//no position has been given
 		//could be useful when implementing a drag and drop i.e. in hand/not placed
