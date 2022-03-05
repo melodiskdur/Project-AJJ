@@ -105,6 +105,30 @@ void ExtendedRenderWindow::drawActiveSceneToWindow()
 	}
 }
 
+void ExtendedRenderWindow::drawActiveSceneToWindow()
+{
+	if (this->window_state)
+	{
+		// clear the window with transparent(black) color
+		this->clear(sf::Color::Transparent);
+
+		if (active_scene != nullptr)
+		{
+			//Collision detection.
+			this->active_scene->updateSceneFrame();
+			//All layers are drawn.
+			this->drawLayersToWindow();
+		}
+
+		// Debugging.
+		if (this->debugger_mode)
+			this->debugDraw();
+
+		// end the current frame. Display all changes
+		this->display();
+	}
+}
+
 void ExtendedRenderWindow::drawLayoutObject(Object* obj, sf::RenderTexture* render_texture)
 {
 	//BUTTON
