@@ -73,7 +73,6 @@ protected:
 private:
 	signed int layer_num = 1;			// Rendering order. x = 0: Main layer (reserved). x > 0 background, x < 0 : foreground.
 	static unsigned int instance_counter;
-	
 };
 
 
@@ -90,13 +89,14 @@ class StaticFixatedLayer : public SceneLayer
 public:
 	StaticFixatedLayer(int layer_num);
 	StaticFixatedLayer(int layer_num, float scale, sf::View cam_v);
+	StaticFixatedLayer(int layer_num, float scale, sf::FloatRect view_rect);
 	~StaticFixatedLayer() override;
 	// Getters.
 	std::vector<Object*> getLayerObjectsWithinView(sf::FloatRect view_rect) override { return this->obj_within_view; };
 	std::vector<Layout*> getLayerLayoutsWithinView(sf::FloatRect view_rect) override;
 	// Setters.
 	// Others.
-	sf::View manipulateCameraView(const sf::View cam_v) override { return this->static_view; };
+	sf::View manipulateCameraView(const sf::View cam_v) override;
 	void addObject(Object* o) override;
 	void addObjects(std::vector<Object*> o_vec) override;
 private:
@@ -147,17 +147,20 @@ public:
 	std::vector<Object*> getLayerObjectsWithinView(sf::FloatRect view_rect) override;
 	// Setters.
 	void setAutoScrolling(sf::Vector2f a_s) { this->auto_scrolling = a_s; };
+	void setFixatedX(bool b) { this->fixated_x = b; };
+	void setFixatedY(bool b) { this->fixated_y = b; };
+	void setRepeat(bool b) { this->repeat = b; };
 	// Others.
 	sf::View manipulateCameraView(const sf::View cam_v) override;
 	void addObject(Object* o) override;
 	void addObjects(std::vector<Object*> o_vec) override;
 	void updateLayerObjects() override;
 private:
-	bool repeat = true;
+	bool repeat = false;
 	bool fixated_x = true;
-	bool fixated_y = false;
+	bool fixated_y = true;
 	sf::Vector2f auto_scrolling = { 0.0f, 0.0f };
-
+	sf::View static_view;
 	void checkForReset(Object* o, sf::FloatRect rect);
 };
 

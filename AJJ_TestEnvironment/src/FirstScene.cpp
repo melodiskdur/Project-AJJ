@@ -110,15 +110,14 @@ Scene* FirstScene::createScene()
 	
 	// Create HitboxNodes and add to relevant tiles.
 	FirstScene::createHitboxNodes(first_scene);
-	SceneLayer* layout_test1 = new SceneLayer(-2, 1.f, 0);
+
+	SceneLayer* layout_test1 = new SceneLayer(-2, 1.f, 1.f);
 	layout_test1->addLayout(TestLayout::createTestLayout(false));
 	first_scene->addSceneLayer(layout_test1);
 
-	SceneLayer* layout_test2 = new StaticFixatedLayer(-3, 1.f, sf::View({ 0.f, 0.f }, { 800.f, 600.f }));
-	layout_test2->addLayout(TestLayout::createTestLayout(true));
-
+	SceneLayer* layout_test2 = new StaticFixatedLayer(-3, 1.f, sf::FloatRect(0.f, 0.f, 800.f, 600.f));
+	layout_test2->addLayout(TestLayout::createTestLayout(false));
 	first_scene->addSceneLayer(layout_test2);
-
 
 	return first_scene;
 }
@@ -225,6 +224,7 @@ void FirstScene::createStaticBackgroundLayer(Scene* scene, sf::String texture_na
 void FirstScene::createCloudLayer(Scene* scene)
 {
 	DynamicFixatedLayer* cloud_layer = new DynamicFixatedLayer(8, 30.f, 2.7f);
+	cloud_layer->setRepeat(true);
 	cloud_layer->setAutoScrolling({50.3f, 0.f});
 	std::vector<sf::Vector2f> positions = { {-430.f, -150.f}, { -200.f, 80.f}, { 450.f, -400.f}, { 130.f, -350.f} };
 	scene->addSceneLayer(cloud_layer);
@@ -245,6 +245,7 @@ void FirstScene::createCloudLayer(Scene* scene)
 void FirstScene::createCloudLayer2(Scene* scene)
 {
 	DynamicFixatedLayer* cloud_layer = new DynamicFixatedLayer(7, 30.f, 2.7f);
+	cloud_layer->setRepeat(true);
 	cloud_layer->setAutoScrolling({ 100.6f, 0.f });
 	std::vector<sf::Vector2f> positions = { {-30.f, -130.f}, { -230.f, -400.f}, { 450.f, -35.f}, { 130.f, -250.f} };
 	scene->addSceneLayer(cloud_layer);

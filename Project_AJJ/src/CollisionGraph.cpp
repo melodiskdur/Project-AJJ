@@ -288,6 +288,7 @@ void CollisionGraph::collisionTriggered(CollisionEdge* r, CollisionEdge* e)
 {
 	// Setup part.
 	CollisionNode* r_adj = this->findNode(r->m_i_adjacent);
+	if (r_adj == nullptr) return;
 	CollisionNode* r_c = this->findNode(r->m_i_node);
 	CollisionEdge* r_inv = this->invertedEdge(r);
 	bool chain_case = false;

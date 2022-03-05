@@ -134,7 +134,7 @@ std::vector<ActionNode> Controller::constructActiveActions()
 				switch (btn_trigger) 
 				{
 				case TRIGGER_TYPE::CLICKED:
-
+					
 					break;
 				case TRIGGER_TYPE::PRESSED:
 		

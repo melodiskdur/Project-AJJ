@@ -41,11 +41,16 @@ StaticFixatedLayer::StaticFixatedLayer(int layer_num) : SceneLayer(layer_num) { 
 StaticFixatedLayer::StaticFixatedLayer(int layer_num, float scale, sf::View cam_v) : SceneLayer(layer_num, 1.f, scale) 
 {
     // Set up the static view. Point to (0,0).
-    this->static_view = cam_v; 
-    this->static_view.setCenter({ 0.f, 0.f });
+    this->static_view = cam_v;
 
     // Set up the view rect accordingly.
     this->static_rect = { this->static_view.getCenter() - 0.5f * this->static_view.getSize(), this->static_view.getSize() };
+}
+
+StaticFixatedLayer::StaticFixatedLayer(int layer_num, float scale, sf::FloatRect view_rect) : SceneLayer(layer_num, 1.f, scale)
+{
+    this->static_rect = view_rect;
+    this->static_view = sf::View(view_rect);
 }
 
 std::vector<Layout*> StaticFixatedLayer::getLayerLayoutsWithinView(sf::FloatRect view_rect)
@@ -55,12 +60,27 @@ std::vector<Layout*> StaticFixatedLayer::getLayerLayoutsWithinView(sf::FloatRect
     for (Layout* l : this->layouts)
     {
         sf::FloatRect layout_rect = l->getRect();
-        if (view_rect.intersects(layout_rect)) viewable_layouts.push_back(l);
+        if (this->static_rect.intersects(layout_rect)) viewable_layouts.push_back(l);
     }
     return viewable_layouts;
 }
 
 StaticFixatedLayer::~StaticFixatedLayer() {}
+
+sf::View StaticFixatedLayer::manipulateCameraView(const sf::View cam_v)
+{
+    // Check if the viewport has been changed.
+    if (this->static_view.getViewport() != cam_v.getViewport())
+    {
+        // Continue to draw from top left of the view_rect.
+        this->static_view.setCenter(this->static_view.getCenter().x * cam_v.getViewport().width,
+            this->static_view.getCenter().y * cam_v.getViewport().height);
+        this->static_view.setSize(this->static_rect.width * cam_v.getViewport().width,
+                                  this->static_rect.height * cam_v.getViewport().height);
+        this->static_view.setViewport(cam_v.getViewport());
+    }
+    return this->static_view;
+}
 
 void StaticFixatedLayer::addObject(Object* o)
 {
@@ -137,7 +157,9 @@ DynamicFixatedLayer::~DynamicFixatedLayer() { }
 std::vector<Object*> DynamicFixatedLayer::getLayerObjectsWithinView(sf::FloatRect view_rect)
 {
     // Manipulate rectangle.
-    sf::View v(view_rect);
+    sf::View v = this->fixated_x && this->fixated_y ?
+        sf::View({ 0.f, 0.f }, { view_rect.width, view_rect.height }) :
+        sf::View(view_rect);
     v.zoom(this->depth * this->scale);
     view_rect = { v.getCenter() - 0.5f * v.getSize(), v.getSize() };
     for (Object* o : this->layer_objects)
@@ -173,8 +195,7 @@ void DynamicFixatedLayer::updateLayerObjects()
     /* * * * * * * * * * *
     *  INSERT STUFF HERE *
     * * * * * * * * * * **/
-    // Autoscroll.
-    
+    // Autoscroll.   
 }
 
 void DynamicFixatedLayer::checkForReset(Object* o, sf::FloatRect rect)

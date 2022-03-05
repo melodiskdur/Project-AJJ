@@ -62,7 +62,6 @@ public:
 	void setLastCursorPress(sf::Vector2f pos) { this->last_cursor_press_pos = pos; }
 	void setLastCursorRelease(sf::Vector2f pos) { this->last_cursor_release_pos = pos; }
 	
-
 	/*Getters*/
 	bool getControllerState() { return this->controller_state; };
 	Object* getObject() { return obj; };

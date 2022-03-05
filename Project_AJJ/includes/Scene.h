@@ -72,6 +72,7 @@ public:
 	//Updates the scene (object positions etc) for the drawing of the next frame.
 	void updateSceneFrame();
 	std::vector<sf::View> getLayerManipulatedViews();
+	std::map<int, sf::View> getLayerManipulatedView();
 
 	static unsigned int instanceCount() { return instance_counter; };
 private:

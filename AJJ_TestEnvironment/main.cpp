@@ -57,6 +57,9 @@ int main()
 	test_scene->setCamera(&scene_camera);
 	window.setActiveScene(test_scene);
 
+	scene_camera.resizeToViewPort({ 1.f, 1.f });
+	scene_camera.getCameraView()->setViewport({ 0.f, 0.f, 1.f, 1.f });
+
 	//----------------------- Create Players & Lock View --------------------
 
 	TestObject* player_1 = new TestObject(sf::Vector2f(1800.0f, 0.0f), sf::Vector2f(100.0f, 100.0f));
@@ -191,7 +194,7 @@ int main()
 		}
 		
 		//draw the active_scene
-		window.drawActiveScene();
+		window.drawActiveSceneToWindow();
 
 		//DEBUGGING
 		//window.getLayouts()[0]->setPositionForAll({ window.getLayouts()[0]->getPosition().x + 1 , window.getLayouts()[0]->getPosition().y + 1});
@@ -201,8 +204,7 @@ int main()
 		//test_layout->placeLayouts();
 		//prints out the framerate
 		//std::cout << 1.0f / framerate.asSeconds() << std::endl;
-		//END DEBUGGING
-		
+		//END DEBUGGING	
 	}
 	delete test_scene;
 	delete phys_mag;

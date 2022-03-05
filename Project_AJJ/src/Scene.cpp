@@ -86,7 +86,6 @@ void Scene::addSceneLayer(SceneLayer* L)
 		delete L;
 }
 
-
 void Scene::addSceneObject(Object* object)
 {
 	scene_objects.push_back(object);
@@ -138,6 +137,18 @@ std::vector<sf::View> Scene::getLayerManipulatedViews()
 	for (SceneLayer* L : this->scene_layers) 
 		manip_v.push_back(L->manipulateCameraView(*this->scene_camera->getCameraView()));
 	return manip_v;
+}
+std::map<int, sf::View> Scene::getLayerManipulatedView()
+{
+	std::map<int, sf::View> num_view_pairs;
+	for (SceneLayer* L : this->scene_layers)
+	{
+		std::pair<int, sf::View> nvp;
+		nvp.first = L->getLayerNum();
+		nvp.second = L->manipulateCameraView(*this->scene_camera->getCameraView());
+		num_view_pairs.insert(nvp);
+	}
+	return num_view_pairs;
 }
 bool Scene::addLayer(SceneLayer* layer)
 {

@@ -560,3 +560,125 @@ std::vector<sf::Vector2f> CollisionHandler::recalibrate(const HBData& odata, con
 	}
 	return { i_updated, j_updated };
 }
+
+std::vector<HBData> CollHandler::calculateResolves(HitboxNode* i, HitboxNode* j)
+{
+	std::vector<HBData> hbdata;
+	if (i == nullptr || j == nullptr) return hbdata;
+	if (i->getBehavior() == HBOX::STATIC && j->getBehavior() == HBOX::STATIC) return hbdata;
+	// Retrieve hitboxes.
+	SubBox2* sb_i = i->getSB2();
+	SubBox2* sb_j = j->getSB2();
+	if (sb_i == nullptr || sb_j == nullptr) return hbdata;
+	// Check for the involved box types and choose that resolving algorithm accordingly.
+	
+	// RectBox or CircleBox.
+	if (sb_i->getType() == sf::String("RectBox") || sb_i->getType() == sf::String("CircleBox"))
+	{
+		// RectBoxes and Circles are axis-aligned and can be solved using the simple AABB algorithm.
+		if (sb_j->getType() == sf::String("RectBox") || sb_j->getType() == sf::String("CircleBox"))
+			hbdata = CollHandler::resolveAA(i, j);
+		// Collison with a ConvexBox requires the Separating Axis algorithm.
+		else if (sb_j->getType() == sf::String("ConvexBox"))
+			hbdata = CollHandler::resolveSAT(i, j);
+		// If collision with a static Spline hitbox, run a customized algorithm for that situation.
+		else if (sb_j->getType() == sf::String("SplineBox"))
+			hbdata = CollHandler::resolveSpline(i, j);
+	}
+	// ConvexBox.
+	else if (sb_i->getType() == sf::String("ConvexBox"))
+	{
+		// Spline hitbox case.
+		if (sb_j->getType() == sf::String("SplineBox"))
+			hbdata = CollHandler::resolveSpline(i, j);
+		// Every other situation requires SAT.
+		else hbdata = CollHandler::resolveSAT(i, j);
+	}
+	// SplineBox.
+	else if (sb_i->getType() == sf::String("SplineBox"))
+	{
+		// Only valid case is a non-SplineBox collision.
+		if (sb_j->getType() != sf::String("SplineBox"))
+			hbdata = CollHandler::resolveSpline(i, j);
+	}
+	return hbdata;
+}
+
+std::vector<HBData> CollHandler::resolveAA(HitboxNode* i, HitboxNode* j)
+{
+	std::vector<HBData> hbdata;
+	SubBox2* sb_i = i->getSB2();
+	SubBox2* sb_j = j->getSB2();
+	// Calculate overlaps from the involved Hitbox types.
+	sf::Vector2f overlaps = CollHandler::calculateOverlaps(sb_i, sb_j);
+	return hbdata;
+}
+
+std::vector<HBData> CollHandler::resolveSAT(HitboxNode* i, HitboxNode* j)
+{
+	return std::vector<HBData>();
+}
+
+std::vector<HBData> CollHandler::resolveSpline(HitboxNode* i, HitboxNode* j)
+{
+	return std::vector<HBData>();
+}
+
+sf::Vector2f CollHandler::calculateOverlaps(SubBox2* i, SubBox2* j)
+{
+	sf::Vector2f ol;
+	// Decide which the overlap function to be called depending on the involved Hitbox types.
+	if (i->getType() == sf::String("RectBox"))
+	{
+		if (j->getType() == sf::String("RectBox"))
+			ol = CollHandler::ol_RectRect(static_cast<RectBox*>(i), static_cast<RectBox*>(j));
+		else if (j->getType() == sf::String("CircleBox"))
+			ol = CollHandler::ol_RectCircle(static_cast<RectBox*>(i), static_cast<CircleBox*>(j));
+	}
+	return ol;
+}
+
+sf::Vector2f CollHandler::ol_CircleCircle(CircleBox* i, CircleBox* j)
+{
+	return sf::Vector2f();
+}
+
+sf::Vector2f CollHandler::ol_RectRect(RectBox* i, RectBox* j)
+{
+	return sf::Vector2f();
+}
+
+sf::Vector2f CollHandler::ol_RectCircle(RectBox* i, CircleBox* j)
+{
+	return sf::Vector2f();
+}
+
+sf::Vector2f CollHandler::ol_RectConv(RectBox* i, ConvexBox* j)
+{
+	return sf::Vector2f();
+}
+
+sf::Vector2f CollHandler::ol_ConvConv(ConvexBox* i, ConvexBox* j)
+{
+	return sf::Vector2f();
+}
+
+sf::Vector2f CollHandler::ol_CircleConv(CircleBox* i, ConvexBox* j)
+{
+	return sf::Vector2f();
+}
+
+sf::Vector2f CollHandler::ol_RectSpline(RectBox* i, SplineBox* j)
+{
+	return sf::Vector2f();
+}
+
+sf::Vector2f CollHandler::ol_ConvSpline(ConvexBox* i, SplineBox* j)
+{
+	return sf::Vector2f();
+}
+
+sf::Vector2f CollHandler::ol_CircleSpline(CircleBox* i, SplineBox* j)
+{
+	return sf::Vector2f();
+}

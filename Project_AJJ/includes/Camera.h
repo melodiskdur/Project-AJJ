@@ -39,15 +39,19 @@ public:
 	void unlockFromObject();
 	//Zoom out/in with the camera
 	void addOrSubCameraZoom(float zoom_factor);
-	
+	// Resize camera view rect while maintaining the proportions of all object.
+	void resizeToViewPort(sf::Vector2f vp_sz);
+
 	static unsigned int instanceCount() { return instance_counter; };
 private:
-	sf::View* camera_view;				// Display region.
-	sf::Vector2f camera_position;		// Camera central point within a scene.
-	sf::FloatRect camera_view_rect;		// The part of the scene that is seen from the camera POV.
-	float current_zoom = 1;				// Default = 1. If z_f > 1, objects appear smaller.
-	float max_zoom = 2;					// Maximum allowed zoom.
-	Object* target_object = nullptr;	// Object to follow.
+	sf::View* camera_view;					// Display region.
+	sf::Vector2f camera_position;			// Camera central point within a scene.
+	sf::Vector2f original_size;				// The original size of the Camera viewrect.
+	sf::FloatRect camera_view_rect;			// The part of the scene that is seen from the camera POV.
+	sf::Vector2f viewport_size{ 0.5f, 1.f };	// Viewport ratios (for resizing the Camera.camera_view.
+	float current_zoom = 1;				    // Default = 1. If z_f > 1, objects appear smaller.
+	float max_zoom = 2;					    // Maximum allowed zoom.
+	Object* target_object = nullptr;	    // Object to follow.
 
 	static unsigned int instance_counter;
 };

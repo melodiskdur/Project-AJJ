@@ -87,7 +87,6 @@ void Layout::setBorderSizeForAll(sf::Vector2f new_border_size)
 		//use recursion to the set the new border_size for all layouts
 		l->setBorderSizeForAll(new_border_size);
 	}
-	
 }
 
 void Layout::setPosition(sf::Vector2f new_pos)
@@ -105,7 +104,6 @@ void Layout::setPosition(sf::Vector2f new_pos)
 		this->setMarginSpaceRect(ms, index);
 		index++;
 	}
-
 }
 
 void Layout::setPositionForAll(sf::Vector2f new_pos)

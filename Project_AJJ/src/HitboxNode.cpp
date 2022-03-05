@@ -45,6 +45,11 @@ SubBox HitboxNode::getSB()
 	return sb;
 }
 
+SubBox2* HitboxNode::getSB2()
+{
+	return nullptr;
+}
+
 void HitboxNode::setHitboxTotal(sf::Vector2f hb_center, sf::Vector2f hb_size)
 {
 	if (this->parent_object == nullptr) return;
@@ -128,4 +133,43 @@ sf::VertexArray HitboxNode::getDrawable()
 		sb_drawable[i].color = gc;
 	}
 	return sb_drawable;
+}
+
+RectBox::RectBox()
+{
+}
+
+RectBox::RectBox(sf::FloatRect rb)
+{
+}
+
+RectBox::RectBox(sf::Vector2f center, sf::Vector2f size)
+{
+}
+
+RectBox::~RectBox()
+{
+}
+
+sf::VertexArray RectBox::getDrawable()
+{
+	return sf::VertexArray();
+}
+
+std::vector<sf::Vector2f> RectBox::getVertices()
+{
+	return std::vector<sf::Vector2f>();
+}
+
+sf::FloatRect RectBox::getRect()
+{
+	return sf::FloatRect();
+}
+
+void RectBox::setLocalCenter(sf::Vector2f c)
+{
+}
+
+void RectBox::rescale()
+{
 }

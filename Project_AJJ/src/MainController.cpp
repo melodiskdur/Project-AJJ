@@ -159,31 +159,37 @@ void MainController::triggerActiveActions()
 void MainController::processUserInput()
 {
 	//DEBUGGING
+	// Search for "correct" SceneLayer-view.
+	// NOTE: HARDCODED. TEMPORARY CODE.
+	std::map<int, sf::View> lv_pairs = this->window->getActiveScene()->getLayerManipulatedView();
+	sf::View v;
+	for (const std::pair<int, sf::View>& p : lv_pairs)
+	{ if (p.first == -3) { v = p.second; break; } }
+	this->window->setView(v);
+	 
 	//update cursor specific parameters
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && !getMousePressed())
 	{
 		setLastCursorPress(this->window->mapPixelToCoords(sf::Mouse::getPosition()));
-		std::cout << "\nlast_cursor_press_pos: " << last_cursor_press_pos.x << ", " << last_cursor_press_pos.y << std::endl;
+		//std::cout << "\nlast_cursor_press_pos: " << last_cursor_press_pos.x << ", " << last_cursor_press_pos.y << std::endl;
 		this->setMousePressed(true);
 	}
 	else if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && getMousePressed())
 	{
 		setLastCursorRelease(last_cursor_release_pos = this->window->mapPixelToCoords(sf::Mouse::getPosition()));
-		std::cout << "last_cursor_release_pos: " << last_cursor_release_pos.x << ", " << last_cursor_release_pos.y << std::endl;
+		//std::cout << "last_cursor_release_pos: " << last_cursor_release_pos.x << ", " << last_cursor_release_pos.y << std::endl;
 		this->setMousePressed(false);
 	}
 	//END DEBUGGING
 
 	//add to active_actions vector
 	Controller::constructActiveActions();
-
 	//if there are no active_actions
 	if (active_actionnodes.empty())
 	{
 		active_actionnodes.push_back(actionnodes[0]);				//add the idle/not-active action
 		this->num_active_actionnodes++;
 	}
-
 	//at last, trigger all active_actions
 	MainController::triggerActiveActions();
 }

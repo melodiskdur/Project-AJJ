@@ -33,14 +33,20 @@ public:
 	/*Etc*/
 	//Draws a frame of the active Scene-object.
 	void drawActiveScene();
+	// Draws a frame of the active Scene directly onto the window render target 
+	// instead of off-screen RenderTextures.
+	void drawActiveSceneToWindow();
 	//draw a button on the screen
 	void drawLayoutObject(Object * obj, sf::RenderTexture* render_texture);
+	void drawLayoutObjectToWindow(Object* obj);
 	//draw an object on the screen
 	void drawObject(Object* obj);
 	//draw the layouts and all of the layouts contained inside
 	void drawLayouts(Layout* layout, sf::RenderTexture* render_texture);
+	void drawLayoutsToWindow(Layout* layout);
 	//draw a specific layout
 	void drawLayout(Layout* layout, sf::RenderTexture* render_texture);
+	void drawLayoutToWindow(Layout* layout);
 	//debug view for the layout. Draws the layout and the contained margin_spaces
 	void drawLayoutsDEBUG(Layout* layout);
 
@@ -62,6 +68,9 @@ private:
 	void clearSceneLayerTextures();
 	//Draws layers in descending order (layer_num). Used internally in drawActiveScene().
 	void drawLayers();
+	void drawLayersToWindow();
+	void drawLayerToWindow(int layer_num);
+	void drawLayertoTexture(int layer_num, sf::RenderTexture* tex);
 
 	// Debugging.
 	bool debugger_mode = true;

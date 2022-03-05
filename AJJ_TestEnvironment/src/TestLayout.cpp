@@ -1,14 +1,12 @@
 #include "../includes/TestLayout.h"
 #include "../includes/TestButton.h"
 
-
-
 Layout* TestLayout::createTestLayout(bool on_fixated_layer)
 {
 	/*/////////////----ADD LAYOUTS---//////////////*/
 
 	//baselayout (base)
-	Layout* test_layout = new Layout(sf::FloatRect(0, 0, 180, 310), sf::Vector2f(0, 0), sf::Vector2f(0, 0), LAYOUT_PLACEMENT::NONE);
+	Layout* test_layout = new Layout(sf::FloatRect(0.f, 0.f, 180, 310), sf::Vector2f(0, 0), sf::Vector2f(0, 0), LAYOUT_PLACEMENT::NONE);
 
 	//base->children
 	int num_children = 6;

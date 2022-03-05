@@ -7,6 +7,7 @@ Camera::Camera()
 	Camera::instance_counter++;
 	camera_view = new sf::View(sf::Vector2f(400, 300), sf::Vector2f(800, 600));
 	camera_position = camera_view->getCenter();
+	original_size = sf::Vector2f(800, 600);
 	setCameraViewRect();
 }
 
@@ -24,8 +25,9 @@ sf::View* Camera::getCameraView()
 		pos = target_object->getWorldPosition();
 	else
 		pos = this->getCameraPosition();
-	setCameraPosition(pos);
-	setCameraViewRect();
+	this->setCameraPosition(pos);
+	this->setCameraViewRect();
+	
 	return camera_view;
 }
 
@@ -36,7 +38,7 @@ sf::Vector2f Camera::getCameraPosition()
 
 sf::FloatRect Camera::getCameraViewRect()
 {
-	return camera_view_rect;
+	return this->camera_view_rect;
 }
 
 float Camera::getCameraZoom()
@@ -81,7 +83,7 @@ void Camera::setCameraViewRect()
 	float half_width = camera_view->getSize().x / 2;
 	float half_height = camera_view->getSize().y / 2;
 	sf::Vector2f upper_left = sf::Vector2f(camera_position.x - half_width, camera_position.y - half_height);
-	this->camera_view_rect = sf::FloatRect(upper_left, camera_view->getSize());
+	this->camera_view_rect = sf::FloatRect(upper_left, this->camera_view->getSize());
 }
 
 void Camera::setCameraZoom(float zoom_factor)
@@ -122,5 +124,13 @@ void Camera::unlockFromObject()
 void Camera::addOrSubCameraZoom(float zoom_by_value) 
 {
 	setCameraZoom(this->current_zoom + zoom_by_value);
+}
+
+void Camera::resizeToViewPort(sf::Vector2f vp_sz)
+{
+	this->viewport_size = vp_sz;
+	this->camera_view->setSize({ original_size.x * vp_sz.x, original_size.y * vp_sz.y });
+	this->camera_view_rect.width = original_size.x * vp_sz.x;
+	this->camera_view_rect.height = original_size.y * vp_sz.y;
 }
 
