@@ -49,15 +49,17 @@ Layout* TestLayout::createTestLayout(bool on_fixated_layer)
 	Action* hide_layout = new Action("BtnHideLayout", ACTIONTYPE::HIDE_LAYOUT, 0, 0);
 
 	Button* btn1 = TestButton::createTestButton({ 80,40 }, zoom_in, on_fixated_layer, "ZOOM IN");
+	btn1->setTriggerType(TRIGGER_TYPE::PRESSED);
 	zoom_in->setParentObject(btn1);
 	
 	Button* btn2 = TestButton::createTestButton({ 80,40 }, zoom_out, on_fixated_layer, "ZOOM OUT");
+	btn2->setTriggerType(TRIGGER_TYPE::PRESSED);
 	zoom_out->setParentObject(btn2);
 
-	Button* btn3 = TestButton::createTestButton({ 80,40 }, pause, on_fixated_layer, "PAUSE");
+	Button* btn3 = TestButton::createTestButton({ 80,40 }, pause, on_fixated_layer, "PAUSE/PLAY");
 	pause->setParentObject(btn3);
 
-	Button* btn4 = TestButton::createTestButton({ 80,40 }, play, on_fixated_layer, "PLAY");
+	Button* btn4 = TestButton::createTestButton({ 80,40 }, play, on_fixated_layer, "PAUSE/PLAY");
 	play->setParentObject(btn4);
 
 	Button* btn5 = TestButton::createTestButton({ 80,40 }, switch_camera_obj, on_fixated_layer, "SWITCH");
