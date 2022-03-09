@@ -184,14 +184,8 @@ int main()
 			}	
 		}
 
-		//take and process the input for the main_controller
+		//take and process the input for the main_controller as well as all of the connected controllers 
 		main_contr.processUserInput();
-
-		//take and process the input for the active player_controllers
-		for (Controller* player_contr : main_contr.getControllers())
-		{
-			player_contr->processUserInput();
-		}
 		
 		//draw the active_scene
 		window.drawActiveSceneToWindow();

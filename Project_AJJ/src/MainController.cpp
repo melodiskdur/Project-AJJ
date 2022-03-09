@@ -38,7 +38,7 @@ void MainController::triggerAction(int index)
 	if (active_scene->getSceneDenotation() == SCENE_DENOTATION::TEST_GAME)
 	{
 		//PAUSE
-		if (type == ACTIONTYPE::PAUSE && window_active)
+		if ((type == ACTIONTYPE::PAUSE && window_active) || (type == ACTIONTYPE::PLAY && window_active))
 		{
 			for (auto& contr : this->controllers)
 			{
@@ -47,7 +47,7 @@ void MainController::triggerAction(int index)
 			this->window->deactivateWindow();
 		}
 		//PLAY
-		if (type == ACTIONTYPE::PLAY && !window_active)
+		if ((type == ACTIONTYPE::PLAY && !window_active) || (type == ACTIONTYPE::PAUSE && !window_active))
 		{
 			for (auto& contr : this->controllers)
 			{
@@ -100,6 +100,7 @@ void MainController::triggerAction(int index)
 		//HIDE LAYOUT
 		if (type == ACTIONTYPE::HIDE_LAYOUT && window_active)
 		{
+			//HARDCODED LAYER WITH NUM -3!!!!!!!!!!!!!
 			for (auto& l : this->window->getActiveScene()->getLayer(-3)->getLayouts())
 			{
 				if (l->getEnabled())
@@ -168,22 +169,48 @@ void MainController::processUserInput()
 	this->window->setView(v);
 	 
 	//update cursor specific parameters
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && !getMousePressed())
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && !getMouseButtonState(sf::Mouse::Button::Left))
 	{
-		setLastCursorPress(this->window->mapPixelToCoords(sf::Mouse::getPosition()));
-		//std::cout << "\nlast_cursor_press_pos: " << last_cursor_press_pos.x << ", " << last_cursor_press_pos.y << std::endl;
-		this->setMousePressed(true);
+		if (this->window != nullptr)
+			setLastCursorPress(sf::Mouse::getPosition(*this->window));
+		//std::cout << "\nlast_cursor_press_pos: " << last_cursor_press_pos.x << ", " << last_cursor_press_pos.y << std::endl;	
+
 	}
-	else if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && getMousePressed())
+	else if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && getMouseButtonState(sf::Mouse::Button::Left))
 	{
-		setLastCursorRelease(last_cursor_release_pos = this->window->mapPixelToCoords(sf::Mouse::getPosition()));
+		if (this->window != nullptr)
+			setLastCursorRelease(sf::Mouse::getPosition(*this->window));
 		//std::cout << "last_cursor_release_pos: " << last_cursor_release_pos.x << ", " << last_cursor_release_pos.y << std::endl;
-		this->setMousePressed(false);
+	}
+	for (auto& contr : this->controllers)
+	{
+		contr->setLastCursorPress(this->last_cursor_press_pos);
+		contr->setLastCursorRelease(this->last_cursor_release_pos);
+	}
+	//END DEBUGGING
+	
+
+	//add to active_actions vector
+	constructActiveActions();
+
+
+	//DEBUGGING
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && !getMouseButtonState(sf::Mouse::Button::Left))
+	{
+		this->setMouseButtonState(sf::Mouse::Button::Left, true);
+	}
+	else if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && getMouseButtonState(sf::Mouse::Button::Left))
+	{
+		this->setMouseButtonState(sf::Mouse::Button::Left, false);
+	}
+	for (auto& contr : this->controllers)
+	{
+		contr->setMouseButtonState(sf::Mouse::Button::Left, this->left_mouse_button_state);
+		contr->setMouseButtonState(sf::Mouse::Button::Right, this->right_mouse_button_state);
 	}
 	//END DEBUGGING
 
-	//add to active_actions vector
-	Controller::constructActiveActions();
+
 	//if there are no active_actions
 	if (active_actionnodes.empty())
 	{
@@ -192,4 +219,10 @@ void MainController::processUserInput()
 	}
 	//at last, trigger all active_actions
 	MainController::triggerActiveActions();
+
+	for (Controller* contr : this->controllers)
+	{
+		contr->processUserInput();
+	}
+
 }

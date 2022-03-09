@@ -24,6 +24,35 @@ void Controller::setObject(Object* obj)
 	this->obj = obj;
 }
 
+void Controller::setMouseButtonState(sf::Mouse::Button mouse_btn, bool state) 
+{
+	//pressed <-> state = true
+	//not pressed <-> state = false
+
+	if (mouse_btn == sf::Mouse::Button::Left)
+	{
+		this->left_mouse_button_state = state;
+	}
+	else if (mouse_btn == sf::Mouse::Button::Right)
+	{
+		this->right_mouse_button_state = state;
+	}
+}
+
+/*Getters*/
+bool Controller::getMouseButtonState(sf::Mouse::Button mouse_btn)
+{
+	if (mouse_btn == sf::Mouse::Button::Left)
+	{
+		return this->left_mouse_button_state;
+	}
+	else if (mouse_btn == sf::Mouse::Button::Right)
+	{
+		return this->right_mouse_button_state;
+	}
+}
+
+
 /*Bind action to input*/
 void Controller::bindActionToKey(Action* action, sf::Keyboard::Key key)
 {
@@ -107,6 +136,23 @@ std::vector<sf::FloatRect> Controller::cursorHoverRects(std::vector<sf::FloatRec
 /*Main methods for controlling an object*/
 std::vector<ActionNode> Controller::constructActiveActions()
 {
+	//DEBUGGING
+	//update cursor specific parameters
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && !getMouseButtonState(sf::Mouse::Button::Left))
+	{
+		if (this->window != nullptr)
+			setLastCursorPress(sf::Mouse::getPosition(*this->window));
+		//std::cout << "\nlast_cursor_press_pos: " << last_cursor_press_pos.x << ", " << last_cursor_press_pos.y << std::endl;	
+
+	}
+	else if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && getMouseButtonState(sf::Mouse::Button::Left))
+	{
+		if (this->window != nullptr)
+			setLastCursorRelease(sf::Mouse::getPosition(*this->window));
+		//std::cout << "last_cursor_release_pos: " << last_cursor_release_pos.x << ", " << last_cursor_release_pos.y << std::endl;
+	}
+	//END DEBUGGING
+	
 	//for-loop for constructing the active_actionnodes vector
 	for (auto& a_node : this->actionnodes)
 	{
@@ -126,39 +172,57 @@ std::vector<ActionNode> Controller::constructActiveActions()
 				//cast as a button
 				Button* btn = (Button*)a_node.obj;
 
-				bool btn_hovered = cursorHover(btn->getFloatRect(), btn->getOnFixatedLayer());
-				bool btn_pressed = sf::Mouse::isButtonPressed(a_node.mouse_button) && btn_hovered;
+				bool btn_hovered = cursorHover(btn->getFloatRect(), btn->getOnFixatedLayer());													//hovered = cursor currently over btn-rect
+				bool btn_pressed = sf::Mouse::isButtonPressed(a_node.mouse_button) && btn_hovered;												//pressed = hovered + mouse-button pressed
+				bool btn_released = !sf::Mouse::isButtonPressed(a_node.mouse_button) && getMouseButtonState(a_node.mouse_button) && btn_hovered;//released = mouse-button not pressed + we are coming out of a pressed state + hovered
+				bool btn_clicked = btn->getFloatRect().contains((sf::Vector2f)this->last_cursor_press_pos) && btn_released;						//clicked = the last cursor-press happened on the button-rect + released i.e. pressed + released
 
-				TRIGGER_TYPE btn_trigger = btn->getTriggerType();
+				//if we arent on a fixated layer, the last_cursor_press_pos need to be adjusted from pixel to coords. We therefore need to change btn_clicked
+				if (!btn->getOnFixatedLayer())
+					btn_clicked = btn->getFloatRect().contains(this->window->mapPixelToCoords(this->last_cursor_press_pos)) && btn_released;
+					
+				TRIGGER_TYPE btn_trigger = btn->getTriggerType();															//the trigger-type of this button i.e. what type of input that triggers it
 
+				//check if assumption is true or not depending on the trigger-type
 				switch (btn_trigger) 
 				{
 				case TRIGGER_TYPE::CLICKED:
-					
+					if (!btn_clicked)
+					{
+						action_state = false;
+					}
 					break;
+
 				case TRIGGER_TYPE::PRESSED:
-		
+					if (!btn_pressed)
+					{
+						action_state = false;
+					}
 					break;
+
 				case TRIGGER_TYPE::HOVERED:
-	
+					if (!btn_hovered)
+					{
+						action_state = false;
+					}
 					break;
+
 				case TRIGGER_TYPE::RELEASED:
-				
+					if (!btn_released)
+					{
+						action_state = false;
+					}
 					break;
+
 				case TRIGGER_TYPE::PRESSED_HOVER:
 
 					break;
+
 				default:
-					std::cout << "ERROR: std::vector<ActionNode> Controller::constructActiveActions(), something went wrong." << std::endl;
+					std::cout << "ERROR: std::vector<ActionNode> Controller::constructActiveActions(), faulty trigger-type." << std::endl;
 				}
 
-				if (!btn_pressed)
-				{
-					//the assumption is wrong. The action will not be activated
-					action_state = false;
-				}
-					
-				//std::cout << "btn_pressed: " << btn_pressed << ", btn_hovered: " << btn_hovered << std::endl;
+				//update the frame depending on hovered/pressed/default
 				btn->updateFrame(btn_pressed, btn_hovered);
 			}
 
@@ -231,7 +295,6 @@ std::vector<ActionNode> Controller::constructActiveActions()
 				k++;
 			}
 		}
-
 	}
 
 	//at last, return the active_actionnodes

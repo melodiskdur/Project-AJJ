@@ -57,56 +57,28 @@ void ExtendedRenderWindow::setTextureManager(TextureManager* tex_mag)
 //Others
 void ExtendedRenderWindow::drawActiveScene()
 {
-	//TEST-GAME
-	if (this->window_state)
+	if (active_scene != nullptr && this->window_state)
 	{
-		// clear the window with transparent(black) color
+		//Clear the window with transparent(black) color
 		this->clear(sf::Color::Transparent);
 
-		if (active_scene != nullptr)
-		{
-			//Collision detection.
-			this->active_scene->updateSceneFrame();
-			//Updates the sf::View position.
-			this->setView(*(active_scene->getCamera()->getCameraView()));
-			//All layers are drawn.
-			this->drawLayers();	
-		}
+		//Collision detection.
+		this->active_scene->updateSceneFrame();
 
-		// Debugging.
-		if (this->debugger_mode)
-			this->debugDraw();	
+		//Updates the camera-view
+		this->setView(*(active_scene->getCamera()->getCameraView()));
+	}
+
+	//All layers are drawn.
+	//by placing it outside the above if-statement, only the main-layer will be paused
+	this->drawLayers();
+
+	//DEBUGGING
+	if (this->debugger_mode) this->debugDraw();	
+	//END DEBUGGING
 	
-		// end the current frame. Display all changes
-		this->display();
-	}
-	//PAUSE
-	else
-	{
-		
-		if (active_scene == nullptr) return;
-		
-		//DEBUGGING
-		//!!!!!!!FIX THIS--shouldnt load each time!!!!!!!!!!!!!
-		sf::Text text;
-		sf::Font font;
-		font.loadFromFile("../Project_AJJ/assets/ayar_takhu.ttf");
-		text.setString("PAUSED");
-		text.setFont(font);
-		text.setCharacterSize(this->getSize().x / 16); // in pixels, not points!
-		text.setFillColor(sf::Color::White);
-		//-----------------------------------------------------
-
-		sf::FloatRect cam_rect = this->getActiveScene()->getCamera()->getCameraViewRect();
-		text.setPosition({ cam_rect.left + (cam_rect.width / 2) - (text.getLocalBounds().width / 2),
-						   cam_rect.top + (cam_rect.height / 2) - (text.getLocalBounds().height / 2) });
-		//pause-text
-		this->draw(text);
-
-		// end the current frame. Display all changes
-		this->display();
-		//END DEBUGGING
-	}
+	//End the current frame. Display all changes
+	this->display();
 }
 
 void ExtendedRenderWindow::drawActiveSceneToWindow()
@@ -489,8 +461,6 @@ void ExtendedRenderWindow::drawLayers()
 
 		for (Layout* l : this->active_scene->getLayer(layer_nums[i])->getLayouts())
 		{
-			l->resetMarginSpaces();
-			l->placeLayouts();
 			this->drawLayouts(l, this->scene_layer_textures[i]);
 		}
 		

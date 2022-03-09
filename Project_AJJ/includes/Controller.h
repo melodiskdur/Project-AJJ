@@ -58,9 +58,9 @@ public:
 	/*Setters*/
 	void setWindow(ExtendedRenderWindow* scene);
 	void setObject(Object* obj);
-	void setMousePressed(bool state) { this->mouse_pressed = state; }
-	void setLastCursorPress(sf::Vector2f pos) { this->last_cursor_press_pos = pos; }
-	void setLastCursorRelease(sf::Vector2f pos) { this->last_cursor_release_pos = pos; }
+	void setMouseButtonState(sf::Mouse::Button mouse_btn, bool state);
+	void setLastCursorPress(sf::Vector2i pos) { this->last_cursor_press_pos = pos; }
+	void setLastCursorRelease(sf::Vector2i pos) { this->last_cursor_release_pos = pos; }
 	
 	/*Getters*/
 	bool getControllerState() { return this->controller_state; };
@@ -68,9 +68,9 @@ public:
 	std::vector<ActionNode> getActiveActionnodes() { return this->active_actionnodes; };
 	int getNumActiveActionnodes() { return this->num_active_actionnodes; };
 	int getNumActionnodes() { return this->num_actionnodes; };
-	bool getMousePressed() { return this->mouse_pressed; }
-	sf::Vector2f getLastCursorPress() { return this->last_cursor_press_pos; }
-	sf::Vector2f getLastCursorRelease() { return this->last_cursor_release_pos; }
+	bool getMouseButtonState(sf::Mouse::Button mouse_btn);
+	sf::Vector2i getLastCursorPress() { return this->last_cursor_press_pos; }
+	sf::Vector2i getLastCursorRelease() { return this->last_cursor_release_pos; }
 
 	static unsigned int instanceCount() { return instance_counter; };
 protected:
@@ -84,9 +84,10 @@ protected:
 
 	bool controller_state = true;				//activated/deactivated i.e. in use or not in use
 
-	sf::Vector2f last_cursor_press_pos;			//the position of the last cursor press (press + relase = click)
-	sf::Vector2f last_cursor_release_pos;		//the position of the last cursor release (press + relase = click)
-	bool mouse_pressed = false;					//if the mouse is currently pressed
+	sf::Vector2i last_cursor_press_pos;			//the position of the last cursor press (press + relase = click)
+	sf::Vector2i last_cursor_release_pos;		//the position of the last cursor release (press + relase = click)
+	bool left_mouse_button_state = false;
+	bool right_mouse_button_state = false;
 
 	sf::Vector2f original_view_size;			//the original view_size
 	ExtendedRenderWindow* window = nullptr;		//the main exteneded render window
