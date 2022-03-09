@@ -111,12 +111,12 @@ Scene* FirstScene::createScene()
 	// Create HitboxNodes and add to relevant tiles.
 	FirstScene::createHitboxNodes(first_scene);
 
-	SceneLayer* layout_test1 = new SceneLayer(-2, 1.f, 0);
+	SceneLayer* layout_test1 = new SceneLayer(-2, 1.f, 1.f);
 	layout_test1->addLayout(TestLayout::createTestLayout(false));
 	first_scene->addSceneLayer(layout_test1);
 
 	SceneLayer* layout_test2 = new StaticFixatedLayer(-3, 1.f, sf::FloatRect(0.f, 0.f, 800.f, 600.f));
-	layout_test2->addLayout(TestLayout::createTestLayout(false));
+	layout_test2->addLayout(TestLayout::createTestLayout(true));
 
 	first_scene->addSceneLayer(layout_test2);
 

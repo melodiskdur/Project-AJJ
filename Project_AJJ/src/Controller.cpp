@@ -136,22 +136,7 @@ std::vector<sf::FloatRect> Controller::cursorHoverRects(std::vector<sf::FloatRec
 /*Main methods for controlling an object*/
 std::vector<ActionNode> Controller::constructActiveActions()
 {
-	//DEBUGGING
-	//update cursor specific parameters
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && !getMouseButtonState(sf::Mouse::Button::Left))
-	{
-		if (this->window != nullptr)
-			setLastCursorPress(sf::Mouse::getPosition(*this->window));
-		//std::cout << "\nlast_cursor_press_pos: " << last_cursor_press_pos.x << ", " << last_cursor_press_pos.y << std::endl;	
 
-	}
-	else if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && getMouseButtonState(sf::Mouse::Button::Left))
-	{
-		if (this->window != nullptr)
-			setLastCursorRelease(sf::Mouse::getPosition(*this->window));
-		//std::cout << "last_cursor_release_pos: " << last_cursor_release_pos.x << ", " << last_cursor_release_pos.y << std::endl;
-	}
-	//END DEBUGGING
 	
 	//for-loop for constructing the active_actionnodes vector
 	for (auto& a_node : this->actionnodes)
@@ -179,7 +164,9 @@ std::vector<ActionNode> Controller::constructActiveActions()
 
 				//if we arent on a fixated layer, the last_cursor_press_pos need to be adjusted from pixel to coords. We therefore need to change btn_clicked
 				if (!btn->getOnFixatedLayer())
+				{
 					btn_clicked = btn->getFloatRect().contains(this->window->mapPixelToCoords(this->last_cursor_press_pos)) && btn_released;
+				}	
 					
 				TRIGGER_TYPE btn_trigger = btn->getTriggerType();															//the trigger-type of this button i.e. what type of input that triggers it
 
@@ -296,7 +283,6 @@ std::vector<ActionNode> Controller::constructActiveActions()
 			}
 		}
 	}
-
 	//at last, return the active_actionnodes
 	return this->active_actionnodes;
 }

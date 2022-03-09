@@ -162,11 +162,12 @@ void MainController::processUserInput()
 	//DEBUGGING
 	// Search for "correct" SceneLayer-view.
 	// NOTE: HARDCODED. TEMPORARY CODE.
+	/*
 	std::map<int, sf::View> lv_pairs = this->window->getActiveScene()->getLayerManipulatedView();
 	sf::View v;
 	for (const std::pair<int, sf::View>& p : lv_pairs)
 	{ if (p.first == -3) { v = p.second; break; } }
-	this->window->setView(v);
+	this->window->setView(v);*/
 	 
 	//update cursor specific parameters
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left) && !getMouseButtonState(sf::Mouse::Button::Left))

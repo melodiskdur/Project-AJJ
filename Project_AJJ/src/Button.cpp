@@ -100,7 +100,7 @@ void Button::updateFrame(bool btn_pressed, bool btn_hovered)
 	//change to PRESSED-frame
 	else if (btn_pressed)
 	{
-		std::cout << "PRESSED\n";
+		//std::cout << "PRESSED\n";
 		this->current_frame = this->pressed_frame;
 	}
 }
