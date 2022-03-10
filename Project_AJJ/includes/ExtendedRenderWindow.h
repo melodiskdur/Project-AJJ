@@ -5,6 +5,7 @@
 #include "TextureIds.h"
 #include "TextureManager.h"
 #include "Scene.h"
+#include "ExtendedViewport.h"
 
 
 /* ExtendedRenderWindow
@@ -63,6 +64,7 @@ private:
 	TextureManager* texture_manager = nullptr;				//TextureManager-object.
 	std::vector<sf::RenderTexture*> scene_layer_textures;	//Off-screen rendering of the active scene's layers.
 	bool window_state = true;								//Activated/deactivated
+	ExtendedViewport* defultViewport = nullptr;								
 
 	//Used internally to clear all RenderTextures in preparation for the next frame draw.
 	void clearSceneLayerTextures();
@@ -71,6 +73,7 @@ private:
 	void drawLayersToWindow();
 	void drawLayerToWindow(int layer_num);
 	void drawLayertoTexture(int layer_num, sf::RenderTexture* tex);
+	
 
 	// Debugging.
 	bool debugger_mode = true;

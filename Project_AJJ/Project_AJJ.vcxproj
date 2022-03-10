@@ -22,6 +22,7 @@
     <ClInclude Include="includes\AirFriction.h" />
     <ClInclude Include="includes\CollisionGraph.h" />
     <ClInclude Include="includes\Button.h" />
+    <ClInclude Include="includes\ExtendedViewport.h" />
     <ClInclude Include="includes\Gravity.h" />
     <ClInclude Include="includes\CollisionHandler.h" />
     <ClInclude Include="includes\HitboxNode.h" />
@@ -55,6 +56,7 @@
     <ClCompile Include="src\CollisionGraph.cpp" />
     <ClCompile Include="src\Controller.cpp" />
     <ClCompile Include="src\ExtendedRenderWindow.cpp" />
+    <ClCompile Include="src\ExtendedViewport.cpp" />
     <ClCompile Include="src\Gravity.cpp" />
     <ClCompile Include="src\CollisionHandler.cpp" />
     <ClCompile Include="src\HitboxNode.cpp" />
@@ -116,7 +118,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
