@@ -6,9 +6,14 @@ ExtendedRenderWindow::ExtendedRenderWindow(sf::Vector2u resolution, std::string 
 	: sf::RenderWindow(sf::VideoMode(resolution.x, resolution.y), window_title, sf::Style::Default, settings)
 {
 	ExtendedRenderWindow::instance_counter++;
+	this->defultViewport = new ExtendedViewport();
 }
 
-ExtendedRenderWindow::~ExtendedRenderWindow() { ExtendedRenderWindow::instance_counter--; }
+ExtendedRenderWindow::~ExtendedRenderWindow()
+{ 
+	ExtendedRenderWindow::instance_counter--;
+	delete this->defultViewport;
+}
 
 //Getters
 Scene* ExtendedRenderWindow::getActiveScene()
@@ -38,6 +43,7 @@ Scene* ExtendedRenderWindow::getSceneFromDenotation(SCENE_DENOTATION scene_denot
 void ExtendedRenderWindow::setActiveScene(Scene* scene)
 {
 	active_scene = scene;
+	this->defultViewport->connect(active_scene->getCamera());
 	this->clearSceneLayerTextures();
 	int num_layers = static_cast<int>(active_scene->getSceneLayers().size());
 	for (int i = 0; i < num_layers; i++)

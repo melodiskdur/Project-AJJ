@@ -90,6 +90,9 @@
     <ClInclude Include="includes\PropertyNode.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="includes\ExtendedViewport.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp">
@@ -162,6 +165,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\PropertyNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ExtendedViewport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

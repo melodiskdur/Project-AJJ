@@ -57,9 +57,6 @@ int main()
 	test_scene->setCamera(&scene_camera);
 	window.setActiveScene(test_scene);
 
-	scene_camera.resizeToViewPort({ 1.f, 1.f });
-	scene_camera.getCameraView()->setViewport({ 0.f, 0.f, 1.f, 1.f });
-
 	//----------------------- Create Players & Lock View --------------------
 
 	TestObject* player_1 = new TestObject(sf::Vector2f(1800.0f, 0.0f), sf::Vector2f(100.0f, 100.0f));
