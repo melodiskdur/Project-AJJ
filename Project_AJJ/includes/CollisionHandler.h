@@ -71,6 +71,8 @@ public:
     static std::vector<sf::Vector2f> recalibrateResolves();
 protected:
     static bool isDual(HitboxNode* i, HitboxNode* j);
+    static bool oppositeX(HitboxNode* i, HitboxNode* j);
+    static bool oppositeY(HitboxNode* i, HitboxNode* j);
     // Different resolving algorithms depending on the properties of the involved hitboxes.
     static std::vector<HBData> resolveAA(HitboxNode* i, HitboxNode* j);         // Axis-aligned.
     static std::vector<HBData> resolveSAT(HitboxNode* i, HitboxNode* j);        // Separating axes.
@@ -78,14 +80,14 @@ protected:
     // Overlap calculations for different combinations of shapes. NOTE: The overlaps are calculated
     // in the transformed coordinate systems of i and j and then translated into the world coordinate
     // system.
-    static sf::Vector2f calculateOverlaps(SubBox2* i, SubBox2* j);
-    static sf::Vector2f ol_CircleCircle(CircleBox* i, CircleBox* j);
-    static sf::Vector2f ol_RectRect(RectBox* i, RectBox* j);
-    static sf::Vector2f ol_RectCircle(RectBox* i, CircleBox* j);
-    static sf::Vector2f ol_RectConv(RectBox* i, ConvexBox* j);
-    static sf::Vector2f ol_ConvConv(ConvexBox* i, ConvexBox* j);
-    static sf::Vector2f ol_CircleConv(CircleBox* i, ConvexBox* j);
-    static sf::Vector2f ol_RectSpline(RectBox* i, SplineBox* j);
-    static sf::Vector2f ol_ConvSpline(ConvexBox* i, SplineBox* j);
-    static sf::Vector2f ol_CircleSpline(CircleBox* i, SplineBox* j);
+    static std::vector<sf::Vector2f> calculateOverlapsAA(SubBox2* i, SubBox2* j, bool dual);
+    static sf::Vector2f ol(CircleBox* i, CircleBox* j, float ol_ratio);
+    static sf::Vector2f ol(RectBox* i, RectBox* j, float ol_ratio);
+    static sf::Vector2f ol(RectBox* i, CircleBox* j, float ol_ratio);
+    static sf::Vector2f ol(RectBox* i, ConvexBox* j, float ol_ratio);
+    static sf::Vector2f ol(ConvexBox* i, ConvexBox* j, float ol_ratio);
+    static sf::Vector2f ol(CircleBox* i, ConvexBox* j, float ol_ratio);
+    static sf::Vector2f ol(RectBox* i, StaticSplineBox* j, float ol_ratio);
+    static sf::Vector2f ol(ConvexBox* i, StaticSplineBox* j, float ol_ratio);
+    static sf::Vector2f ol(CircleBox* i, StaticSplineBox* j, float ol_ratio);
 };

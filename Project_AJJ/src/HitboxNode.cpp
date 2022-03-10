@@ -47,7 +47,9 @@ SubBox HitboxNode::getSB()
 
 SubBox2* HitboxNode::getSB2()
 {
-	return nullptr;
+	if (this->sb != nullptr)
+		this->sb->updateWorldPos(this->parent_object->getWorldPosition(), this->parent_object->getSize());
+	return this->sb;
 }
 
 void HitboxNode::setHitboxTotal(sf::Vector2f hb_center, sf::Vector2f hb_size)
@@ -173,3 +175,5 @@ void RectBox::setLocalCenter(sf::Vector2f c)
 void RectBox::rescale()
 {
 }
+
+void CircleBox::updateWorldPos(sf::Vector2f o_wp, sf::Vector2f o_sz) { this->global = o_wp + sf::Vector2f(o_sz.x * this->center.x, o_sz.y + this->center.y); }

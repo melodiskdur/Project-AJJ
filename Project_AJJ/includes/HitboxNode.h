@@ -17,7 +17,7 @@ class SubBox2;
 class RectBox;
 class CircleBox;
 class ConvexBox;
-class SplineBox;
+class StaticSplineBox;
 
 /* HitboxNode
 *  Sub class to PropertyNode. Gives an easy way to attach a Hitbox to an Object, which is 
@@ -89,13 +89,16 @@ public:
     virtual ~SubBox2() {};
     // Getters.
     virtual sf::String getType() = 0;
+    virtual sf::Vector2f getGlobalPos() = 0;
     virtual sf::VertexArray getDrawable() = 0;
     virtual std::vector<sf::Vector2f> getVertices() = 0;
     // Setters.
     virtual void setLocalCenter(sf::Vector2f c) = 0;
     // Others.
     virtual void rescale() = 0;
+    virtual void updateWorldPos(sf::Vector2f o_wp, sf::Vector2f o_sz) = 0;
 protected:
+    sf::Vector2f global{ 0.f, 0.f };
     std::vector<sf::Vector2f> vertices;
     float angle{0.f};
 };
@@ -131,13 +134,17 @@ public:
     CircleBox(sf::Vector2f c, float r);
     ~CircleBox();
     // Getters.
+    sf::String getType() override { return sf::String("CircleBox"); };
+    sf::Vector2f getGlobalPos() override { return this->global; };
     sf::VertexArray getDrawable() override;
     std::vector<sf::Vector2f> getVertices() override;
-    float getRadius();
+    float getRadius() { return this->radius; };
+    sf::Vector2f getCenter() { return this->center; };
     // Setters.
     void setLocalCenter(sf::Vector2f c) override;
     // Others.
     void rescale() override;
+    void updateWorldPos(sf::Vector2f o_wp, sf::Vector2f o_sz) override;
 protected:
     sf::Vector2f center{0.5f, 0.5f};
     float radius{ 1.f };

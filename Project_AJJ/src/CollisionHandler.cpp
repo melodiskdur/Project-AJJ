@@ -604,13 +604,26 @@ std::vector<HBData> CollHandler::calculateResolves(HitboxNode* i, HitboxNode* j)
 	return hbdata;
 }
 
+bool CollHandler::isDual(HitboxNode* i, HitboxNode* j)
+{
+	sf::Vector2f vel_i = i->getParentObject()->getVelocity();
+	sf::Vector2f vel_j = j->getParentObject()->getVelocity();
+	// Check if two objects are moving in opposite directions in either x
+	// or y. This constitutes a dual collision check.
+	return ((vel_i.x * vel_j.x < 0) || (vel_i.y * vel_j.y < 0) );
+}
+
+bool CollHandler::oppositeX(HitboxNode* i, HitboxNode* j) { return (i->getParentObject()->getVelocity().x * j->getParentObject()->getVelocity().x < 0); }
+
+bool CollHandler::oppositeY(HitboxNode* i, HitboxNode* j) { return (i->getParentObject()->getVelocity().y * j->getParentObject()->getVelocity().y < 0); };
+
 std::vector<HBData> CollHandler::resolveAA(HitboxNode* i, HitboxNode* j)
 {
 	std::vector<HBData> hbdata;
 	SubBox2* sb_i = i->getSB2();
 	SubBox2* sb_j = j->getSB2();
 	// Calculate overlaps from the involved Hitbox types.
-	sf::Vector2f overlaps = CollHandler::calculateOverlaps(sb_i, sb_j);
+	std::vector<sf::Vector2f> overlaps = CollHandler::calculateOverlapsAA(sb_i, sb_j, CollHandler::isDual(i, j));
 	return hbdata;
 }
 
@@ -624,61 +637,74 @@ std::vector<HBData> CollHandler::resolveSpline(HitboxNode* i, HitboxNode* j)
 	return std::vector<HBData>();
 }
 
-sf::Vector2f CollHandler::calculateOverlaps(SubBox2* i, SubBox2* j)
+std::vector<sf::Vector2f> CollHandler::calculateOverlapsAA(SubBox2* i, SubBox2* j, bool dual = false)
 {
-	sf::Vector2f ol;
-	// Decide which the overlap function to be called depending on the involved Hitbox types.
-	if (i->getType() == sf::String("RectBox"))
-	{
-		if (j->getType() == sf::String("RectBox"))
-			ol = CollHandler::ol_RectRect(static_cast<RectBox*>(i), static_cast<RectBox*>(j));
-		else if (j->getType() == sf::String("CircleBox"))
-			ol = CollHandler::ol_RectCircle(static_cast<RectBox*>(i), static_cast<CircleBox*>(j));
-	}
+	std::vector<sf::Vector2f> ol;
+	// Calculate overlaps by Hitbox type.
+	SubBox2* i_temp = i;
+	SubBox2* j_temp = j;
+	if (i_temp->getType() == sf::String("CircleBox")) i_temp = static_cast<CircleBox*>(i_temp);
+	else if (i_temp->getType() == sf::String("RectBox")) i_temp = static_cast<RectBox*>(i_temp);
+	if (j_temp->getType() == sf::String("CircleBox")) j_temp = static_cast<CircleBox*>(j_temp);
+	else if (j_temp->getType() == sf::String("RectBox")) j_temp = static_cast<RectBox*>(j_temp);
+	if (dual) ol.push_back(CollHandler::ol(i_temp, j_temp, 0.5f))
 	return ol;
 }
 
-sf::Vector2f CollHandler::ol_CircleCircle(CircleBox* i, CircleBox* j)
+sf::Vector2f CollHandler::ol(CircleBox* i, CircleBox* j, float ol_ratio = 1.f)
+{
+	sf::Vector2f overlaps;
+	// Circle centers + radii.
+	sf::Vector2f i_c = i->getGlobalPos(), j_c = j->getGlobalPos();
+	float i_r = i->getRadius(), j_r = j->getRadius();
+	// If there's an overlap (if the summed distance is smaller than the summed radii).
+	if ((i_c.x - j_c.x) * (i_c.x - j_c.x) + (i_c.y - j_c.y) * (i_c.y - j_c.y) < (i_r + j_r) * (i_r + j_r))
+	{
+		// Calculate the distance of the center points, as well as the overlap.
+		float d = std::sqrtf((i_c.x - j_c.x) * (i_c.x - j_c.x) + (i_c.y - j_c.y) * (i_c.y - j_c.y));
+		float ol = ol_ratio * (d - i_r - j_r);
+		overlaps = { ol, ol };
+	}
+	else overlaps = { 0.f, 0.f };
+	return overlaps;
+}
+
+sf::Vector2f CollHandler::ol(RectBox* i, RectBox* j, float ol_ratio = 1.f)
 {
 	return sf::Vector2f();
 }
 
-sf::Vector2f CollHandler::ol_RectRect(RectBox* i, RectBox* j)
+sf::Vector2f CollHandler::ol(RectBox* i, CircleBox* j, float ol_ratio = 1.f)
 {
 	return sf::Vector2f();
 }
 
-sf::Vector2f CollHandler::ol_RectCircle(RectBox* i, CircleBox* j)
+sf::Vector2f CollHandler::ol(RectBox* i, ConvexBox* j, float ol_ratio = 1.f)
 {
 	return sf::Vector2f();
 }
 
-sf::Vector2f CollHandler::ol_RectConv(RectBox* i, ConvexBox* j)
+sf::Vector2f CollHandler::ol(ConvexBox* i, ConvexBox* j, float ol_ratio = 1.f)
 {
 	return sf::Vector2f();
 }
 
-sf::Vector2f CollHandler::ol_ConvConv(ConvexBox* i, ConvexBox* j)
+sf::Vector2f CollHandler::ol(CircleBox* i, ConvexBox* j, float ol_ratio = 1.f)
 {
 	return sf::Vector2f();
 }
 
-sf::Vector2f CollHandler::ol_CircleConv(CircleBox* i, ConvexBox* j)
+sf::Vector2f CollHandler::ol(RectBox* i, StaticSplineBox* j, float ol_ratio = 1.f)
 {
 	return sf::Vector2f();
 }
 
-sf::Vector2f CollHandler::ol_RectSpline(RectBox* i, SplineBox* j)
+sf::Vector2f CollHandler::ol(ConvexBox* i, StaticSplineBox* j, float ol_ratio = 1.f)
 {
 	return sf::Vector2f();
 }
 
-sf::Vector2f CollHandler::ol_ConvSpline(ConvexBox* i, SplineBox* j)
-{
-	return sf::Vector2f();
-}
-
-sf::Vector2f CollHandler::ol_CircleSpline(CircleBox* i, SplineBox* j)
+sf::Vector2f CollHandler::ol(CircleBox* i, StaticSplineBox* j, float ol_ratio = 1.f)
 {
 	return sf::Vector2f();
 }
