@@ -98,43 +98,35 @@ bool HitboxNode::createSubBox(std::vector<sf::Vector2f> pts)
 	return true;
 }
 
-sf::VertexArray HitboxNode::getDrawable()
+void HitboxNode::addSubBox(SubBox2* sb)
 {
+	if (this->sb == nullptr)
+	{
+		this->sb = sb;
+	}
+}
+
+std::vector<sf::VertexArray> HitboxNode::getDrawable()
+{
+	std::vector<sf::VertexArray> drawables;
 	sf::Color gc = sf::Color::Cyan;
 	// Bounding box.
-	if (this->sub_boxes.size() == 0)
-	{
-		sf::VertexArray bb_drawable(sf::LineStrip, 5);
-		sf::FloatRect bb = this->getBB();
-		bb_drawable[0].position = { bb.left, bb.top };
-		bb_drawable[1].position = { bb.left + bb.width, bb.top };
-		bb_drawable[2].position = { bb.left + bb.width, bb.top + bb.height };
-		bb_drawable[3].position = { bb.left, bb.top + bb.height };
-		bb_drawable[4].position = { bb.left, bb.top };
-		bb_drawable[0].color = gc;
-		bb_drawable[1].color = gc;
-		bb_drawable[2].color = gc;
-		bb_drawable[3].color = gc;
-		bb_drawable[4].color = gc;
-		return bb_drawable;
-	}
-	// Sub boxes.
+	sf::VertexArray bb_drawable(sf::LineStrip, 5);
 	sf::FloatRect bb = this->getBB();
-	std::vector<sf::Vector2f> sb_points = this->sub_boxes[0].b_pts;
-	sf::VertexArray sb_drawable(sf::LineStrip, sb_points.size());
-	auto translate = [bb](const sf::Vector2f& rel_pos) -> sf::Vector2f
+	bb_drawable[0].position = { bb.left, bb.top }; 
+	bb_drawable[1].position = { bb.left + bb.width, bb.top };
+	bb_drawable[2].position = { bb.left + bb.width, bb.top + bb.height };
+	bb_drawable[3].position = { bb.left, bb.top + bb.height };
+	bb_drawable[4].position = { bb.left, bb.top };
+	for (int i = 0; i < 5; i++) bb_drawable[i].color = gc;
+	drawables.push_back(bb_drawable);
+	// Sub box.
+	if (this->sb != nullptr)
 	{
-		sf::Vector2f gpos = rel_pos;
-		gpos.x = bb.left + rel_pos.x * bb.width;
-		gpos.y = bb.top + rel_pos.y * bb.height;
-		return gpos;
-	};
-	for (int i = 0; i < sb_points.size(); i++)
-	{
-		sb_drawable[i].position = translate(sb_points[i]);
-		sb_drawable[i].color = gc;
+		this->sb->updateWorldPos(this->parent_object->getWorldPosition(), this->parent_object->getSize());
+		drawables.push_back(this->sb->getDrawable());
 	}
-	return sb_drawable;
+	return drawables;
 }
 
 RectBox::RectBox()
@@ -147,6 +139,7 @@ RectBox::RectBox(sf::FloatRect rb)
 
 RectBox::RectBox(sf::Vector2f center, sf::Vector2f size)
 {
+
 }
 
 RectBox::~RectBox()
@@ -155,7 +148,15 @@ RectBox::~RectBox()
 
 sf::VertexArray RectBox::getDrawable()
 {
-	return sf::VertexArray();
+	sf::Color sbcc = sf::Color::Green;
+	sf::VertexArray sb(sf::LineStrip, 5);
+	sb[0].position = { this->global.x, this->global.y };
+	sb[1].position = { this->global.x + this->sb_size.x, this->global.y };
+	sb[2].position = this->global + this->sb_size;
+	sb[3].position = { this->global.x, this->global.y + this->sb_size.y };
+	sb[4].position = sb[0].position;
+	for (int i = 0; i < 5; i++) sb[i].color = sbcc;
+	return sb;
 }
 
 std::vector<sf::Vector2f> RectBox::getVertices()
@@ -165,7 +166,7 @@ std::vector<sf::Vector2f> RectBox::getVertices()
 
 sf::FloatRect RectBox::getRect()
 {
-	return sf::FloatRect();
+	return sf::FloatRect(this->global, this->sb_size);
 }
 
 void RectBox::setLocalCenter(sf::Vector2f c)
@@ -176,4 +177,52 @@ void RectBox::rescale()
 {
 }
 
-void CircleBox::updateWorldPos(sf::Vector2f o_wp, sf::Vector2f o_sz) { this->global = o_wp + sf::Vector2f(o_sz.x * this->center.x, o_sz.y + this->center.y); }
+void RectBox::updateWorldPos(sf::Vector2f o_wp, sf::Vector2f o_sz)
+{
+	this->global = o_wp + sf::Vector2f(o_sz.x * this->sb_rect.left, o_sz.y * this->sb_rect.top);
+	this->sb_size = sf::Vector2f(o_sz.x * this->sb_rect.width, o_sz.y * this->sb_rect.height);
+}
+
+void CircleBox::setLocalCenter(sf::Vector2f c)
+{
+}
+
+void CircleBox::rescale()
+{
+}
+
+void CircleBox::updateWorldPos(sf::Vector2f o_wp, sf::Vector2f o_sz) { this->global = o_wp + sf::Vector2f(o_sz.x * this->center.x, o_sz.y * this->center.y); }
+
+CircleBox::CircleBox()
+{
+}
+
+CircleBox::CircleBox(sf::Vector2f c, float r)
+{
+	this->center = c;
+	this->radius = r;
+}
+
+CircleBox::~CircleBox()
+{
+}
+
+sf::VertexArray CircleBox::getDrawable()
+{
+	sf::Color sbcc = sf::Color::Green;
+	// Decide number of vertices depending on radius size.
+	unsigned int numv = (int)this->radius * 40;
+	sf::VertexArray sb(sf::LineStrip, numv + 1);
+	float ratio = 2.f * 3.14159f / (float)numv;
+	for (int i = 0; i < numv + 1; i++)
+	{
+		sb[i].position = this->global + this->radius * sf::Vector2f(std::cos(ratio * (float)i), std::sin(ratio * (float)i));
+		sb[i].color = sbcc;
+	}
+	return sb;
+}
+
+std::vector<sf::Vector2f> CircleBox::getVertices()
+{
+	return std::vector<sf::Vector2f>();
+}

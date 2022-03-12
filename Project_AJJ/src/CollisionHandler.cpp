@@ -44,14 +44,14 @@ std::vector<HBData> CollisionHandler::separateHitboxes(HitboxNode* i, HitboxNode
 			wp_and_vel_re = CollisionHandler::dualSeparation(i, j);
 		return wp_and_vel_re;
 	}
-
+	/*
 	// Check non-rectangle collision.
 	if (j->getSB_pts().size() != 0 && j->getBehavior() == HBOX::STATIC)
 	{
 		wp_and_vel_re = CollisionHandler::nonRectangleSeparation(i, j);
 		return wp_and_vel_re;
 	}
-
+	*/
 	sf::Vector2f abs_vel_i = sf::Vector2f(std::abs(vel_i.x), std::abs(vel_i.y));
 	sf::Vector2f abs_vel_j = sf::Vector2f(std::abs(vel_j.x), std::abs(vel_j.y));
 
@@ -604,6 +604,11 @@ std::vector<HBData> CollHandler::calculateResolves(HitboxNode* i, HitboxNode* j)
 	return hbdata;
 }
 
+bool CollHandler::sb_intersects(HitboxNode* i, sf::Vector2f i_proposed, HitboxNode* j, sf::Vector2f j_proposed)
+{
+	return false;
+}
+
 bool CollHandler::isDual(HitboxNode* i, HitboxNode* j)
 {
 	sf::Vector2f vel_i = i->getParentObject()->getVelocity();
@@ -622,8 +627,15 @@ std::vector<HBData> CollHandler::resolveAA(HitboxNode* i, HitboxNode* j)
 	std::vector<HBData> hbdata;
 	SubBox2* sb_i = i->getSB2();
 	SubBox2* sb_j = j->getSB2();
-	// Calculate overlaps from the involved Hitbox types.
-	std::vector<sf::Vector2f> overlaps = CollHandler::calculateOverlapsAA(sb_i, sb_j, CollHandler::isDual(i, j));
+	std::vector<sf::Vector2f> overlaps;
+	// Get overlaps depending on subtype of sb_ii and sb_j.
+	if (CollHandler::isDual(i, j))
+	{
+		overlaps.push_back(CollHandler::calculateOverlapsAA(sb_i, sb_j, 0.5f));
+		overlaps.push_back(CollHandler::calculateOverlapsAA(sb_j, sb_i, 0.5f));
+	}
+	else overlaps.push_back(CollHandler::calculateOverlapsAA(sb_i, sb_j, 1.f));
+
 	return hbdata;
 }
 
@@ -637,18 +649,20 @@ std::vector<HBData> CollHandler::resolveSpline(HitboxNode* i, HitboxNode* j)
 	return std::vector<HBData>();
 }
 
-std::vector<sf::Vector2f> CollHandler::calculateOverlapsAA(SubBox2* i, SubBox2* j, bool dual = false)
+sf::Vector2f CollHandler::calculateOverlapsAA(SubBox2* i, SubBox2* j, float ol_ratio = 1.f)
 {
-	std::vector<sf::Vector2f> ol;
 	// Calculate overlaps by Hitbox type.
-	SubBox2* i_temp = i;
-	SubBox2* j_temp = j;
-	if (i_temp->getType() == sf::String("CircleBox")) i_temp = static_cast<CircleBox*>(i_temp);
-	else if (i_temp->getType() == sf::String("RectBox")) i_temp = static_cast<RectBox*>(i_temp);
-	if (j_temp->getType() == sf::String("CircleBox")) j_temp = static_cast<CircleBox*>(j_temp);
-	else if (j_temp->getType() == sf::String("RectBox")) j_temp = static_cast<RectBox*>(j_temp);
-	if (dual) ol.push_back(CollHandler::ol(i_temp, j_temp, 0.5f))
-	return ol;
+	if (i->getType() == sf::String("CircleBox"))
+	{
+		if (j->getType() == sf::String("CircleBox")) return CollHandler::ol(static_cast<CircleBox*>(i), static_cast<CircleBox*>(j), ol_ratio);
+		else if (j->getType() == sf::String("RectBox")) return CollHandler::ol(static_cast<CircleBox*>(i), static_cast<RectBox*>(j), ol_ratio);
+	}
+	else if (i->getType() == sf::String("RectBox"))
+	{
+		if (j->getType() == sf::String("CircleBox")) return CollHandler::ol(static_cast<RectBox*>(i), static_cast<CircleBox*>(j), ol_ratio);
+		else if (j->getType() == sf::String("RectBox")) return CollHandler::ol(static_cast<RectBox*>(i), static_cast<RectBox*>(j), ol_ratio);
+	}
+	return sf::Vector2f(0.f, 0.f);
 }
 
 sf::Vector2f CollHandler::ol(CircleBox* i, CircleBox* j, float ol_ratio = 1.f)
@@ -677,6 +691,27 @@ sf::Vector2f CollHandler::ol(RectBox* i, RectBox* j, float ol_ratio = 1.f)
 sf::Vector2f CollHandler::ol(RectBox* i, CircleBox* j, float ol_ratio = 1.f)
 {
 	return sf::Vector2f();
+}
+
+sf::Vector2f CollHandler::ol(CircleBox* i, RectBox* j, float ol_ratio = 1.f)
+{
+	sf::Vector2f overlaps;
+	// Define circle center+radius, as well as rectangle end points (top left, bottom right).
+	sf::FloatRect j_rect = j->getRect();
+	float i_r = i->getRadius();
+	sf::Vector2f i_c = i->getGlobalPos();
+	sf::Vector2f j_TL = sf::Vector2f(j_rect.left, j_rect.top), j_BR = sf::Vector2f(j_rect.left + j_rect.width, j_rect.top + j_rect.height);
+	// Find the nearest point between i.center and j (the perpendicular distance from r.center and a side of j). Calculate distance.
+	float n_x = std::max(j_TL.x, std::min(j_BR.x, i_c.x)), d_x = i_c.x - n_x;
+	float n_y = std::max(j_TL.y, std::min(j_BR.y, i_c.y)), d_y = i_c.y - n_y;
+	// If the absolute distance is smaller than i_r, this constitutes a collision.
+	if ((n_x * n_x) + (n_y * n_y) < (i_r * i_r))
+	{
+		float norm = std::sqrt(n_x * n_x + n_y * n_y);
+		overlaps = (i_r - norm) / norm * sf::Vector2f( n_x, n_y );
+	}
+	else overlaps = { 0.f, 0.f };
+	return overlaps;
 }
 
 sf::Vector2f CollHandler::ol(RectBox* i, ConvexBox* j, float ol_ratio = 1.f)

@@ -27,9 +27,11 @@ void PhysicsManager::basicCollisionHandler(sf::FloatRect view_rect)
 
 	// Gravity, Air Friction here.
 
+	
 	// Find Gravity attribute.
 	Gravity* grav = (Gravity*)this->searchAttribute("Gravity");
 	grav->applyGravity(extra_view_rect);
+	
 
 	// Find Air Friction attribute.
     AirFriction* fric = (AirFriction*)this->searchAttribute("Air Friction");

@@ -12,7 +12,7 @@ ExtendedRenderWindow::ExtendedRenderWindow(sf::Vector2u resolution, std::string 
 ExtendedRenderWindow::~ExtendedRenderWindow()
 { 
 	ExtendedRenderWindow::instance_counter--;
-	delete this->defultViewport;
+	//delete this->defultViewport;
 }
 
 //Getters
@@ -566,7 +566,8 @@ void ExtendedRenderWindow::debugDraw()
 		this->setView(*this->active_scene->getCamera()->getCameraView());
 		for (int i = 0; i < hitboxes.size(); i++)
 		{
-			this->draw(hitboxes[i]->getDrawable());
+			for (sf::VertexArray& v : hitboxes[i]->getDrawable())
+				this->draw(v);
 		}
 	}
 }

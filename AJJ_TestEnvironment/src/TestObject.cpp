@@ -109,6 +109,8 @@ TestObject::TestObject(sf::Vector2f pos, sf::Vector2f size, bool npc)
     hb->connectTo(this);
     hb->setBehavior(HBOX::DYNAMIC);
     hb->setHitboxRatio(sf::Vector2f(0.5, 0.5), sf::Vector2f(0.6, 0.8f));
+    CircleBox* cb = new CircleBox(sf::Vector2f(0.5, 0.5), 0.4f * size.x);
+    hb->addSubBox(cb);
 }
 
 TestObject::~TestObject()

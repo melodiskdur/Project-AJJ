@@ -1,5 +1,6 @@
 #pragma once
 #include "PropertyNode.h"
+#include <math.h>
 
 enum class HBOX { STATIC, DYNAMIC, HOLLOW, SEMI_STATIC, SEMI_DYNAMIC, SEMI_HOLLOW};
 enum class HBSPLINE { LINEAR, CUBIC, NONE };
@@ -68,7 +69,7 @@ public:
     void addSubBox(SubBox2* sb);
 
     // DEBUGGING.
-    sf::VertexArray getDrawable();
+    std::vector<sf::VertexArray> getDrawable();
     // END DEBUGGING.
 private:
     sf::Vector2f bb_pos{ 0.f, 0.f };                      // Ratios.
@@ -123,7 +124,9 @@ public:
     void setRect();
     // Others.
     void rescale() override;
+    void updateWorldPos(sf::Vector2f o_wp, sf::Vector2f o_sz) override;
 protected:
+    sf::Vector2f sb_size{ 10.f, 10.f };
     sf::FloatRect sb_rect{ 0.f, 0.f, 1.f, 1.f };
 };
 
